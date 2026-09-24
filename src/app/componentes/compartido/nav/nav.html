@@ -1,1 +1,20 @@
-<p>nav works!</p>
+    <header>
+        <nav class="navbar">
+            <!-- <picture class="navbar__logo">
+                <a href="./index.html"><img src="./img/multimedia/branding/logo_light_horizontal.svg" alt="logo Funkoshop"></a>
+            </picture> -->
+
+            <a [routerLink]="'/home'" routerLinkActive="active">Logo/nombre</a>
+            
+
+            <ul class="navbar__menu">
+                @for (ruta of rutas(); track ruta.url) {
+                    <li class="navbar__item">
+                          <a class="navbar__link" [routerLink]="ruta.url" routerLinkActive="active">{{ ruta.nombre }}</a>
+                    </li>
+                }
+            </ul>
+
+
+        </nav>
+    </header>

@@ -83,7 +83,7 @@ form{
     align-items: flex-start;
     /* justify-items:flex-start; */
     gap: var(--spacing-20);
-border: 1px blue solid;
+/* border: 1px blue solid; */
 
     width: 100%;
     max-width: 25vw;
@@ -127,7 +127,7 @@ button:hover {
 .item{
     display: flex;
     flex-direction: column;
-border: 1px green solid;
+/* border: 1px green solid; */
 width: 100%;
 
 }
@@ -136,7 +136,7 @@ section{
 display: flex;
 flex-direction: row;
 justify-content: space-between;
-border: 1px red solid;
+/* border: 1px red solid; */
 
 
 }
