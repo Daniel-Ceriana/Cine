@@ -1,1 +1,48 @@
-<p>login works!</p>
+<app-nav></app-nav>
+
+<h1>Login</h1>
+
+
+
+<div class="contenedor-form">
+
+  <form (submit)="onSubmit($event)" novalidate>
+    
+    <div class="item">
+      <section>
+        <label>
+          Email
+        </label>
+        <input type="email" [formField]="loginForm.email" autocomplete="email" />
+      </section>
+
+      @if (loginForm.email().touched() && loginForm.email().invalid()) {
+      <small class="error">{{ loginForm.email().errors()[0].message }}</small>
+      }
+    </div>
+
+
+
+    <div class="item">
+
+      <section>
+
+        <label>
+          Contraseña
+        </label>
+        <input type="password" [formField]="loginForm.password" autocomplete="new-password" />
+      </section>
+        
+      @if (loginForm.password().touched() && loginForm.password().invalid()) {
+      <small class="error">{{ loginForm.password().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+
+      <button type="submit" [disabled]="loginForm().submitting()">
+        {{ loginForm().submitting() ? 'Iniciando sesión...' : 'Iniciar sesión' }}
+      </button>
+    </div>
+  </form>
+</div>

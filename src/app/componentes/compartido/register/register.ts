@@ -12,11 +12,11 @@ import {
   submit,
 } from '@angular/forms/signals';
 import { Auth } from '../../../services/auth';
-
+import { Nav } from '../nav/nav';
 @Component({
-  imports: [FormField, RouterLink],
+  imports: [FormField, RouterLink,Nav],
   selector: 'app-register',
-  styleUrl: './register.css',
+  styleUrls: ['./register.css','../stylesCompartidos/forms.css'],
   templateUrl: './register.html',
 })
 export class Register {
