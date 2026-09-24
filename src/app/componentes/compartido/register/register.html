@@ -1,0 +1,158 @@
+<h1>Crear cuenta</h1>
+
+<div class="contenedor-form">
+
+  <form (submit)="onSubmit($event)" novalidate>
+    <div class="item">
+      <section>
+        <label>
+          Nombre
+        </label>
+        <input type="text" [formField]="registerForm.nombre" />
+      </section>
+      @if (registerForm.nombre().touched() && registerForm.nombre().invalid()) {
+      <small class="error">{{ registerForm.nombre().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>
+          Apellido
+        </label>
+        <input type="text" [formField]="registerForm.apellido" />
+      </section>
+      @if (registerForm.apellido().touched() && registerForm.apellido().invalid()) {
+      <small class="error">{{ registerForm.apellido().errors()[0].message }}</small>
+      }
+    </div>
+    <div class="item">
+
+<section>
+
+  <label>
+    Fecha de nacimiento
+  </label>
+  <input type="date" [formField]="registerForm.fecha_nacimiento" />
+</section>
+      @if (registerForm.fecha_nacimiento().touched() && registerForm.fecha_nacimiento().invalid()) {
+      <small class="error">{{ registerForm.fecha_nacimiento().errors()[0].message }}</small>
+      }
+
+    </div>
+
+    <div class="item">
+      <section>
+
+        <label>
+          Tipo de sangre
+        </label>
+        <select [formField]="registerForm.tipo_sangre">
+          <option value="">Seleccioná...</option>
+          @for (t of tiposSangre; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
+      </section>
+      @if (registerForm.tipo_sangre().touched() && registerForm.tipo_sangre().invalid()) {
+      <small class="error">{{ registerForm.tipo_sangre().errors()[0].message }}</small>
+      }
+
+    </div>
+
+    <div class="item">
+      <section>
+
+        <label>
+          Color de ojos
+        </label>
+        <select [formField]="registerForm.color_ojos">
+          <option value="">Seleccioná...</option>
+          @for (c of coloresOjos; track c) {
+            <option [value]="c">{{ c }}</option>
+          }
+        </select>
+      </section>
+      @if (registerForm.color_ojos().touched() && registerForm.color_ojos().invalid()) {
+      <small class="error">{{ registerForm.color_ojos().errors()[0].message }}</small>
+      }
+
+    </div>
+
+    <div class="item">
+
+      <section>
+
+        <label>
+          Dias de vacaciones
+        </label>
+        <input type="number" [formField]="registerForm.dias_vacaciones" />
+        
+      </section>
+      @if (registerForm.dias_vacaciones().touched() && registerForm.dias_vacaciones().invalid()) {
+      <small class="error">{{ registerForm.dias_vacaciones().errors()[0].message }}</small>
+      }
+    </div>
+    <div class="item">
+
+      <section>
+
+
+        <label>
+          Email
+        </label>
+        <input type="email" [formField]="registerForm.email" autocomplete="email" />
+      </section>
+
+      @if (registerForm.email().touched() && registerForm.email().invalid()) {
+      <small class="error">{{ registerForm.email().errors()[0].message }}</small>
+      }
+    </div>
+
+
+
+    <div class="item">
+
+      <section>
+
+        <label>
+          Contraseña
+        </label>
+        <input type="password" [formField]="registerForm.password" autocomplete="new-password" />
+      </section>
+        
+      @if (registerForm.password().touched() && registerForm.password().invalid()) {
+      <small class="error">{{ registerForm.password().errors()[0].message }}</small>
+      }
+    </div>
+
+
+    <div class="item">
+
+      <section>
+
+        <label>
+          Repetir contraseña
+        </label>
+        <input type="password" [formField]="registerForm.confirmPassword" autocomplete="new-password" />
+      </section>
+        
+      @if (registerForm.confirmPassword().touched() && registerForm.confirmPassword().invalid()) {
+      <small class="error">{{ registerForm.confirmPassword().errors()[0].message }}</small>
+      }
+
+      @if (errorMsg()) {
+      <p class="error">{{ errorMsg() }}</p>
+      }
+    </div>
+
+    <div class="item">
+
+      <button type="submit" [disabled]="registerForm().submitting()">
+        {{ registerForm().submitting() ? 'Creando cuenta...' : 'Registrarme' }}
+      </button>
+    </div>
+  </form>
+</div>
+
+<p>¿Ya tenés cuenta? <a routerLink="/login">Iniciá sesión</a></p>
