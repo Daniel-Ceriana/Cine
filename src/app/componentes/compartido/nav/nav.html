@@ -8,7 +8,7 @@
             
 
             <ul class="navbar__menu">
-                @for (ruta of rutas(); track ruta.url) {
+                @for (ruta of navService.rutas(); track ruta.url) {
                     <li class="navbar__item">
                           <a class="navbar__link" [routerLink]="ruta.url" routerLinkActive="active">{{ ruta.nombre }}</a>
                     </li>

@@ -1,6 +1,6 @@
-import { Component,input } from '@angular/core';
+import { Component,input,inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { NavRoute } from '../../../interfaces/nav-route';
+import { NavService } from '../../../services/nav-service';
 
 @Component({
   imports: [RouterLink, RouterLinkActive],
@@ -12,12 +12,13 @@ export class Nav {
     //   url: string;   
     // nombre: string; 
 
-  rutas = input<NavRoute[]>([
-    {url:'/home',nombre:'Home'},
-    {url:'/login',nombre:'Login'},
-    {url:'/register',nombre:'Registrar'}
-  ]);
+  // rutas = input<NavRoute[]>([
+  //   {url:'/home',nombre:'Home'},
+  //   {url:'/login',nombre:'Login'},
+  //   {url:'/register',nombre:'Registrar'}
+  // ]);
 
-
+  // constructor(navService:NavService){}
+  navService = inject(NavService);
 
 }
