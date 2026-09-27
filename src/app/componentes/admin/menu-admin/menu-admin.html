@@ -1,32 +1,23 @@
 <div class="contenedor-admin">
-
-    
-    <h1>MENU ADMIN</h1>
+    <h1 class="admin__title">Menú Admin</h1>
     <ul class="admin__menu">
-        
-        <li class="admin__item" [routerLink]="'/admin/funciones'">
-            <a class="admin__link" >Funciones</a>
+        <li class="admin__item">
+            <a class="admin__link" routerLink="/admin/funciones" routerLinkActive="admin__link--active">Funciones</a>
         </li>
-        <li class="admin__item" [routerLink]="'/admin/empleados'">
-            <a class="admin__link" >Empleados</a>
+        <li class="admin__item">
+            <a class="admin__link" routerLink="/admin/empleados" routerLinkActive="admin__link--active">Empleados</a>
         </li>
-        <li class="admin__item"[routerLink]="'/admin/salas'">
-            <a class="admin__link" >Salas</a>
+        <li class="admin__item">
+            <a class="admin__link" routerLink="/admin/salas" routerLinkActive="admin__link--active">Salas</a>
         </li>
-        <li class="admin__item" [routerLink]="'/admin/peliculas'">
-            <a class="admin__link" >Peliculas</a>
+        <li class="admin__item">
+            <a class="admin__link" routerLink="/admin/peliculas" routerLinkActive="admin__link--active">Películas</a>
         </li>
-        <li class="admin__item" [routerLink]="'/admin/productos'">
-            <a class="admin__link" >Productos</a>
+        <li class="admin__item">
+            <a class="admin__link" routerLink="/admin/productos" routerLinkActive="admin__link--active">Productos</a>
         </li>
-        <li class="admin__item" [routerLink]="'/admin/cupones'">
-            <a class="admin__link" >Cupones</a>
+        <li class="admin__item">
+            <a class="admin__link" routerLink="/admin/cupones" routerLinkActive="admin__link--active">Cupones</a>
         </li>
-        <li class="admin__item" [routerLink]="'/admin/peliculas'">
-            <a class="admin__link" >Peliculas</a>
-        </li>
-        
-        
-        
     </ul>
 </div>
