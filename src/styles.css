@@ -19,6 +19,7 @@
     /* background */
     --dark-bg-solid: #30343F;
     --light-bg-solid: #FAFAFF;
+    --light-bg-admin-solid: #d8d8db;
     --light-font-solid: #FFFFFF;
     /* Typography */
     --base-font: 'Inter', sans-serif;

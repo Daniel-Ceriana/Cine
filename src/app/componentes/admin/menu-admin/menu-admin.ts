@@ -1,10 +1,13 @@
 import { Component,inject } from '@angular/core';
 import { NavService } from '../../../services/nav-service';
+import { RouterLink     
+ } from '@angular/router';
+
 
 @Component({
-  imports: [],
+  imports: [RouterLink],
   selector: 'app-menu-admin',
-  styleUrl: './menu-admin.css',
+  styleUrls: ['../estilosAdmin/estilosAdmin.css','./menu-admin.css'],
   templateUrl: './menu-admin.html',
 })
 export class MenuAdmin {
