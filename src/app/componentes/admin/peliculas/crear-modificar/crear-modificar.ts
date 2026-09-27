@@ -10,8 +10,9 @@ import {
   validate,
   submit,
 } from '@angular/forms/signals';
-import { SupabaseService } from '../../../../services/supabase-service'; // ajustar ruta real
-
+import { SupabaseService } from '../../../../services/supabase-service';
+import { PeliculaModel, PeliculaModelForm } from '../../../../modelos/pelicula-model';
+import{PeliculaService} from '../../../../services/peliculas-service'
 
 
 @Component({
@@ -23,7 +24,7 @@ import { SupabaseService } from '../../../../services/supabase-service'; // ajus
 export class CrearModificar implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private supabase = inject(SupabaseService); // asumo .client: SupabaseClient
+  private peliculasService = inject(PeliculaService);
 
   errorMsg = signal('');
   cargando = signal(false);
@@ -36,7 +37,7 @@ export class CrearModificar implements OnInit {
   archivoSeleccionado = signal<File | null>(null);
   previewUrl = signal<string | null>(null);
 
-  private model = signal<PeliculaForm>({
+  private model = signal<PeliculaModelForm>({
     nombre: '',
     sinopsis: '',
     imagen_url: '',
@@ -104,44 +105,37 @@ export class CrearModificar implements OnInit {
     );
   });
 
-  async ngOnInit() {
-    const id = this.route.snapshot.queryParamMap.get('id');
-    if (!id) return;
+ async ngOnInit() {
+  const id = this.route.snapshot.queryParamMap.get('id');
+  if (!id) return;
 
-    this.peliculaId.set(id);
-    this.cargando.set(true);
+  this.peliculaId.set(id);
+  this.cargando.set(true);
 
-    const { data, error } = await this.supabase.client
-      .from('peliculas')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    this.cargando.set(false);
-
-    if (error || !data) {
-      this.errorMsg.set('No se pudo cargar la película');
-      return;
-    }
-
+  try {
+    const pelicula = await this.peliculasService.getById(id);
     this.model.set({
-      nombre: data.nombre,
-      sinopsis: data.sinopsis,
-      imagen_url: data.imagen_url,
-      duracion_minutos: data.duracion_minutos,
-      formato: data.formato,
-      idioma: data.idioma,
-      restriccion_edad: data.restriccion_edad,
-      fecha_estreno: data.fecha_estreno,
-      precio_base: data.precio_base,
-      precio_preventa: data.precio_preventa,
-      dias_preventa: data.dias_preventa,
-      activa: data.activa,
-      destacada: data.activa,
+      nombre: pelicula.nombre,
+      sinopsis: pelicula.sinopsis,
+      imagen_url: pelicula.imagen_url,
+      duracion_minutos: pelicula.duracion_minutos,
+      formato: pelicula.formato,
+      idioma: pelicula.idioma,
+      restriccion_edad: String(pelicula.restriccion_edad),
+      fecha_estreno: pelicula.fecha_estreno,
+      precio_base: pelicula.precio_base,
+      precio_preventa: pelicula.precio_preventa,
+      dias_preventa: pelicula.dias_preventa,
+      activa: pelicula.activa,
+      destacada:pelicula.destacada
     });
-
-    this.previewUrl.set(data.imagen_url ?? null);
+    this.previewUrl.set(pelicula.imagen_url ?? null);
+  } catch (e: any) {
+    this.errorMsg.set(e?.message ?? 'No se pudo cargar la película');
+  } finally {
+    this.cargando.set(false);
   }
+}
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -152,21 +146,6 @@ export class CrearModificar implements OnInit {
     this.previewUrl.set(URL.createObjectURL(file));
   }
 
-  private async subirImagen(file: File): Promise<string> {
-    const extension = file.name.split('.').pop();
-    const nombreArchivo = `${crypto.randomUUID()}.${extension}`;
-    const ruta = `peliculas/${nombreArchivo}`;
-
-    const { error } = await this.supabase.client.storage
-      .from('imagenes') // ajustar al nombre real del bucket
-      .upload(ruta, file, { upsert: false });
-
-    if (error) throw error;
-
-    const { data } = this.supabase.client.storage.from('imagenes').getPublicUrl(ruta);
-    return data.publicUrl;
-  }
-
   async onSubmit(event: Event) {
     event.preventDefault();
     this.errorMsg.set('');
@@ -174,25 +153,23 @@ export class CrearModificar implements OnInit {
     await submit(this.peliculaForm, async () => {
       try {
         this.cargando.set(true);
-        let imagenUrl = this.model().imagen_url;
 
+        let imagenUrl = this.model().imagen_url;
         const archivo = this.archivoSeleccionado();
         if (archivo) {
-          imagenUrl = await this.subirImagen(archivo);
+          imagenUrl = await this.peliculasService.subirImagen(archivo);
         }
 
-        const payload = { ...this.model(),
-  restriccion_edad: Number(this.model().restriccion_edad), imagen_url: imagenUrl };
+        const payload = {
+          ...this.model(),
+          restriccion_edad: Number(this.model().restriccion_edad),
+          imagen_url: imagenUrl,
+        };
 
         if (this.esEdicion()) {
-          const { error } = await this.supabase.client
-            .from('peliculas')
-            .update(payload)
-            .eq('id', this.peliculaId());
-          if (error) throw error;
+          await this.peliculasService.modificar(this.peliculaId()!, payload);
         } else {
-          const { error } = await this.supabase.client.from('peliculas').insert(payload);
-          if (error) throw error;
+          await this.peliculasService.crear(payload);
         }
 
         this.router.navigate(['/admin/peliculas']);
@@ -203,4 +180,6 @@ export class CrearModificar implements OnInit {
       }
     });
   }
+
+
 }
