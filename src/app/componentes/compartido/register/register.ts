@@ -12,9 +12,8 @@ import {
   submit,
 } from '@angular/forms/signals';
 import { Auth } from '../../../services/auth';
-import { Nav } from '../nav/nav';
 @Component({
-  imports: [FormField, RouterLink,Nav],
+  imports: [FormField, RouterLink],
   selector: 'app-register',
   styleUrls: ['./register.css','../stylesCompartidos/forms.css'],
   templateUrl: './register.html',

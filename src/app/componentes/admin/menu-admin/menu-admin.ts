@@ -12,11 +12,11 @@ export class MenuAdmin {
    private nav = inject(NavService);
 
   constructor() {
-    this.nav.setRutas([
-      { url: '/home', nombre: 'Home' },
-      { url: '/Crearalgo', nombre: 'Crear algo' },
-      { url: '/Crearalgo2', nombre: 'Crear otra cosa' },
-    ]);
+    // this.nav.setRutas([
+    //   { url: '/home', nombre: 'Home' },
+    //   { url: '/Crearalgo', nombre: 'Crear algo' },
+    //   { url: '/Crearalgo2', nombre: 'Crear otra cosa' },
+    // ]);
   }
 
 }

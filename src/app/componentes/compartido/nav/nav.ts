@@ -9,16 +9,7 @@ import { NavService } from '../../../services/nav-service';
   templateUrl: './nav.html',
 })
 export class Nav {
-    //   url: string;   
-    // nombre: string; 
 
-  // rutas = input<NavRoute[]>([
-  //   {url:'/home',nombre:'Home'},
-  //   {url:'/login',nombre:'Login'},
-  //   {url:'/register',nombre:'Registrar'}
-  // ]);
-
-  // constructor(navService:NavService){}
   navService = inject(NavService);
 
 }

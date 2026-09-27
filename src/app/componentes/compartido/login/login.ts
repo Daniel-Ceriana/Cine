@@ -1,6 +1,5 @@
 import { Component,inject,signal } from '@angular/core';
 import { Router} from '@angular/router';
-import { Nav } from '../nav/nav';
 import {
   form,
   FormField,
@@ -14,7 +13,7 @@ import {
 } from '@angular/forms/signals';
 import { Auth } from '../../../services/auth';
 @Component({
-  imports: [Nav,FormField],
+  imports: [FormField],
   selector: 'app-login',
   // styleUrl: './login.css',
   styleUrls: ['./login.css','../stylesCompartidos/forms.css'],
