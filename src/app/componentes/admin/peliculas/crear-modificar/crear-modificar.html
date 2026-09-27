@@ -1,0 +1,161 @@
+<!-- crear-modificar.html -->
+<h1>{{ esEdicion() ? 'Modificar película' : 'Crear película' }}</h1>
+
+<div class="contenedor-form">
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  <form (submit)="onSubmit($event)" novalidate>
+
+    <div class="item">
+      <section>
+        <label>Nombre</label>
+        <input type="text" [formField]="peliculaForm.nombre" />
+      </section>
+      @if (peliculaForm.nombre().touched() && peliculaForm.nombre().invalid()) {
+        <small class="error">{{ peliculaForm.nombre().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Sinopsis</label>
+        <textarea [formField]="peliculaForm.sinopsis" rows="4"></textarea>
+      </section>
+      @if (peliculaForm.sinopsis().touched() && peliculaForm.sinopsis().invalid()) {
+        <small class="error">{{ peliculaForm.sinopsis().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Imagen</label>
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+      </section>
+      @if (previewUrl()) {
+        <img class="preview-imagen" [src]="previewUrl()" alt="Vista previa" />
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Duración (minutos)</label>
+        <input type="number" [formField]="peliculaForm.duracion_minutos" />
+      </section>
+      @if (peliculaForm.duracion_minutos().touched() && peliculaForm.duracion_minutos().invalid()) {
+        <small class="error">{{ peliculaForm.duracion_minutos().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Formato</label>
+        <select [formField]="peliculaForm.formato">
+          @for (f of formatos; track f) {
+            <option [value]="f">{{ f }}</option>
+          }
+        </select>
+      </section>
+      @if (peliculaForm.formato().touched() && peliculaForm.formato().invalid()) {
+        <small class="error">{{ peliculaForm.formato().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Idioma</label>
+        <select [formField]="peliculaForm.idioma">
+            <option value="castellano">Castellano</option>
+            <option value="subtitulada">Subtitulada</option>
+        </select>
+      </section>
+      @if (peliculaForm.idioma().touched() && peliculaForm.idioma().invalid()) {
+        <small class="error">{{ peliculaForm.idioma().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Restricción de edad</label>
+        <select [formField]="peliculaForm.restriccion_edad">
+
+            <option [value]="0">ATP (0)</option>
+            <option [value]="13">+13</option>
+            <option [value]="18">+18</option>
+
+        </select>
+      </section>
+      @if (peliculaForm.restriccion_edad().touched() && peliculaForm.restriccion_edad().invalid()) {
+        <small class="error">{{ peliculaForm.restriccion_edad().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Fecha de estreno</label>
+        <input type="date" [formField]="peliculaForm.fecha_estreno" />
+      </section>
+      @if (peliculaForm.fecha_estreno().touched() && peliculaForm.fecha_estreno().invalid()) {
+        <small class="error">{{ peliculaForm.fecha_estreno().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Precio base</label>
+        <input type="number" step="0.01" [formField]="peliculaForm.precio_base" />
+      </section>
+      @if (peliculaForm.precio_base().touched() && peliculaForm.precio_base().invalid()) {
+        <small class="error">{{ peliculaForm.precio_base().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Precio preventa</label>
+        <input type="number" step="0.01" [formField]="peliculaForm.precio_preventa" />
+      </section>
+      @if (peliculaForm.precio_preventa().touched() && peliculaForm.precio_preventa().invalid()) {
+        <small class="error">{{ peliculaForm.precio_preventa().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Días de preventa</label>
+        <input type="number" [formField]="peliculaForm.dias_preventa" />
+      </section>
+      @if (peliculaForm.dias_preventa().touched() && peliculaForm.dias_preventa().invalid()) {
+        <small class="error">{{ peliculaForm.dias_preventa().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>
+          <input type="checkbox" [formField]="peliculaForm.activa" />
+          Activa
+        </label>
+      </section>
+    </div>
+        <div class="item">
+      <section>
+        <label>
+          <input type="checkbox" [formField]="peliculaForm.destacada" />
+          Destacada
+        </label>
+      </section>
+    </div>
+
+    @if (errorMsg()) {
+      <p class="error">{{ errorMsg() }}</p>
+    }
+
+    <div class="item">
+      <button type="submit" [disabled]="peliculaForm().submitting()">
+        {{ peliculaForm().submitting() ? 'Guardando...' : (esEdicion() ? 'Modificar' : 'Crear') }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -15,7 +15,8 @@ export const routes: Routes = [
     { path: 'admin/funciones', loadComponent: () => import('./componentes/admin/funciones/funciones').then(m => m.Funciones) },
     { path: 'admin/empleados', loadComponent: () => import('./componentes/admin/empleados/empleados').then(m => m.Empleados) },
     { path: 'admin/salas', loadComponent: () => import('./componentes/admin/salas/salas').then(m => m.Salas) },
-    { path: 'admin/peliculas', loadComponent: () => import('./componentes/admin/peliculas/peliculas').then(m => m.Peliculas) },
+    { path: 'admin/peliculas', loadComponent: () => import('./componentes/admin/peliculas/peliculas').then(m => m.Peliculas)},
+    { path: 'admin/peliculas/crear',loadComponent: () => import('./componentes/admin/peliculas/crear-modificar/crear-modificar').then(m => m.CrearModificar)},
     { path: 'admin/productos', loadComponent: () => import('./componentes/admin/productos/productos').then(m => m.Productos) },
     { path: 'admin/cupones', loadComponent: () => import('./componentes/admin/cupones/cupones').then(m => m.Cupones) },
     
