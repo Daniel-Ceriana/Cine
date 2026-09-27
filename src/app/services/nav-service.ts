@@ -19,11 +19,11 @@ const RUTAS_CLIENTE: NavRoute[] = [
 ];
 
 const RUTAS_ADMIN: NavRoute[] = [
-  { url: '/home', nombre: 'Home' },
-  { url: '/ALGO', nombre: 'Algo de admin' },
-  { url: '/ALGO', nombre: 'Algo de admin2' },
-  { url: '/ALGO', nombre: 'Algo de admin3' },
-  { url: '/ALGO', nombre: 'Algo de admin4' },
+  { url: '/homeadmin', nombre: 'Home' },
+  { url: '/admin/funciones', nombre: 'Funciones' },
+  { url: '/admin/peliculas', nombre: 'Peliculas' },
+  { url: '/admin/productos', nombre: 'Productos' },
+  { url: '/admin/cupones', nombre: 'Cupones' },
   { url: '/logout', nombre: 'Salir' },
 ];
 const RUTAS_EMPLEADO_CANDY: NavRoute[] = [
@@ -64,7 +64,7 @@ constructor() {
   rutas = computed<NavRoute[]>(() => {
     const actual = this._rutaActual();
     
-    if (actual.startsWith('/empleados') || actual.startsWith('/homeadmin')) {
+    if (actual.startsWith('/admin') || actual.startsWith('/homeadmin')) {
       return RUTAS_ADMIN;
     }
     if (actual.startsWith('/perfil')) {
