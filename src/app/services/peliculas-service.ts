@@ -1,7 +1,7 @@
 import { Service } from '@angular/core';
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase-service'; 
-import { PeliculaModel } from '../modelos/pelicula-model';
+import { PeliculaModel,PeliculaConGeneros, Genero } from '../modelos/pelicula-model';
 
 export type PeliculaModelPayload = Omit<PeliculaModel, 'id' | 'created_at'>;
 
@@ -24,15 +24,44 @@ export class PeliculaService {
     return data as PeliculaModel;
   }
 
-  async getAll(): Promise<PeliculaModel[]> {
-    const { data, error } = await this.supabase.client
-      .from(this.tabla)
-      .select('*')
-      .order('created_at', { ascending: false });
+ async getAll(soloActivas = false): Promise<PeliculaConGeneros[]> {
+  let query = this.supabase.client
+    .from(this.tabla)
+    .select('*, generos(id, nombre)') // PostgREST resuelve la tabla intermedia pelicula_generos solo
+    .order('created_at', { ascending: false });
 
-    if (error) throw error;
-    return data as PeliculaModel[];
-  }
+  if (soloActivas) query = query.eq('activa', true);
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data as unknown as PeliculaConGeneros[];
+}
+
+async getGeneros(): Promise<Genero[]> {
+  const { data, error } = await this.supabase.client
+    .from('generos')
+    .select('id, nombre')
+    .order('nombre');
+
+  if (error) throw error;
+  return data as Genero[];
+}
+
+// Reemplaza los géneros de una película (para usar desde crear/modificar)
+async setGeneros(peliculaId: string, generoIds: number[]): Promise<void> {
+  const { error: delError } = await this.supabase.client
+    .from('pelicula_generos')
+    .delete()
+    .eq('pelicula_id', peliculaId);
+  if (delError) throw delError;
+
+  if (generoIds.length === 0) return;
+
+  const { error } = await this.supabase.client
+    .from('pelicula_generos')
+    .insert(generoIds.map((genero_id) => ({ pelicula_id: peliculaId, genero_id })));
+  if (error) throw error;
+}
 
   async crear(payload: PeliculaModelPayload): Promise<PeliculaModel> {
     const { data, error } = await this.supabase.client

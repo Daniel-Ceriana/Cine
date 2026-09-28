@@ -32,3 +32,12 @@ export interface PeliculaModelForm {
   activa: boolean;
   destacada: boolean;
 }
+
+export interface Genero {
+  id: number;
+  nombre: string;
+}
+
+export interface PeliculaConGeneros extends PeliculaModel {
+  generos: Genero[];
+}
