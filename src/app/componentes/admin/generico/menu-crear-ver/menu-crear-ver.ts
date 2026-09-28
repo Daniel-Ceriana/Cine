@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { RouterLink} from '@angular/router';
-
 
 @Component({
   imports: [RouterLink],
@@ -9,6 +8,6 @@ import { RouterLink} from '@angular/router';
   templateUrl: './menu-crear-ver.html',
 })
 export class MenuCrearVer {
-
+ modificar = input<boolean>(true);
 
 }

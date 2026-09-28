@@ -4,8 +4,10 @@
         <li class="admin__item">
             <a class="admin__link" routerLink="/admin/peliculas/crear">Crear pelicula</a>
         </li>
-        <li class="admin__item">
-            <a class="admin__link" routerLink="/admin/peliculas/ver">Modificar pelicula</a>
-        </li>
+        @if(modificar()){
+            <li  class="admin__item">
+                <a class="admin__link" routerLink="/admin/peliculas/ver">Modificar pelicula</a>
+            </li>
+        }
     </ul>
 </div>
