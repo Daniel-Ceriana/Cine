@@ -49,7 +49,7 @@ export class ListadoPeliculas implements OnInit {
       (!nombre || normalizar(p.nombre).includes(nombre)) &&
       (!f.idioma || p.idioma === f.idioma) &&
       (!f.genero || p.generos.some((g) => String(g.nombre) === f.genero)) &&  
-      (!f.tipoSala || p.formato === f.tipoSala) &&
+      // (!f.tipoSala || p.formato === f.tipoSala) &&
       (!f.destacada || p.destacada),
   );
 });

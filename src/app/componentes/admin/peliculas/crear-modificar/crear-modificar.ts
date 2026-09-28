@@ -29,7 +29,7 @@ export class CrearModificar implements OnInit {
   errorMsg = signal('');
   cargando = signal(false);
 
-  formatos: Array<'2D' | '3D' | '4D' | '5D'> = ['2D', '3D', '4D', '5D'];
+  // formatos: Array<'2D' | '3D' | '4D' | '5D'> = ['2D', '3D', '4D', '5D'];
 
   peliculaId = signal<string | null>(null);
   esEdicion = computed(() => this.peliculaId() !== null);
@@ -45,7 +45,7 @@ export class CrearModificar implements OnInit {
     sinopsis: '',
     imagen_url: '',
     duracion_minutos: 0,
-    formato: '2D',
+    // formato: '2D',
     idioma: 'castellano',
     restriccion_edad: '0',
     fecha_estreno: '',
@@ -77,7 +77,7 @@ export class CrearModificar implements OnInit {
       value() <= 0 ? { kind: 'min', message: 'Tiene que ser mayor a 0' } : null,
     );
 
-    required(p.formato, { message: 'Seleccioná un formato' });
+    // required(p.formato, { message: 'Seleccioná un formato' });
 
     required(p.idioma, { message: 'El idioma es obligatorio' });
     maxLength(p.idioma, 50, { message: 'Máximo 50 caracteres' });
@@ -134,7 +134,7 @@ export class CrearModificar implements OnInit {
       sinopsis: pelicula.sinopsis,
       imagen_url: pelicula.imagen_url,
       duracion_minutos: pelicula.duracion_minutos,
-      formato: pelicula.formato,
+      // formato: pelicula.formato,
       idioma: pelicula.idioma,
       restriccion_edad: String(pelicula.restriccion_edad),
       fecha_estreno: pelicula.fecha_estreno,
