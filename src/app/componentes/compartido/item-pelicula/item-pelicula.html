@@ -1,1 +1,22 @@
-<p>item-pelicula works!</p>
+<article class="item-pelicula" (click)="onClickItem()">
+  <img class="item-pelicula__imagen" [src]="pelicula().imagen_url" [alt]="pelicula().nombre" />
+
+  <div class="item-pelicula__info">
+    <h3 class="item-pelicula__nombre">{{ pelicula().nombre }}</h3>
+    <p class="item-pelicula__meta">
+      {{ pelicula().formato }} · {{ pelicula().idioma }} · {{ pelicula().duracion_minutos }} min
+    </p>
+    <p class="item-pelicula__restriccion">
+      {{ pelicula().restriccion_edad === 0 ? 'ATP' : '+' + pelicula().restriccion_edad }}
+    </p>
+  </div>
+
+  @if (esAdmin()) {
+    <button
+      type="button"
+      class="item-pelicula__btn-modificar"
+      (click)="onClickModificar($event)">
+      Modificar
+    </button>
+  }
+</article>
