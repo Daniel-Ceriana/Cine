@@ -147,6 +147,22 @@
         </label>
       </section>
     </div>
+    <div class="item">
+  <section class="generos">
+    <label>Géneros</label>
+    <div class="generos__lista">
+      @for (g of generos(); track g.id) {
+        <label class="generos__opcion">
+          <input
+            type="checkbox"
+            [checked]="generosSeleccionados().includes(g.id)"
+            (change)="toggleGenero(g.id, $event)" />
+          {{ g.nombre }}
+        </label>
+      }
+    </div>
+  </section>
+</div>
 
     @if (errorMsg()) {
       <p class="error">{{ errorMsg() }}</p>

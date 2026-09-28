@@ -47,7 +47,7 @@ async getGeneros(): Promise<Genero[]> {
   return data as Genero[];
 }
 
-// Reemplaza los géneros de una película (para usar desde crear/modificar)
+
 async setGeneros(peliculaId: string, generoIds: number[]): Promise<void> {
   const { error: delError } = await this.supabase.client
     .from('pelicula_generos')
@@ -61,6 +61,16 @@ async setGeneros(peliculaId: string, generoIds: number[]): Promise<void> {
     .from('pelicula_generos')
     .insert(generoIds.map((genero_id) => ({ pelicula_id: peliculaId, genero_id })));
   if (error) throw error;
+}
+
+async getGeneroIdsDePelicula(peliculaId: string): Promise<number[]> {
+  const { data, error } = await this.supabase.client
+    .from('pelicula_generos')
+    .select('genero_id')
+    .eq('pelicula_id', peliculaId);
+
+  if (error) throw error;
+  return (data ?? []).map((r) => r.genero_id as number);
 }
 
   async crear(payload: PeliculaModelPayload): Promise<PeliculaModel> {

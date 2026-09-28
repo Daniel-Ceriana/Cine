@@ -11,7 +11,7 @@ import {
   submit,
 } from '@angular/forms/signals';
 import { SupabaseService } from '../../../../services/supabase-service';
-import { PeliculaModel, PeliculaModelForm } from '../../../../modelos/pelicula-model';
+import { PeliculaModel, PeliculaModelForm, Genero } from '../../../../modelos/pelicula-model';
 import{PeliculaService} from '../../../../services/peliculas-service'
 
 
@@ -37,6 +37,9 @@ export class CrearModificar implements OnInit {
   archivoSeleccionado = signal<File | null>(null);
   previewUrl = signal<string | null>(null);
 
+  generos = signal<Genero[]>([]);
+  generosSeleccionados = signal<number[]>([]);
+
   private model = signal<PeliculaModelForm>({
     nombre: '',
     sinopsis: '',
@@ -53,6 +56,12 @@ export class CrearModificar implements OnInit {
     destacada: false,
 
   });
+  toggleGenero(id: number, event: Event) {
+  const checked = (event.target as HTMLInputElement).checked;
+  this.generosSeleccionados.update((ids) =>
+    checked ? [...ids, id] : ids.filter((g) => g !== id),
+  );
+}
 
   peliculaForm = form(this.model, (p) => {
     required(p.nombre, { message: 'El nombre es obligatorio' });
@@ -106,14 +115,20 @@ export class CrearModificar implements OnInit {
   });
 
  async ngOnInit() {
-  const id = this.route.snapshot.queryParamMap.get('id');
-  if (!id) return;
-
-  this.peliculaId.set(id);
   this.cargando.set(true);
-
   try {
-    const pelicula = await this.peliculasService.getById(id);
+    this.generos.set(await this.peliculasService.getGeneros());
+
+    const id = this.route.snapshot.queryParamMap.get('id');
+    if (!id) return;
+
+    this.peliculaId.set(id);
+
+    const [pelicula, generoIds] = await Promise.all([
+      this.peliculasService.getById(id),
+      this.peliculasService.getGeneroIdsDePelicula(id),
+    ]);
+
     this.model.set({
       nombre: pelicula.nombre,
       sinopsis: pelicula.sinopsis,
@@ -127,8 +142,9 @@ export class CrearModificar implements OnInit {
       precio_preventa: pelicula.precio_preventa,
       dias_preventa: pelicula.dias_preventa,
       activa: pelicula.activa,
-      destacada:pelicula.destacada
+      destacada: pelicula.destacada,
     });
+    this.generosSeleccionados.set(generoIds);
     this.previewUrl.set(pelicula.imagen_url ?? null);
   } catch (e: any) {
     this.errorMsg.set(e?.message ?? 'No se pudo cargar la película');
@@ -166,11 +182,16 @@ export class CrearModificar implements OnInit {
           imagen_url: imagenUrl,
         };
 
-        if (this.esEdicion()) {
-          await this.peliculasService.modificar(this.peliculaId()!, payload);
-        } else {
-          await this.peliculasService.crear(payload);
-        }
+       let peliculaId: string;
+
+      if (this.esEdicion()) {
+        peliculaId = this.peliculaId()!;
+        await this.peliculasService.modificar(peliculaId, payload);
+      } else {
+        const creada = await this.peliculasService.crear(payload);
+        peliculaId = creada.id;
+      }
+      await this.peliculasService.setGeneros(peliculaId, this.generosSeleccionados()); // <- esta faltaba
 
         this.router.navigate(['/admin/peliculas']);
       } catch (e: any) {
