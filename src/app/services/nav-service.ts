@@ -31,12 +31,11 @@ const RUTAS_EMPLEADO_CANDY: NavRoute[] = [
   { url: '/candy', nombre: 'Candy' },
   { url: '/logout', nombre: 'Salir' },
 ];
-
-    // this.nav.setRutas([
-    //   { url: '/home', nombre: 'Home' },
-    //   { url: '/Crearalgo', nombre: 'Crear algo' },
-    //   { url: '/Crearalgo2', nombre: 'Crear otra cosa' },
-    // ]);
+const RUTAS_EMPLEADO_ENTRADA: NavRoute[] = [
+  { url: '/home', nombre: 'Home' },
+  { url: '/entradas', nombre: 'Candy' },
+  { url: '/logout', nombre: 'Salir' },
+];
 
 
 @Service()
@@ -67,8 +66,14 @@ constructor() {
     if (actual.startsWith('/admin') || actual.startsWith('/homeadmin')) {
       return RUTAS_ADMIN;
     }
-    if (actual.startsWith('/perfil')) {
+    if (actual.startsWith('/cliente')) {
       return RUTAS_CLIENTE;
+    }
+        if (actual.startsWith('/candy')) {
+      return RUTAS_EMPLEADO_CANDY;
+    }
+        if (actual.startsWith('/entrada')) {
+      return RUTAS_EMPLEADO_ENTRADA;
     }
     return RUTAS_PUBLICAS;
     

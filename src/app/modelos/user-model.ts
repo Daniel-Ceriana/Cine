@@ -21,3 +21,12 @@ export interface SignUpProfile {
   color_ojos: string;
   dias_vacaciones: number;
 }
+
+export type Rol = 'cliente'| 'empleado_candy' | 'empleado_entradas' | 'admin';
+
+export const RUTA_POR_ROL: Record<Rol, string> = {
+  admin: '/admin/homeadmin',
+  empleado_candy: '/candy',
+  empleado_entradas: '/entradas',
+  cliente: '/home',
+};

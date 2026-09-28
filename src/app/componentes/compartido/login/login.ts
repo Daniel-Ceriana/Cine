@@ -12,6 +12,18 @@ import {
   submit,
 } from '@angular/forms/signals';
 import { Auth } from '../../../services/auth';
+
+import { Rol, RUTA_POR_ROL } from '../../../modelos/user-model';
+
+
+const rutaPorRol: Record<Rol, string> = {
+  admin: '/admin',
+  empleado_candy: '/candy',
+  empleado_entradas: '/entradas',
+  cliente: '/home',
+};
+
+
 @Component({
   imports: [FormField],
   selector: 'app-login',
@@ -31,6 +43,8 @@ private model = signal({
     password: '',
   });
 
+  
+
   loginForm = form(this.model,(p)=>{
 
     required(p.email, { message: 'El email es obligatorio' });
@@ -48,7 +62,8 @@ private model = signal({
       const { email, password} = this.model();
       try {
         await this.auth.signIn(email, password);
-        this.router.navigate(['/']);
+        const rol = await this.auth.getCurrentRole().catch(() => null);
+        this.router.navigate([RUTA_POR_ROL[rol ?? 'cliente']]);
       } catch (e: any) {
         this.errorMsg.set(e?.message ?? 'No se pudo iniciar sesión');
       }

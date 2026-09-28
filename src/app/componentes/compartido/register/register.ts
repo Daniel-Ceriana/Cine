@@ -99,7 +99,7 @@ export class Register {
 
       try {
         await this.auth.signUp(email, password, profile);
-        this.router.navigate(['/']);
+        this.router.navigate(['/login']);
       } catch (e: any) {
         this.errorMsg.set(e?.message ?? 'No se pudo crear la cuenta');
       }
