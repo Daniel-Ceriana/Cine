@@ -27,7 +27,7 @@ export class PeliculaService {
  async getAll(soloActivas = false): Promise<PeliculaConGeneros[]> {
   let query = this.supabase.client
     .from(this.tabla)
-    .select('*, generos(id, nombre)') // PostgREST resuelve la tabla intermedia pelicula_generos solo
+    .select('*, generos(id, nombre)')
     .order('created_at', { ascending: false });
 
   if (soloActivas) query = query.eq('activa', true);

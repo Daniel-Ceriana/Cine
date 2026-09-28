@@ -1,4 +1,4 @@
-<article class="item-pelicula" (click)="onClickItem()">
+<article class="item-pelicula">
   <img class="item-pelicula__imagen" [src]="pelicula().imagen_url" [alt]="pelicula().nombre" />
 
   <div class="item-pelicula__info">
@@ -11,12 +11,18 @@
     </p>
   </div>
 
-  @if (esAdmin()) {
-    <button
-      type="button"
-      class="item-pelicula__btn-modificar"
-      (click)="onClickModificar($event)">
-      Modificar
-    </button>
-  }
+  <div class="item-pelicula__acciones">
+    @if (esAdmin()) {
+      <button
+        type="button"
+        class="item-pelicula__btn-modificar"
+        (click)="onClickModificar()">
+        Modificar
+      </button>
+    } @else {
+      <a class="item-pelicula__btn-sinopsis" [routerLink]="['/peliculas', pelicula().id]">
+        Sinopsis
+      </a>
+    }
+  </div>
 </article>
