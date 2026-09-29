@@ -1,5 +1,11 @@
 <main class="pagina listado">
 
+    <!-- Se filtra encadenando el pipe: por nombre (contiene), por género (exacto) y solo destacadas -->
+    @let filtradas = peliculas()
+        | filtrar: filtrosForm.nombre().value() : ['nombre']
+        | filtrar: filtrosForm.genero().value() : ['generos.nombre'] : true
+        | filtrar: filtrosForm.destacada().value() : ['destacada'];
+
     <form class="filtros" (submit)="$event.preventDefault()">
         <div class="filtros__campo filtros__campo--buscar">
             <label for="buscar">Buscar</label>
@@ -35,12 +41,12 @@
     @if (!cargando() && peliculas().length === 0) {
     <p class="listado__mensaje">No hay películas disponibles.</p>
     }
-    @if (!cargando() && peliculas().length > 0 && peliculasFiltradas().length === 0) {
+    @if (!cargando() && peliculas().length > 0 && filtradas.length === 0) {
     <p class="listado__mensaje">Ninguna película coincide con la búsqueda.</p>
     }
 
     <section class="grilla">
-        @for (pelicula of peliculasFiltradas(); track pelicula.id) {
+        @for (pelicula of filtradas; track pelicula.id) {
         <app-item-pelicula [pelicula]="pelicula" [esAdmin]="esAdmin()" />
         }
     </section>

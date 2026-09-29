@@ -13,7 +13,7 @@
         <label>
           Email
         </label>
-        <input type="email" [formField]="loginForm.email" autocomplete="email" />
+        <input type="email" [formField]="loginForm.email" autocomplete="email" [class.campo-error]="errorMsg()" />
       </section>
 
       @if (loginForm.email().touched() && loginForm.email().invalid()) {
@@ -30,13 +30,17 @@
         <label>
           Contraseña
         </label>
-        <input type="password" [formField]="loginForm.password" autocomplete="new-password" />
+        <input type="password" [formField]="loginForm.password" autocomplete="current-password" [class.campo-error]="errorMsg()" />
       </section>
         
       @if (loginForm.password().touched() && loginForm.password().invalid()) {
       <small class="error">{{ loginForm.password().errors()[0].message }}</small>
       }
     </div>
+
+    @if (errorMsg()) {
+      <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+    }
 
     <div class="item">
 

@@ -33,17 +33,17 @@
           @for (f of dia.funciones; track f.id) {
             <article class="funcion ticket" [class.funcion--cancelada]="!f.activa">
               <div class="funcion__info">
-                <p class="funcion__horario texto-ticket">{{ hora(f.inicio) }} <span>a {{ horaFin(f) }}</span></p>
+                <p class="funcion__horario texto-ticket">{{ f.inicio | horaAr }} <span>a {{ finPelicula(f) | horaAr }}</span></p>
                 <div class="funcion__chips">
-                  <span class="chip">{{ f.salas.formato }}</span>
-                  <span class="chip">{{ f.idioma }}</span>
+                  <span class="chip">{{ f.salas.formato | formatoSala }}</span>
+                  <span class="chip">{{ f.idioma | idiomaFuncion }}</span>
                   @if (!f.activa) {
                     <span class="chip chip--rojo">Cancelada</span>
                   }
                 </div>
-                <p class="funcion__meta texto-ticket">Sala {{ f.salas.numero }} · $ {{ f.precio_base }}</p>
+                <p class="funcion__meta texto-ticket">Sala {{ f.salas.numero }} · {{ f.precio_base | pesos }}</p>
                 @if (f.dias_preventa > 0) {
-                  <p class="funcion__meta texto-ticket">Preventa $ {{ f.precio_preventa }} ({{ f.dias_preventa }} días)</p>
+                  <p class="funcion__meta texto-ticket">Preventa {{ f.precio_preventa | pesos }} ({{ f.dias_preventa }} días)</p>
                 }
               </div>
 
@@ -75,7 +75,7 @@
           <span class="pelicula__meta texto-ticket">
             {{ p.cantidad }} {{ p.cantidad === 1 ? 'función' : 'funciones' }} · {{ p.formatos.join(' / ') }}
           </span>
-          <span class="pelicula__meta texto-ticket">Próxima: {{ dia(p.proxima) }} {{ hora(p.proxima) }}</span>
+          <span class="pelicula__meta texto-ticket">Próxima: {{ p.proxima | diaAr }} {{ p.proxima | horaAr }}</span>
         </button>
       }
     </section>

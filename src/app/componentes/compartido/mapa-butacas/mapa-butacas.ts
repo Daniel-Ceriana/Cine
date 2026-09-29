@@ -7,6 +7,7 @@ import {
   ButacaPlantilla,
 } from '../../../modelos/sala-plantilla';
 import { ButacaEstadoVista, OcupacionButaca } from '../../../modelos/compra-model';
+import { ETIQUETA_ESTADO_BUTACA, ETIQUETA_TIPO_BUTACA } from '../../../pipes/butaca/butaca.pipes';
 
 interface FilaMapa {
   fila: string; // '' es la fila vacía que separa la J de la L
@@ -48,10 +49,14 @@ export class MapaButacas {
         : 'libre';
   }
 
+  // Texto que se ve al pasar el mouse y que leen los lectores de pantalla: 'A6 · VIP · ocupada'
   titulo(b: ButacaPlantilla): string {
-    const tipo = b.tipo === 'vip' ? ' · VIP' : b.tipo === 'accesible' ? ' · Accesible' : '';
+    const partes = [b.codigo];
+    if (b.tipo !== 'normal') partes.push(ETIQUETA_TIPO_BUTACA[b.tipo]);
+
     const estado = this.estadoDe(b.codigo);
-    const texto = estado === 'libre' ? '' : ` · ${estado === 'seleccionada' ? 'elegida' : estado === 'reservada' ? 'en proceso' : 'ocupada'}`;
-    return `${b.codigo}${tipo}${texto}`;
+    if (estado !== 'libre') partes.push(ETIQUETA_ESTADO_BUTACA[estado].toLowerCase());
+
+    return partes.join(' · ');
   }
 }

@@ -2,13 +2,13 @@
   <div class="pelicula__cartel">
     <img class="pelicula__imagen" [src]="pelicula().imagen_url" [alt]="pelicula().nombre" />
     <span class="pelicula__restriccion chip" [class.chip--rojo]="pelicula().restriccion_edad > 0">
-      {{ pelicula().restriccion_edad === 0 ? 'ATP' : '+' + pelicula().restriccion_edad }}
+      {{ pelicula().restriccion_edad | restriccionEdad }}
     </span>
   </div>
 
   <div class="pelicula__info">
     <h3 class="pelicula__nombre">{{ pelicula().nombre }}</h3>
-    <p class="pelicula__meta texto-ticket">{{ pelicula().duracion_minutos }} min</p>
+    <p class="pelicula__meta texto-ticket">{{ pelicula().duracion_minutos | duracion }}</p>
   </div>
 
   <div class="pelicula__acciones">

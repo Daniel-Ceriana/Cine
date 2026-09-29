@@ -1,0 +1,27 @@
+<main class="pagina sin-permiso">
+  <h1 class="titulo-pagina">{{ auth.haySesion() ? 'Sin permiso' : 'Iniciá sesión' }}</h1>
+
+  <section class="sin-permiso__tarjeta ticket">
+    @if (auth.haySesion()) {
+      <!-- Hay sesión, pero el rol de la cuenta no alcanza para la sección pedida -->
+      <p>Tu cuenta no tiene acceso a esta sección.</p>
+      <p class="sin-permiso__ayuda">
+        Si creés que es un error, iniciá sesión con una cuenta que tenga los permisos necesarios.
+      </p>
+
+      <div class="sin-permiso__acciones">
+        <a class="btn" routerLink="/home">Ir a la cartelera</a>
+        <a class="btn btn--secundario" routerLink="/logout">Cerrar sesión</a>
+      </div>
+    } @else {
+      <!-- Sin sesión: se explica por qué no se pudo entrar y se ofrece iniciar sesión -->
+      <p>Para entrar a esta sección tenés que iniciar sesión.</p>
+      <p class="sin-permiso__ayuda">Solo el personal autorizado del cine puede acceder.</p>
+
+      <div class="sin-permiso__acciones">
+        <a class="btn" routerLink="/login">Iniciar sesión</a>
+        <a class="btn btn--secundario" routerLink="/home">Ir a la cartelera</a>
+      </div>
+    }
+  </section>
+</main>

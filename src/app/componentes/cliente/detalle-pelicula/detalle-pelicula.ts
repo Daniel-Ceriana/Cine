@@ -4,8 +4,14 @@ import { PeliculaService } from '../../../services/peliculas-service';
 import { FuncionService } from '../../../services/funcion-service';
 import { PeliculaConGeneros } from '../../../modelos/pelicula-model';
 import { FuncionConRelaciones } from '../../../modelos/funcion-model';
-import { partesAr, formatearDia, formatearHora, etiquetaLarga } from '../../../utilidades/fechas-ar';
+import { partesAr, formatearDia } from '../../../utilidades/fechas-ar';
 import { precioVigente, VigenciaPrecio } from '../../../utilidades/precio-funcion';
+import { PesosPipe } from '../../../pipes/comunes/pesos.pipe';
+import { DuracionPipe } from '../../../pipes/comunes/duracion.pipe';
+import { DiaArPipe, HoraArPipe } from '../../../pipes/comunes/fechas-ar.pipes';
+import { FormatoSalaPipe } from '../../../pipes/sala/sala.pipes';
+import { IdiomaFuncionPipe } from '../../../pipes/funcion/idioma-funcion.pipe';
+import { RestriccionEdadPipe } from '../../../pipes/pelicula/restriccion-edad.pipe';
 
 interface FuncionConPrecio {
   funcion: FuncionConRelaciones;
@@ -20,7 +26,7 @@ interface DiaConFunciones {
 
 // Detalle de una película: datos, sinopsis y sus próximas funciones agrupadas por día
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, PesosPipe, DuracionPipe, DiaArPipe, HoraArPipe, FormatoSalaPipe, IdiomaFuncionPipe, RestriccionEdadPipe],
   selector: 'app-detalle-pelicula',
   styleUrl: './detalle-pelicula.css',
   templateUrl: './detalle-pelicula.html',
@@ -34,9 +40,6 @@ export class DetallePelicula implements OnInit {
   funciones = signal<FuncionConRelaciones[]>([]);
   cargando = signal(false);
   errorMsg = signal('');
-
-  readonly hora = formatearHora;
-  readonly fechaLarga = etiquetaLarga;
 
   dias = computed<DiaConFunciones[]>(() => {
     const dias: DiaConFunciones[] = [];
@@ -69,9 +72,5 @@ export class DetallePelicula implements OnInit {
     } finally {
       this.cargando.set(false);
     }
-  }
-
-  pesos(monto: number): string {
-    return `$ ${Number(monto).toLocaleString('es-AR')}`;
   }
 }

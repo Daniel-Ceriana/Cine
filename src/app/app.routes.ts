@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
-import { authGuard, clienteGuard, guestGuard, roleGuard } from './guards/auth-guard';
+import { clienteMatch, invitadoMatch, rolMatch } from './guards/auth-guard';
+import { confirmarSalidaGuard } from './guards/salida-guard';
 
 
 
@@ -9,35 +10,23 @@ export const routes: Routes = [
 { path: '', redirectTo: '/home', pathMatch: 'full' },
 {
   path: 'home',
-  canActivate: [clienteGuard],
+  canMatch: [clienteMatch],
   loadComponent: () => import('./componentes/cliente/home-cliente/home-cliente').then(m => m.HomeCliente),
 },
 {
   path: 'peliculas/:id',
-  canActivate: [clienteGuard],
+  canMatch: [clienteMatch],
   loadComponent: () => import('./componentes/cliente/detalle-pelicula/detalle-pelicula').then(m => m.DetallePelicula),
 },
 {
   path: 'funcion/:id/butacas',
-  canActivate: [clienteGuard],
+  canMatch: [clienteMatch],
+  canDeactivate: [confirmarSalidaGuard],
   loadComponent: () => import('./componentes/cliente/seleccion-butacas/seleccion-butacas').then(m => m.SeleccionButacas),
 },
-    //cambiar path a home cuando tenga los guards activos, asi el canMatch pasa del anterior a este
-    //en caso de admin o de algun empleado
-    // {path:'homeadmin',loadComponent:()=>import('./componentes/admin/menu-admin/menu-admin').then(m=>m.MenuAdmin)},
-    // {path: 'admin', redirectTo:'homeadmin'},
-
-    // { path: 'admin/funciones', loadComponent: () => import('./componentes/admin/funciones/funciones').then(m => m.Funciones) },
-    // { path: 'admin/empleados', loadComponent: () => import('./componentes/admin/empleados/empleados').then(m => m.Empleados) },
-    // { path: 'admin/salas', loadComponent: () => import('./componentes/admin/salas/salas').then(m => m.Salas) },
-    // { path: 'admin/peliculas', loadComponent: () => import('./componentes/admin/peliculas/peliculas').then(m => m.Peliculas)},
-    // { path: 'admin/peliculas/crear',loadComponent: () => import('./componentes/admin/peliculas/crear-modificar/crear-modificar').then(m => m.CrearModificar)},
-    // { path: 'admin/productos', loadComponent: () => import('./componentes/admin/productos/productos').then(m => m.Productos) },
-    // { path: 'admin/cupones', loadComponent: () => import('./componentes/admin/cupones/cupones').then(m => m.Cupones) },
-    
     {
   path: 'admin',
-  canActivate: [authGuard, roleGuard],
+  canMatch: [rolMatch],
   data: { roles: ['admin'] },
   children: [
     { path: '', redirectTo: 'homeadmin', pathMatch: 'full' },
@@ -72,13 +61,17 @@ export const routes: Routes = [
     
 {
   path: 'register',
-  canActivate: [guestGuard],
+  canMatch: [invitadoMatch],
   loadComponent: () => import('./componentes/compartido/register/register').then(m => m.Register),
 },
 {
   path: 'login',
-  canActivate: [guestGuard],
+  canMatch: [invitadoMatch],
   loadComponent: () => import('./componentes/compartido/login/login').then(m => m.Login),
+},
+{
+  path: 'no-autorizado',
+  loadComponent: () => import('./componentes/compartido/no-autorizado/no-autorizado').then(m => m.NoAutorizado),
 },
 { path: 'logout', loadComponent: () => import('./componentes/compartido/logout/logout').then(m => m.Logout) },
 

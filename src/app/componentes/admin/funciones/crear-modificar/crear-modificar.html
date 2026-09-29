@@ -15,7 +15,7 @@
         <mat-label>Película</mat-label>
         <mat-select [value]="funcionForm.pelicula_id().value()" (selectionChange)="setPelicula($event.value)">
           @for (p of peliculas(); track p.id) {
-            <mat-option [value]="p.id">{{ p.nombre }} ({{ p.duracion_minutos }} min)</mat-option>
+            <mat-option [value]="p.id">{{ p.nombre }} ({{ p.duracion_minutos | duracion }})</mat-option>
           }
         </mat-select>
       </mat-form-field>
@@ -62,7 +62,7 @@
             </mat-button-toggle-group>
           </div>
         } @else {
-          <p class="resumen">Desde {{ etiquetaLarga(diaUnico()) }} en adelante.</p>
+          <p class="resumen">Desde {{ diaUnico() | diaAr }} en adelante.</p>
         }
 
         <div class="opcion">
@@ -87,7 +87,7 @@
           <mat-label>Día</mat-label>
           <mat-select [value]="diaUnico()" (selectionChange)="diaUnico.set($event.value)">
             @for (d of opcionesDia(); track d) {
-              <mat-option [value]="d">{{ etiquetaLarga(d) }}</mat-option>
+              <mat-option [value]="d">{{ d | diaAr }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
@@ -108,7 +108,7 @@
           </p>
           <ul class="fechas">
             @for (f of fechasGeneradas(); track f) {
-              <li class="fechas__item">{{ etiqueta(f) }}</li>
+              <li class="fechas__item">{{ f | fechaCortaAr }}</li>
             }
           </ul>
           @if (esEdicion()) {

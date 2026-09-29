@@ -59,7 +59,8 @@ src/app/
 │   └── compartido/   piezas reutilizables (nav, login, registro, listado y tarjeta de película, mapa de butacas)
 ├── modelos/          interfaces TypeScript de las tablas y la plantilla de butacas
 ├── services/         acceso a Supabase (un servicio por tema)
-├── guards/           control de acceso por sesión y rol
+├── guards/           control de acceso por sesión y rol (canMatch) y confirmación al salir (canDeactivate)
+├── pipes/            formatos de datos que vienen de la base (por modelo) y el filtro genérico de listas
 ├── utilidades/       funciones puras: fechas en hora argentina, precio vigente de una función
 └── interfaces/       tipos auxiliares (rutas del menú)
 ```
@@ -75,8 +76,10 @@ src/app/
   `SalaService`, `FuncionService`, `ButacaService`, `CompraService`, `Auth`).
 - **`SupabaseService` es el único que crea el cliente de Supabase.** Los demás lo reutilizan; si cambia la
   conexión, se cambia en un solo lugar.
-- **Guards** de ruta: `authGuard` (exige sesión), `roleGuard` (exige un rol), `clienteGuard` (deja pasar a
-  visitantes y clientes, y manda al personal a su panel) y `guestGuard` (evita entrar a login si ya hay sesión).
+- **Guards funcionales** con `canMatch` y `canDeactivate` (ver 3.6): la decisión de acceso se toma al elegir la
+  ruta, sin pedidos a la red, y redirige al lugar correcto según el caso.
+- **Pipes propios** para dar formato a los datos de la base y filtrar listas (ver 3.5): los templates dicen
+  `{{ sala.formato | formatoSala }}` en lugar de repetir lógica de formato en cada componente.
 - **Componente genérico** `MenuCrearVer`, reutilizado en películas, salas y funciones (se le pasan la ruta y las
   etiquetas), en lugar de copiar el mismo menú tres veces.
 - **Componente compartido `MapaButacas`**: dibuja el plano. No conoce la base de datos: recibe qué está ocupado y
@@ -91,6 +94,7 @@ src/app/
 | `/peliculas/:id` | Visitante y cliente | Detalle de película y sus funciones |
 | `/funcion/:id/butacas` | Visitante y cliente | Elegir butacas, reservar y pagar |
 | `/login`, `/register` | Sin sesión | Acceso y registro |
+| `/no-autorizado` | Cualquiera | Aviso de "sin permiso" (sesión iniciada con un rol que no alcanza) |
 | `/admin/...` | Solo admin | Películas, salas, funciones, butacas por función |
 
 ### 3.4 Fechas y horas
@@ -101,6 +105,133 @@ src/app/
   librerías de fechas.
 - Las fechas y horas se ingresan **sin calendarios desplegables**, como pidió el cliente:
   días de la semana con botones, cantidad de semanas, y un selector de hora con pasos de 5 minutos.
+
+### 3.5 Pipes
+
+**Criterio:** todo dato que viene de la base y se muestra con formato pasa por un pipe. Antes, cada componente
+repetía su propio método (`pesos()` estaba copiado en tres componentes, y `hora()` y `dia()` en varios) o escribía
+la lógica en la plantilla (`restriccion_edad === 0 ? 'ATP' : '+' + ...`). Ahora hay un solo lugar por formato.
+
+| Carpeta | Pipe | Ejemplo |
+|---------|------|---------|
+| `pipes/comunes` | `pesos` | `12500` → `$ 12.500` |
+| | `duracion` | `135` → `2 h 15 min` |
+| | `diaAr`, `horaAr`, `fechaCortaAr` | `lunes, 5 de octubre` · `18:00` · `lun 05/10` (siempre hora argentina) |
+| | `filtrar` | filtra una lista por texto o booleano (ver abajo) |
+| `pipes/sala` | `formatoSala`, `estadoSala` | `'3D'` · `true` → `Activa` |
+| `pipes/pelicula` | `restriccionEdad` | `0` → `ATP`, `13` → `+13` |
+| `pipes/funcion` | `idiomaFuncion` | `'castellano'` → `Castellano` |
+| `pipes/butaca` | `tipoButaca`, `estadoButaca` | `'vip'` → `VIP` · `'reservada'` → `En proceso` |
+| `pipes/compra` | `estadoCompra` | `'pendiente'` → `Pendiente de pago` |
+
+**Decisiones:**
+- **Un pipe por dato de dominio, agrupado por modelo**, y no uno por modelo con un parámetro. Cada pipe hace una sola
+  cosa, se tipa con el tipo exacto del modelo (`FormatoSala`, `EstadoCompra`…) y es fácil de explicar. Un pipe
+  por modelo con un `switch` interno se volvería una función enorme.
+- **Los pipes son puros.** Angular solo los recalcula cuando cambia su entrada, así que no cuestan nada en cada
+  ciclo de detección de cambios, y funcionan bien con signals.
+- **Devuelven solo texto.** Los colores y clases (`chip--rojo`) quedan en el CSS y en la plantilla.
+- **Los textos también se exportan como constantes** (`ETIQUETA_TIPO_BUTACA`, `ETIQUETA_ESTADO_BUTACA`) para usarlos
+  desde TypeScript, por ejemplo en el título accesible de cada butaca del mapa. Así el texto no se escribe dos veces.
+- **Los pipes de fecha reutilizan las funciones de `utilidades/fechas-ar.ts`**, que siguen siendo la fuente de la
+  lógica. El pipe es solo la puerta de entrada desde las plantillas.
+
+**El pipe `filtrar`** es genérico y configurable, en lugar de uno por modelo:
+
+```html
+@let filtradas = peliculas()
+    | filtrar: nombre : ['nombre']                        <!-- contiene el texto -->
+    | filtrar: genero : ['generos.nombre'] : true         <!-- coincidencia exacta -->
+    | filtrar: soloDestacadas : ['destacada'];            <!-- true = solo las que tienen el campo en true -->
+```
+
+- Ignora mayúsculas y tildes ("acción" encuentra "Acción").
+- Acepta rutas con puntos y listas (`generos.nombre` recorre los géneros de la película).
+- El modo exacto evita que buscar "Drama" también traiga "Melodrama".
+- Con un único pipe la lógica de normalizar texto está en un solo lugar; con uno por modelo se repetiría.
+- Se usa con `@let` para poder contar los resultados y mostrar "ninguna película coincide".
+- **Dónde quedan los `computed`:** el filtrado que solo afecta a lo que se muestra pasó a la plantilla con el pipe.
+  Los `computed` se reservan para lógica (totales, agrupaciones por día, reglas de negocio).
+
+### 3.6 Rutas y guards
+
+**Un solo archivo de rutas** (`app.routes.ts`). Se decidió mantener todas las rutas juntas: el archivo es corto,
+se lee de arriba abajo y en la defensa se puede mostrar el mapa completo de la aplicación de una vez.
+
+**Guards funcionales con `canMatch`.** `canMatch` se evalúa al *elegir* la ruta, antes de cargar su código, y si no
+se cumple la ruta ni siquiera se considera. Se usa en todas las rutas con control de acceso:
+
+| Guard | Rutas | Comportamiento |
+|-------|-------|----------------|
+| `clienteMatch` | `/home`, `/peliculas/:id`, `/funcion/:id/butacas` | Pasan visitantes y clientes. El personal con panel propio va a su panel. |
+| `rolMatch` | `/admin/**` (con `data.roles`) | Sin sesión o con otro rol → `/no-autorizado`. La pantalla se adapta: sin sesión invita a iniciar sesión; con sesión explica que la cuenta no tiene acceso. |
+| `invitadoMatch` | `/login`, `/register` | Con sesión, redirige al inicio que le corresponde. |
+| `confirmarSalidaGuard` (`canDeactivate`) | `/funcion/:id/butacas` | Pide confirmación si se sale con butacas reservadas sin pagar. |
+
+**Redirección con `UrlTree` en lugar de `false`.** Con `false`, en un `canMatch` Angular sigue buscando otra ruta y
+termina en la ruta comodín (`**`), que lleva al inicio sin explicar nada. Devolviendo un `UrlTree`, el usuario va
+directo al destino correcto (la pantalla intermedia de "sin permiso"). Antes, además, `/no-autorizado` no existía como ruta. Se prefirió una pantalla intermedia en lugar de saltar
+directo al login, para que el usuario entienda por qué no pudo entrar y elija si iniciar sesión.
+
+**Sin pedidos a la red en los guards.** Antes, cada navegación le preguntaba a Supabase por la sesión y por el perfil
+(hasta cuatro pedidos, sin guardar nada). Ahora el servicio `Auth` guarda la sesión y el perfil en **signals** y los
+mantiene al día con `onAuthStateChange` de Supabase. Los guards solo leen memoria; lo único que esperan es que
+termine la carga inicial de la sesión (`esperarInicio()`), que se hace una vez al abrir la aplicación.
+Dos detalles que conviene saber:
+- Dentro del callback de `onAuthStateChange` no se hacen pedidos a Supabase (puede bloquearse); se difieren con
+  `setTimeout`.
+- Al iniciar sesión, `signIn` espera a tener el perfil antes de terminar, para que el rol ya esté disponible al
+  redirigir. Además ahora **lanza el error** de credenciales inválidas (antes se ignoraba y la pantalla de login
+  navegaba igual).
+
+**Roles sin panel todavía.** Los empleados (candy y entradas) aún no tienen pantallas. Para que no queden en un
+bucle de redirecciones (`/home` → `/candy` → ruta inexistente → `/home`), `clienteMatch` solo redirige a los roles
+listados en `ROLES_CON_PANEL` (hoy solo el admin). Cuando existan sus paneles se agregan a esa lista.
+
+**Por qué, con un solo archivo de rutas, `canMatch` rinde poco frente a `canActivate` en bytes.**
+Es importante tener claro qué se gana y qué no:
+
+- El orden en el que Angular procesa una ruta es: `canMatch` → carga del archivo de rutas (`loadChildren`) →
+  `canActivate` → `resolve` → **carga del componente (`loadComponent`)**. Es decir, aun con `canActivate`, el código
+  de cada pantalla de admin **no se descarga** si el guard rechaza al usuario, porque `loadComponent` corre después
+  de los guards.
+- Donde `canMatch` sí ahorra descargas es cuando el área tiene **su propio archivo de rutas cargado con
+  `loadChildren`** (`admin.routes.ts`): con `canActivate` ese archivo se descarga igual, y con `canMatch` no.
+  Como se eligió **un solo archivo de rutas**, las rutas de admin viajan en el paquete inicial (son unas líneas) y
+  no hay archivo de rutas extra que ahorrar.
+- Por eso, con esta estructura, la ventaja de `canMatch` sobre `canActivate` es de **comportamiento**, no de peso:
+  se evalúa al elegir la ruta, permite redirigir con `UrlTree` con un criterio uniforme en todas las rutas, y deja
+  preparado el caso de dos rutas con el mismo path según el rol (por ejemplo, un `/inicio` distinto para cliente,
+  admin y empleados).
+- Si en el futuro el archivo creciera mucho (candy, cupones, reportes, empleados), dividirlo por áreas con
+  `loadChildren` pasaría a tener sentido y ahí `canMatch` ya rendiría también en bytes; los guards no cambiarían.
+
+### 3.7 Estructura del proyecto: ¿módulos?
+
+Se evaluó pasar a NgModules (o partir en módulos por área) y se decidió **no hacerlo**. Los NgModules se vieron en
+clase pero no son obligatorios, y en Angular 22 el estándar son los componentes standalone, que ya usa todo el
+proyecto. La decisión se tomó con números, midiendo el build de producción:
+
+| Medida | Resultado |
+|--------|-----------|
+| Paquete inicial | 576 kB (141 kB transferidos) |
+| Formulario de funciones (Angular Material, solo admin) | 216 kB (41 kB transferidos) |
+| Selección de butacas | 18 kB (5 kB transferidos) |
+| Cualquier otra pantalla | menos de 10 kB (menos de 3 kB transferidos) |
+
+Conclusiones:
+1. **Ya hay carga diferida por pantalla:** cada componente es su propio archivo (`loadComponent`). Los módulos no
+   cambiarían los límites de carga; solo agregarían archivos y código repetitivo para 25 componentes.
+2. **Un visitante nunca descarga el código de admin** (los guards cortan antes de `loadComponent`).
+3. **Lo único pesado de admin es Angular Material**, y ya está aislado en una pantalla.
+4. **Los imports repetidos son de 1 a 3 líneas por componente:** no justifican una capa nueva (por ejemplo, un
+   `SharedModule`).
+5. **El paquete inicial supera en 76 kB el presupuesto por defecto de 500 kB.** Esos kilobytes son básicamente
+   Angular y el cliente de Supabase, que se usan en casi todas las pantallas; no es un problema de estructura y los
+   módulos no lo resolverían.
+
+La organización actual es por área (`admin`, `cliente`, `compartido`), con las piezas reutilizables en
+`compartido`, los servicios por tema y las utilidades en funciones puras.
 
 ---
 
@@ -284,7 +415,7 @@ que se está viendo.
 ## 9. Seguridad
 
 - **Autenticación** con Supabase Auth (email y contraseña).
-- **Roles** en `profiles.rol`; los guards de Angular redirigen según el rol.
+- **Roles** en `profiles.rol`; los guards (`canMatch`) leen el rol que `Auth` guarda en memoria y redirigen según el caso.
 - **Sin RLS (Row Level Security).** Por decisión del equipo para este TP, las tablas no tienen políticas de acceso.
   Esto significa que **quien tenga la clave pública (`anon`) podría leer y modificar tablas directamente**, salteando
   la interfaz. Los guards de Angular protegen la navegación, no los datos.

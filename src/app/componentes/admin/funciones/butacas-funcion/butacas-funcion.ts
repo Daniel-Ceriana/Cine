@@ -6,14 +6,17 @@ import { FuncionConRelaciones } from '../../../../modelos/funcion-model';
 import { OcupacionButaca } from '../../../../modelos/compra-model';
 import { BUTACAS, TOTAL_BUTACAS } from '../../../../modelos/sala-plantilla';
 import { MapaButacas } from '../../../compartido/mapa-butacas/mapa-butacas';
-import { formatearDia, formatearHora } from '../../../../utilidades/fechas-ar';
+import { PesosPipe } from '../../../../pipes/comunes/pesos.pipe';
+import { DiaArPipe, HoraArPipe } from '../../../../pipes/comunes/fechas-ar.pipes';
+import { FormatoSalaPipe } from '../../../../pipes/sala/sala.pipes';
+import { TipoButacaPipe } from '../../../../pipes/butaca/butaca.pipes';
 
 // Cada tanto se vuelve a consultar por si se perdió algún aviso de tiempo real
 // y para que las reservas vencidas desaparezcan del mapa.
 const REFRESCO_MS = 15_000;
 
 @Component({
-  imports: [RouterLink, MapaButacas],
+  imports: [RouterLink, MapaButacas, PesosPipe, DiaArPipe, HoraArPipe, FormatoSalaPipe, TipoButacaPipe],
   selector: 'app-butacas-funcion',
   styleUrl: './butacas-funcion.css',
   templateUrl: './butacas-funcion.html',
@@ -81,21 +84,5 @@ export class ButacasFuncion implements OnInit, OnDestroy {
 
   onButacaClick(codigo: string) {
     this.codigoElegido.set(this.codigoElegido() === codigo ? null : codigo);
-  }
-
-  dia(iso: string): string {
-    return formatearDia(iso);
-  }
-
-  hora(iso: string): string {
-    return formatearHora(iso);
-  }
-
-  pesos(monto: number): string {
-    return `$ ${Number(monto).toLocaleString('es-AR')}`;
-  }
-
-  fechaHora(iso: string): string {
-    return `${formatearDia(iso)} ${formatearHora(iso)}`;
   }
 }

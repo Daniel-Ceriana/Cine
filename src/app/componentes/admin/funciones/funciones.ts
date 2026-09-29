@@ -5,6 +5,10 @@ import { MenuCrearVer } from '../generico/menu-crear-ver/menu-crear-ver';
 import { FuncionService } from '../../../services/funcion-service';
 import { FuncionConRelaciones } from '../../../modelos/funcion-model';
 import { partesAr, formatearDia, formatearHora } from '../../../utilidades/fechas-ar';
+import { PesosPipe } from '../../../pipes/comunes/pesos.pipe';
+import { DiaArPipe, HoraArPipe } from '../../../pipes/comunes/fechas-ar.pipes';
+import { FormatoSalaPipe } from '../../../pipes/sala/sala.pipes';
+import { IdiomaFuncionPipe } from '../../../pipes/funcion/idioma-funcion.pipe';
 
 interface DiaConFunciones {
   fecha: string; // 'YYYY-MM-DD', sirve como clave del día
@@ -22,7 +26,7 @@ interface PeliculaConFunciones {
 }
 
 @Component({
-  imports: [MenuCrearVer, FormField, RouterLink],
+  imports: [MenuCrearVer, FormField, RouterLink, PesosPipe, DiaArPipe, HoraArPipe, FormatoSalaPipe, IdiomaFuncionPipe],
   selector: 'app-funciones',
   styleUrl: './funciones.css',
   templateUrl: './funciones.html',
@@ -103,18 +107,9 @@ export class Funciones implements OnInit {
     }
   }
 
-  hora(iso: string): string {
-    return formatearHora(iso);
-  }
-
-  dia(iso: string): string {
-    return formatearDia(iso);
-  }
-
   // La película termina a los "duracion" minutos del inicio (sin contar los 30 min de limpieza)
-  horaFin(f: FuncionConRelaciones): string {
-    const fin = new Date(new Date(f.inicio).getTime() + f.peliculas.duracion_minutos * 60_000);
-    return formatearHora(fin.toISOString());
+  finPelicula(f: FuncionConRelaciones): string {
+    return new Date(new Date(f.inicio).getTime() + f.peliculas.duracion_minutos * 60_000).toISOString();
   }
 
   onClickModificar(f: FuncionConRelaciones) {
@@ -124,7 +119,7 @@ export class Funciones implements OnInit {
   async cancelar(f: FuncionConRelaciones) {
     // TODO: cuando existan las entradas, avisar si la función ya tiene tickets vendidos
     // y otorgar puntos equivalentes a los usuarios que las compraron.
-    if (!confirm(`¿Cancelar la función de "${f.peliculas.nombre}" del ${formatearDia(f.inicio)} a las ${this.hora(f.inicio)}?`)) {
+    if (!confirm(`¿Cancelar la función de "${f.peliculas.nombre}" del ${formatearDia(f.inicio)} a las ${formatearHora(f.inicio)}?`)) {
       return;
     }
 

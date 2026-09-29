@@ -249,6 +249,22 @@ input[type='number'] {
     font-weight: 500;
 }
 
+/* Aviso de error que ocupa todo el ancho, con fondo, para que no pase desapercibido */
+.aviso-error {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: #FBE3DF;
+    border: 2px solid var(--error);
+    border-radius: var(--radio);
+    font-weight: 600;
+}
+
+/* Campo marcado como incorrecto (borde rojo); se repite el selector largo para ganarle en especificidad a la regla base */
+input.campo-error:not([type='checkbox']):not([type='radio']):not(.mat-mdc-input-element),
+input.campo-error:not([type='checkbox']):not([type='radio']):not(.mat-mdc-input-element):hover {
+    border-color: var(--error);
+    background-color: #FFF1EE;
+}
+
 /* =====================================================================
    BOTONES
    ===================================================================== */

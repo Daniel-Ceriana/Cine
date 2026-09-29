@@ -1,13 +1,86 @@
-import { inject, Service } from '@angular/core';
-import { SignUpProfile, UserModel,Rol } from '../modelos/user-model';
+import { computed, inject, Service, signal } from '@angular/core';
+import type { Session } from '@supabase/supabase-js';
+import { SignUpProfile, UserModel, Rol } from '../modelos/user-model';
 import { SupabaseService } from './supabase-service';
 
 @Service()
 export class Auth {
-private supabase = inject(SupabaseService).client;
+  private supabase = inject(SupabaseService).client;
 
-  signIn(email: string, password: string) {
-    return this.supabase.auth.signInWithPassword({ email, password });
+  // ---------------------------------------------------------------------
+  // Estado de la sesión en memoria. Los guards y las pantallas lo leen de
+  // acá, en lugar de preguntarle a Supabase en cada navegación.
+  // ---------------------------------------------------------------------
+  private _sesion = signal<Session | null>(null);
+  private _perfil = signal<UserModel | null>(null);
+
+  readonly sesion = this._sesion.asReadonly();
+  readonly perfil = this._perfil.asReadonly();
+  readonly haySesion = computed(() => this._sesion() !== null);
+  readonly rol = computed<Rol | null>(() => this._perfil()?.rol ?? null);
+
+  // Se resuelve cuando ya se sabe si hay sesión (y de quién es) al abrir la aplicación
+  private inicio: Promise<void>;
+
+  constructor() {
+    this.inicio = this.cargarSesionInicial();
+
+    // Supabase avisa cuando alguien inicia o cierra sesión (también desde otra pestaña).
+    // Dentro de este callback no se deben hacer pedidos a Supabase, por eso se difiere con setTimeout.
+    this.supabase.auth.onAuthStateChange((_evento, session) => {
+      setTimeout(() => this.aplicarSesion(session), 0);
+    });
+  }
+
+  private async cargarSesionInicial() {
+    const { data } = await this.supabase.auth.getSession();
+    await this.aplicarSesion(data.session);
+  }
+
+  // Guarda la sesión y, si es de otro usuario que el que ya teníamos, busca su perfil (una sola vez)
+  private async aplicarSesion(session: Session | null) {
+    this._sesion.set(session);
+
+    if (!session) {
+      this._perfil.set(null);
+      return;
+    }
+    if (this._perfil()?.id === session.user.id) return;
+
+    try {
+      this._perfil.set(await this.getProfile(session.user.id));
+    } catch {
+      this._perfil.set(null);
+    }
+  }
+
+  // Los guards esperan esto antes de decidir, para no juzgar con la sesión todavía sin cargar
+  esperarInicio(): Promise<void> {
+    return this.inicio;
+  }
+
+  // ---------------------------------------------------------------------
+  // Acciones
+  // ---------------------------------------------------------------------
+  async signIn(email: string, password: string) {
+    const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
+    if (error) throw new Error(this.mensajeDeLogin(error.message));
+
+    // Se espera a tener el perfil para que, al terminar, el rol ya esté disponible
+    await this.aplicarSesion(data.session);
+    return data;
+  }
+
+  // Supabase responde lo mismo cuando el email no existe y cuando la contraseña es incorrecta
+  // (a propósito, para no revelar qué emails están registrados), así que el aviso también es el mismo.
+  private mensajeDeLogin(mensaje: string): string {
+    if (mensaje === 'Invalid login credentials') {
+      return 'El email o la contraseña no son correctos. Revisá los datos e intentá de nuevo.';
+    }
+    if (mensaje === 'Email not confirmed') {
+      return 'Todavía no confirmaste tu email. Revisá tu casilla de correo.';
+    }
+    return mensaje;
   }
 
   async signUp(email: string, password: string, profile: SignUpProfile) {
@@ -23,26 +96,28 @@ private supabase = inject(SupabaseService).client;
     } finally {
       // Si la confirmación de email está desactivada, signUp deja sesión.
       // La cerramos para que el usuario tenga que loguearse a mano.
-      if (data.session) await this.supabase.auth.signOut();
+      if (data.session) await this.signOut();
     }
 
     return data;
   }
 
-  signOut() {
-    return this.supabase.auth.signOut();
+  async signOut() {
+    await this.supabase.auth.signOut();
+    await this.aplicarSesion(null);
   }
 
+  // ---------------------------------------------------------------------
+  // Consultas (leen el estado en memoria)
+  // ---------------------------------------------------------------------
   async hasSession(): Promise<boolean> {
-    const { data } = await this.supabase.auth.getSession();
-    return !!data.session;
+    await this.inicio;
+    return this.haySesion();
   }
 
   async getCurrentRole(): Promise<Rol | null> {
-    const { data } = await this.supabase.auth.getSession();
-    if (!data.session) return null;
-    const profile = await this.getProfile(data.session.user.id);
-    return profile.rol;
+    await this.inicio;
+    return this.rol();
   }
 
   getUser() {

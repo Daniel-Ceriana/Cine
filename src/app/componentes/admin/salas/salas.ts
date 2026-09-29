@@ -4,9 +4,10 @@ import { MenuCrearVer } from '../generico/menu-crear-ver/menu-crear-ver';
 import { SalaService } from '../../../services/sala-service';
 import { SalaModel } from '../../../modelos/sala-model';
 import { TOTAL_BUTACAS } from '../../../modelos/sala-plantilla';
+import { FormatoSalaPipe, EstadoSalaPipe } from '../../../pipes/sala/sala.pipes';
 
 @Component({
-  imports: [MenuCrearVer],
+  imports: [MenuCrearVer, FormatoSalaPipe, EstadoSalaPipe],
   selector: 'app-salas',
   styleUrl: './salas.css',
   templateUrl: './salas.html',

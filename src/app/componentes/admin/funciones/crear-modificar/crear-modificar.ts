@@ -24,9 +24,9 @@ import {
   sumarDias,
   lunesDe,
   diaSemana,
-  etiquetaCorta,
-  etiquetaLarga,
 } from '../../../../utilidades/fechas-ar';
+import { DuracionPipe } from '../../../../pipes/comunes/duracion.pipe';
+import { DiaArPipe, FechaCortaArPipe } from '../../../../pipes/comunes/fechas-ar.pipes';
 
 // Valores de Date.getDay(): domingo = 0
 const DIAS_SEMANA = [
@@ -59,6 +59,9 @@ interface FuncionFormModel {
     MatSelectModule,
     MatTimepickerModule,
     MatButtonToggleModule,
+    DuracionPipe,
+    DiaArPipe,
+    FechaCortaArPipe,
   ],
   selector: 'app-crear-modificar-funcion',
   styleUrl: './crear-modificar.css',
@@ -83,8 +86,6 @@ export class CrearModificarFuncion implements OnInit {
   peliculas = signal<PeliculaModel[]>([]);
   readonly diasSemana = DIAS_SEMANA;
   readonly formatos: FormatoSala[] = ['2D', '3D', '4D', '5D'];
-  readonly etiqueta = etiquetaCorta;
-  readonly etiquetaLarga = etiquetaLarga;
 
   // Valores que manejan los componentes de Material
   diasElegidos = signal<number[]>([]);

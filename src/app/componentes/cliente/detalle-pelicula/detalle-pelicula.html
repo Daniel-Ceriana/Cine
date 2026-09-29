@@ -18,9 +18,9 @@
         <h1>{{ p.nombre }}</h1>
 
         <div class="ficha__chips">
-          <span class="chip">{{ p.duracion_minutos }} min</span>
+          <span class="chip">{{ p.duracion_minutos | duracion }}</span>
           <span class="chip" [class.chip--rojo]="p.restriccion_edad > 0">
-            {{ p.restriccion_edad === 0 ? 'ATP' : '+' + p.restriccion_edad }}
+            {{ p.restriccion_edad | restriccionEdad }}
           </span>
           @for (g of p.generos; track g.id) {
             <span class="chip">{{ g.nombre }}</span>
@@ -53,19 +53,19 @@
             @for (item of dia.funciones; track item.funcion.id) {
               <article class="funcion ticket">
                 <div class="funcion__info">
-                  <p class="funcion__horario texto-ticket">{{ hora(item.funcion.inicio) }}</p>
+                  <p class="funcion__horario texto-ticket">{{ item.funcion.inicio | horaAr }}</p>
                   <div class="funcion__chips">
-                    <span class="chip">{{ item.funcion.salas.formato }}</span>
-                    <span class="chip">{{ item.funcion.idioma }}</span>
+                    <span class="chip">{{ item.funcion.salas.formato | formatoSala }}</span>
+                    <span class="chip">{{ item.funcion.idioma | idiomaFuncion }}</span>
                     @if (item.vigencia.estado === 'preventa') {
                       <span class="chip chip--rojo">Preventa</span>
                     }
                   </div>
                   @if (item.vigencia.precio !== null) {
-                    <p class="funcion__precio texto-ticket">{{ pesos(item.vigencia.precio) }}</p>
+                    <p class="funcion__precio texto-ticket">{{ item.vigencia.precio | pesos }}</p>
                   } @else {
                     <p class="funcion__precio funcion__precio--cerrada texto-ticket">
-                      Venta desde el {{ fechaLarga(item.vigencia.abreEl!) }}
+                      Venta desde el {{ item.vigencia.abreEl | diaAr }}
                     </p>
                   }
                 </div>

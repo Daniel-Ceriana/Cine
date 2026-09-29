@@ -9,13 +9,13 @@
       <img class="cabecera-funcion__poster" [src]="f.peliculas.imagen_url" [alt]="f.peliculas.nombre" />
       <div>
         <h1>{{ f.peliculas.nombre }}</h1>
-        <p class="texto-ticket">{{ dia(f.inicio) }} · {{ hora(f.inicio) }}</p>
+        <p class="texto-ticket">{{ f.inicio | diaAr }} · {{ f.inicio | horaAr }}</p>
         <p class="texto-ticket">Sala {{ f.salas.numero }}</p>
         <div class="cabecera-funcion__chips">
-          <span class="chip">{{ f.salas.formato }}</span>
-          <span class="chip">{{ f.idioma }}</span>
+          <span class="chip">{{ f.salas.formato | formatoSala }}</span>
+          <span class="chip">{{ f.idioma | idiomaFuncion }}</span>
           @if (restriccion() > 0) {
-            <span class="chip chip--rojo">+{{ restriccion() }}</span>
+            <span class="chip chip--rojo">{{ restriccion() | restriccionEdad }}</span>
           }
         </div>
       </div>
@@ -54,17 +54,17 @@
               @for (c of seleccionadas(); track c) {
                 <li>
                   <span class="texto-ticket">{{ c }}</span>
-                  <span>{{ tipoDe(c) }}</span>
-                  <span class="texto-ticket">{{ pesos(precioDe(c)) }}</span>
+                  <span>{{ tipoDe(c) | tipoButaca }}</span>
+                  <span class="texto-ticket">{{ precioDe(c) | pesos }}</span>
                 </li>
               }
             </ul>
             @if (hayVip()) {
               <p class="aviso aviso--vip">
-                Elegiste butacas <strong>VIP</strong>: tienen un recargo de {{ pesos(recargoVip()) }} cada una.
+                Elegiste butacas <strong>VIP</strong>: tienen un recargo de {{ recargoVip() | pesos }} cada una.
               </p>
             }
-            <p class="resumen__total">Total <span class="texto-ticket">{{ pesos(total()) }}</span></p>
+            <p class="resumen__total">Total <span class="texto-ticket">{{ total() | pesos }}</span></p>
           }
 
           <!-- Sin sesión iniciada: hay que pedir los datos para enviar la entrada -->
@@ -118,12 +118,12 @@
           @for (c of seleccionadas(); track c) {
             <li>
               <span class="texto-ticket">{{ c }}</span>
-              <span>{{ tipoDe(c) }}</span>
-              <span class="texto-ticket">{{ pesos(precioDe(c)) }}</span>
+              <span>{{ tipoDe(c) | tipoButaca }}</span>
+              <span class="texto-ticket">{{ precioDe(c) | pesos }}</span>
             </li>
           }
         </ul>
-        <p class="resumen__total">Total <span class="texto-ticket">{{ pesos(compra()!.total) }}</span></p>
+        <p class="resumen__total">Total <span class="texto-ticket">{{ compra()!.total | pesos }}</span></p>
         <p class="datos__ayuda">A nombre de {{ compra()!.nombre }} · {{ compra()!.email }}</p>
 
         @if (errorMsg()) {
@@ -132,7 +132,7 @@
 
         <div class="paso-pago__acciones">
           <button type="button" (click)="pagar()" [disabled]="procesando()">
-            {{ procesando() ? 'Procesando...' : 'Pagar ' + pesos(compra()!.total) }}
+            {{ procesando() ? 'Procesando...' : 'Pagar ' + (compra()!.total | pesos) }}
           </button>
           <button type="button" class="btn--secundario" (click)="cambiarButacas()" [disabled]="procesando()">
             Cambiar butacas
@@ -147,7 +147,7 @@
       <section class="paso-pago ticket">
         <h2>¡Compra confirmada!</h2>
         <p>Butacas: <strong class="texto-ticket">{{ seleccionadas().join(', ') }}</strong></p>
-        <p>Total pagado: <strong class="texto-ticket">{{ pesos(compra()!.total) }}</strong></p>
+        <p>Total pagado: <strong class="texto-ticket">{{ compra()!.total | pesos }}</strong></p>
         <p>Código de tu entrada:</p>
         <p class="codigo texto-ticket">{{ compra()!.qr_token }}</p>
         @if (restriccion() > 0) {

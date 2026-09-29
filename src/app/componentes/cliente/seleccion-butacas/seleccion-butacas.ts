@@ -1,17 +1,23 @@
 import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { form, FormField } from '@angular/forms/signals';
+import { ConfirmarSalida } from '../../../guards/salida-guard';
 import { FuncionService } from '../../../services/funcion-service';
 import { ButacaService } from '../../../services/butaca-service';
 import { CompraService } from '../../../services/compra-service';
 import { Auth } from '../../../services/auth';
 import { FuncionConRelaciones } from '../../../modelos/funcion-model';
 import { CompraModel, OcupacionButaca } from '../../../modelos/compra-model';
-import { UserModel } from '../../../modelos/user-model';
 import { BUTACAS } from '../../../modelos/sala-plantilla';
 import { MapaButacas } from '../../compartido/mapa-butacas/mapa-butacas';
-import { formatearDia, formatearHora } from '../../../utilidades/fechas-ar';
 import { precioVigente } from '../../../utilidades/precio-funcion';
+import { PesosPipe } from '../../../pipes/comunes/pesos.pipe';
+import { DiaArPipe, HoraArPipe } from '../../../pipes/comunes/fechas-ar.pipes';
+import { FormatoSalaPipe } from '../../../pipes/sala/sala.pipes';
+import { IdiomaFuncionPipe } from '../../../pipes/funcion/idioma-funcion.pipe';
+import { RestriccionEdadPipe } from '../../../pipes/pelicula/restriccion-edad.pipe';
+import { TipoButacaPipe } from '../../../pipes/butaca/butaca.pipes';
+import { TipoButaca } from '../../../modelos/sala-model';
 
 // Mismo valor que configuracion.max_butacas_por_compra; la base es la que lo hace cumplir
 const MAX_BUTACAS = 8;
@@ -20,12 +26,23 @@ const REFRESCO_MS = 15_000;
 type Paso = 'elegir' | 'pagar' | 'listo';
 
 @Component({
-  imports: [RouterLink, FormField, MapaButacas],
+  imports: [
+    RouterLink,
+    FormField,
+    MapaButacas,
+    PesosPipe,
+    DiaArPipe,
+    HoraArPipe,
+    FormatoSalaPipe,
+    IdiomaFuncionPipe,
+    RestriccionEdadPipe,
+    TipoButacaPipe,
+  ],
   selector: 'app-seleccion-butacas',
   styleUrl: './seleccion-butacas.css',
   templateUrl: './seleccion-butacas.html',
 })
-export class SeleccionButacas implements OnInit, OnDestroy {
+export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
   private route = inject(ActivatedRoute);
   private funcionService = inject(FuncionService);
   private butacaService = inject(ButacaService);
@@ -41,7 +58,8 @@ export class SeleccionButacas implements OnInit, OnDestroy {
   ocupacion = signal<OcupacionButaca[]>([]);
   seleccionadas = signal<string[]>([]);
   recargoVip = signal(0);
-  perfil = signal<UserModel | null>(null); // null = compra sin sesión iniciada
+  // Perfil de quien tiene sesión (null = compra sin sesión). Lo guarda Auth en memoria, sin pedidos extra.
+  perfil = this.auth.perfil;
   cargando = signal(false);
   errorMsg = signal('');
   avisoMsg = signal('');
@@ -57,8 +75,6 @@ export class SeleccionButacas implements OnInit, OnDestroy {
   datosForm = form(this.model);
 
   readonly maxButacas = MAX_BUTACAS;
-  readonly dia = formatearDia;
-  readonly hora = formatearHora;
 
   tieneSesion = computed(() => this.perfil() !== null);
   restriccion = computed(() => this.funcion()?.peliculas.restriccion_edad ?? 0);
@@ -90,17 +106,15 @@ export class SeleccionButacas implements OnInit, OnDestroy {
   private ocupadas = computed(() => new Set(this.ocupacion().map((o) => o.butaca_codigo)));
 
   precioDe(codigo: string): number {
-    const tipo = BUTACAS.find((b) => b.codigo === codigo)?.tipo;
-    return (this.precioBase() ?? 0) + (tipo === 'vip' ? this.recargoVip() : 0);
+    return (this.precioBase() ?? 0) + (this.tipoDe(codigo) === 'vip' ? this.recargoVip() : 0);
   }
 
-  tipoDe(codigo: string): string {
-    const tipo = BUTACAS.find((b) => b.codigo === codigo)?.tipo;
-    return tipo === 'vip' ? 'VIP' : tipo === 'accesible' ? 'Accesible' : 'Común';
+  tipoDe(codigo: string): TipoButaca {
+    return BUTACAS.find((b) => b.codigo === codigo)?.tipo ?? 'normal';
   }
 
   total = computed(() => this.seleccionadas().reduce((suma, c) => suma + this.precioDe(c), 0));
-  hayVip = computed(() => this.seleccionadas().some((c) => this.tipoDe(c) === 'VIP'));
+  hayVip = computed(() => this.seleccionadas().some((c) => this.tipoDe(c) === 'vip'));
 
   // Lo que impide continuar, en lenguaje claro
   faltantes = computed<string[]>(() => {
@@ -128,7 +142,6 @@ export class SeleccionButacas implements OnInit, OnDestroy {
       const [funcion, recargo] = await Promise.all([
         this.funcionService.getById(this.funcionId),
         this.compraService.getRecargoVip(),
-        this.cargarPerfil(),
       ]);
       this.funcion.set(funcion);
       this.recargoVip.set(recargo);
@@ -143,6 +156,12 @@ export class SeleccionButacas implements OnInit, OnDestroy {
     }
   }
 
+  // canDeactivate: si hay butacas reservadas sin pagar, se pide confirmación antes de salir
+  puedeSalir(): boolean {
+    if (this.paso() !== 'pagar') return true;
+    return confirm('Tenés butacas reservadas sin pagar. Si salís, se liberan. ¿Querés salir igual?');
+  }
+
   ngOnDestroy() {
     this.cancelarSuscripcion?.();
     if (this.refresco) clearInterval(this.refresco);
@@ -150,16 +169,6 @@ export class SeleccionButacas implements OnInit, OnDestroy {
     // si se va sin pagar, las butacas se liberan en el momento (si no, vencen solas)
     const compra = this.compra();
     if (compra && this.paso() === 'pagar') this.compraService.liberar(compra.id).catch(() => {});
-  }
-
-  private async cargarPerfil() {
-    try {
-      if (!(await this.auth.hasSession())) return;
-      const { data } = await this.auth.getUser();
-      if (data.user) this.perfil.set(await this.auth.getProfile(data.user.id));
-    } catch {
-      this.perfil.set(null); // si falla, se compra como anónimo
-    }
   }
 
   private async cargarOcupacion() {
@@ -282,9 +291,5 @@ export class SeleccionButacas implements OnInit, OnDestroy {
   tiempo(): string {
     const s = this.segundosRestantes();
     return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-  }
-
-  pesos(monto: number): string {
-    return `$ ${Number(monto).toLocaleString('es-AR')}`;
   }
 }

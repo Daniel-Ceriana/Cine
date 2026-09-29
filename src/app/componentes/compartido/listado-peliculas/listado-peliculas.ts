@@ -4,16 +4,13 @@ import { PeliculaService } from '../../../services/peliculas-service';
 import { PeliculaModel } from '../../../modelos/pelicula-model';
 import { PeliculaConGeneros, Genero } from '../../../modelos/pelicula-model';
 import { form,FormField } from '@angular/forms/signals';
-
-
-const normalizar = (s: string) =>
-  s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+import { FiltrarPipe } from '../../../pipes/comunes/filtrar.pipe';
 
 
 @Component({
   selector: 'app-listado-peliculas',
   standalone: true,
-  imports: [ItemPelicula,FormField],
+  imports: [ItemPelicula, FormField, FiltrarPipe],
   templateUrl: './listado-peliculas.html',
   styleUrl: './listado-peliculas.css',
 })
@@ -37,19 +34,7 @@ export class ListadoPeliculas implements OnInit {
   
   filtrosForm = form(this.filtrosModel);
 
-  peliculasFiltradas = computed(() => {
-  const f = this.filtrosModel();
-  const nombre = normalizar(f.nombre);
-// console.log('genero filtro:', f.genero, typeof f.genero);
-//   console.log('generos por película:', this.peliculas().map((p) => p.generos));
-  return this.peliculas().filter(
-    (p) =>
-      (!nombre || normalizar(p.nombre).includes(nombre)) &&
-      (!f.genero || p.generos.some((g) => String(g.nombre) === f.genero)) &&
-      (!f.destacada || p.destacada),
-  );
-});
-
+  // El filtrado de la lista se hace en la plantilla con el pipe `filtrar`
 
 hayFiltrosActivos = computed(() => {
     const f = this.filtrosModel();

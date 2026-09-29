@@ -1,47 +1,65 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanMatchFn, Router } from '@angular/router';
 import { Auth } from '../services/auth';
 import { Rol, RUTA_POR_ROL } from '../modelos/user-model';
 
-// Exige sesión iniciada
-export const authGuard: CanActivateFn = async () => {
+// -----------------------------------------------------------------------
+// Guards de tipo canMatch: se evalúan al ELEGIR la ruta, antes de cargar su código.
+// Si no se cumple, en lugar de un `false` (que cae en la ruta comodín) se devuelve
+// un UrlTree que redirige al lugar correcto y explica por qué no se pudo entrar.
+//
+// Ninguno hace pedidos a la red: leen la sesión y el rol que guarda Auth en memoria.
+// Lo único que esperan es que termine la carga inicial de la sesión.
+// -----------------------------------------------------------------------
+
+// Roles que ya tienen un panel propio. Cuando existan los del personal (candy y entradas),
+// se agregan acá; mientras tanto ven la cartelera en lugar de caer en una ruta inexistente.
+const ROLES_CON_PANEL: Rol[] = ['admin'];
+
+// Exige sesión iniciada; si no hay, va a la pantalla que explica que hay que iniciar sesión
+export const sesionMatch: CanMatchFn = async () => {
   const auth = inject(Auth);
   const router = inject(Router);
-  return (await auth.hasSession()) ? true : router.createUrlTree(['/login']);
+
+  await auth.esperarInicio();
+  return auth.haySesion() ? true : router.createUrlTree(['/no-autorizado']);
 };
 
-// Exige un rol permitido (se define en data.roles de la ruta)
-export const roleGuard: CanActivateFn = async (route) => {
+// Exige uno de los roles indicados en `data.roles` de la ruta.
+//   sin sesión           -> pantalla "sin permiso" (pide iniciar sesión)
+//   con sesión, otro rol -> pantalla "sin permiso" (la cuenta no alcanza)
+export const rolMatch: CanMatchFn = async (route) => {
   const auth = inject(Auth);
   const router = inject(Router);
-  const permitidos = (route.data['roles'] ?? []) as Rol[];
+  const permitidos = (route.data?.['roles'] ?? []) as Rol[];
 
-  const rol = await auth.getCurrentRole().catch(() => null);
-  if (!rol) return router.createUrlTree(['/login']);
+  await auth.esperarInicio();
+  if (!auth.haySesion()) return router.createUrlTree(['/no-autorizado']);
 
-  return permitidos.includes(rol) ? true : router.createUrlTree(['/no-autorizado']);
+  const rol = auth.rol();
+  return rol && permitidos.includes(rol) ? true : router.createUrlTree(['/no-autorizado']);
 };
 
-// Para rutas de cliente: el personal es redirigido a su panel
-export const clienteGuard: CanActivateFn = async () => {
+// Rutas del público: las ven visitantes y clientes. El personal con panel propio va a su panel.
+export const clienteMatch: CanMatchFn = async () => {
   const auth = inject(Auth);
   const router = inject(Router);
 
-  if (!(await auth.hasSession())) return true; // visitante anónimo
+  await auth.esperarInicio();
+  const rol = auth.rol();
 
-  const rol = await auth.getCurrentRole().catch(() => null);
-  if (!rol || rol === 'cliente') return true;
-
-  return router.createUrlTree([RUTA_POR_ROL[rol]]);
+  if (!auth.haySesion() || !rol || rol === 'cliente') return true; // visitante o cliente
+  return ROLES_CON_PANEL.includes(rol) ? router.createUrlTree([RUTA_POR_ROL[rol]]) : true;
 };
 
-// Para /login y /register: si ya hay sesión, va a su home según el rol
-export const guestGuard: CanActivateFn = async () => {
+// Para /login y /register: si ya hay sesión, va al inicio que le corresponde según su rol
+export const invitadoMatch: CanMatchFn = async () => {
   const auth = inject(Auth);
   const router = inject(Router);
 
-  if (!(await auth.hasSession())) return true;
+  await auth.esperarInicio();
+  if (!auth.haySesion()) return true;
 
-  const rol = await auth.getCurrentRole().catch(() => null);
-  return router.createUrlTree([rol ? RUTA_POR_ROL[rol] : '/home']);
+  const rol = auth.rol();
+  return router.createUrlTree([rol && ROLES_CON_PANEL.includes(rol) ? RUTA_POR_ROL[rol] : '/home']);
 };

@@ -24,8 +24,8 @@
           <h3 class="sala__nombre">{{ sala.nombre }}</h3>
           <p class="sala__meta texto-ticket">{{ totalButacas }} butacas</p>
           <div class="sala__chips">
-            <span class="chip">{{ sala.formato }}</span>
-            <span class="chip" [class.chip--rojo]="!sala.activa">{{ sala.activa ? 'Activa' : 'Inactiva' }}</span>
+            <span class="chip">{{ sala.formato | formatoSala }}</span>
+            <span class="chip" [class.chip--rojo]="!sala.activa">{{ sala.activa | estadoSala }}</span>
           </div>
         </div>
 
