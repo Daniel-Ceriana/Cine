@@ -27,13 +27,11 @@ export class ListadoPeliculas implements OnInit {
   errorMsg = signal('');
   generos = signal<Genero[]>([]); 
 
-  tiposSala = ['2D', '3D', '4D', '5D'];
-
+  // idioma y formato (2D/3D/...) ahora son de la función, no de la película:
+  // esos filtros vuelven cuando exista la cartelera con funciones
     private filtrosModel = signal({
     nombre: '',
-    idioma: '',
     genero: '',
-    tipoSala: '',
     destacada: false,
   });
   
@@ -47,9 +45,7 @@ export class ListadoPeliculas implements OnInit {
   return this.peliculas().filter(
     (p) =>
       (!nombre || normalizar(p.nombre).includes(nombre)) &&
-      (!f.idioma || p.idioma === f.idioma) &&
-      (!f.genero || p.generos.some((g) => String(g.nombre) === f.genero)) &&  
-      // (!f.tipoSala || p.formato === f.tipoSala) &&
+      (!f.genero || p.generos.some((g) => String(g.nombre) === f.genero)) &&
       (!f.destacada || p.destacada),
   );
 });
@@ -57,11 +53,11 @@ export class ListadoPeliculas implements OnInit {
 
 hayFiltrosActivos = computed(() => {
     const f = this.filtrosModel();
-    return !!(f.nombre || f.idioma || f.genero || f.tipoSala || f.destacada);
+    return !!(f.nombre || f.genero || f.destacada);
   });
 
   limpiarFiltros() {
-    this.filtrosModel.set({ nombre: '', idioma: '', genero: '', tipoSala: '', destacada: false });
+    this.filtrosModel.set({ nombre: '', genero: '', destacada: false });
   }
   async ngOnInit() {
   this.cargando.set(true);

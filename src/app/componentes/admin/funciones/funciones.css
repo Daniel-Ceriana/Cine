@@ -1,0 +1,133 @@
+.funciones {
+    flex-direction: column;
+    gap: var(--spacing-20);
+    padding: var(--spacing-36) var(--spacing-8);
+}
+
+.funciones__filtros {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--spacing-20);
+    max-width: none;
+}
+
+.funciones__filtros label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    font-size: var(--font-xsmall);
+    font-weight: 600;
+}
+
+.funciones__filtros select {
+    font-size: var(--font-small);
+    min-width: 220px;
+}
+
+.funciones__check {
+    flex-direction: row !important;
+    align-items: center;
+}
+
+.dia__titulo {
+    font-size: var(--font-medium);
+    font-weight: 700;
+    text-transform: capitalize;
+    border-bottom: 2px solid var(--primary-solid);
+    padding-bottom: var(--spacing-8);
+    margin-bottom: var(--spacing-16);
+}
+
+.dia__funciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-16);
+}
+
+.funcion {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
+    width: 380px;
+    padding: var(--spacing-12);
+    background-color: var(--light-bg-solid);
+    border-radius: var(--spacing-8);
+    box-shadow: 0 2px 6px var(--dark-300);
+}
+
+.funcion--cancelada {
+    opacity: .5;
+}
+
+.funcion__imagen {
+    width: 64px;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: 4px;
+    background-color: var(--dark-300);
+}
+
+.funcion__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.funcion__nombre {
+    font-size: var(--font-small);
+    font-weight: 700;
+    margin: 0;
+}
+
+.funcion__horario {
+    font-size: var(--font-small);
+    font-weight: 600;
+    color: var(--primary-solid);
+}
+
+.funcion__meta,
+.funcion__estado {
+    font-size: var(--font-xsmall);
+    color: var(--dark-500);
+}
+
+.funcion__estado {
+    font-weight: 700;
+}
+
+.funcion__acciones {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+}
+
+button {
+    font-family: var(--base-font);
+    font-size: var(--font-xsmall);
+    color: var(--light-font-solid);
+    background-color: var(--primary-solid);
+    padding: var(--spacing-8) var(--spacing-12);
+    border: 0;
+    border-radius: var(--spacing-8);
+    cursor: pointer;
+    transition: background-color .2s ease-in-out;
+}
+
+button:hover {
+    background-color: var(--primary-900);
+}
+
+.funcion__btn-secundario {
+    background-color: var(--dark-bg-solid);
+}
+
+.funcion__btn-secundario:hover {
+    background-color: var(--dark-900);
+}
+
+.error {
+    color: var(--primary-solid);
+}

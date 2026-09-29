@@ -1,1 +1,37 @@
-<p>salas works!</p>
+<app-menu-crear-ver
+    [modificar]="false"
+    ruta="/admin/salas"
+    etiquetaCrear="Crear sala"
+    etiquetaVer="Ver salas"></app-menu-crear-ver>
+
+<main class="container">
+  <section class="salas__lista">
+    @if (cargando()) {
+      <p>Cargando salas...</p>
+    }
+    @if (errorMsg()) {
+      <p class="error">{{ errorMsg() }}</p>
+    }
+    @if (!cargando() && salas().length === 0) {
+      <p>Todavía no hay salas creadas.</p>
+    }
+
+    @for (sala of salas(); track sala.id) {
+      <article class="sala" [class.sala--inactiva]="!sala.activa">
+        <div class="sala__info">
+          <h3 class="sala__nombre">{{ sala.nombre }}</h3>
+          <p class="sala__meta">Sala N° {{ sala.numero }} · {{ cantidadButacas(sala) }} butacas</p>
+          <p class="sala__estado">{{ sala.activa ? 'Activa' : 'Inactiva' }}</p>
+        </div>
+
+        <div class="sala__acciones">
+          <button type="button" (click)="onClickModificar(sala)">Modificar</button>
+          <button type="button" class="sala__btn-secundario" (click)="alternarActiva(sala)">
+            {{ sala.activa ? 'Desactivar' : 'Activar' }}
+          </button>
+          <button type="button" class="sala__btn-secundario" (click)="eliminar(sala)">Eliminar</button>
+        </div>
+      </article>
+    }
+  </section>
+</main>

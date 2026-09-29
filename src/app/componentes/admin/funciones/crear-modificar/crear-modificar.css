@@ -1,0 +1,79 @@
+.titulo {
+    text-align: center;
+    font-size: var(--font-large);
+    margin: var(--spacing-24) 0;
+}
+
+.contenedor {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-16);
+}
+
+/* Tres bloques lado a lado en pantallas grandes para evitar el scroll */
+form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-20);
+    align-items: start;
+}
+
+.bloque {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+    padding: var(--spacing-16);
+    border: 2px solid var(--dark-300);
+    border-radius: var(--spacing-8);
+}
+
+.bloque legend {
+    font-size: var(--font-small);
+    font-weight: 700;
+    padding: 0 var(--spacing-8);
+}
+
+.opcion {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+}
+
+.opcion__titulo {
+    font-size: var(--font-xsmall);
+    font-weight: 600;
+}
+
+.resumen {
+    font-size: var(--font-xsmall);
+    color: var(--dark-500);
+}
+
+.mensajes {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-8);
+}
+
+.error {
+    color: var(--primary-solid);
+    font-size: var(--font-xsmall);
+}
+
+button[type='submit'] {
+    font-family: var(--base-font);
+    font-size: var(--font-medium);
+    color: var(--light-font-solid);
+    background-color: var(--primary-solid);
+    padding: var(--spacing-8) var(--spacing-24);
+    border: 0;
+    border-radius: var(--spacing-8);
+    cursor: pointer;
+    transition: background-color .2s ease-in-out;
+}
+
+button[type='submit']:hover {
+    background-color: var(--primary-900);
+}

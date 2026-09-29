@@ -32,9 +32,21 @@ export const routes: Routes = [
   children: [
     { path: '', redirectTo: 'homeadmin', pathMatch: 'full' },
     { path:'homeadmin',loadComponent:()=>import('./componentes/admin/menu-admin/menu-admin').then(m=>m.MenuAdmin)},
-    { path: 'funciones', loadComponent: () => import('./componentes/admin/funciones/funciones').then(m => m.Funciones) },
+    {
+      path: 'funciones',
+      children: [
+        { path: '', loadComponent: () => import('./componentes/admin/funciones/funciones').then(m => m.Funciones) },
+        { path: 'crear', loadComponent: () => import('./componentes/admin/funciones/crear-modificar/crear-modificar').then(m => m.CrearModificarFuncion) },
+      ],
+    },
     { path: 'empleados', loadComponent: () => import('./componentes/admin/empleados/empleados').then(m => m.Empleados) },
-    { path: 'salas', loadComponent: () => import('./componentes/admin/salas/salas').then(m => m.Salas) },
+    {
+      path: 'salas',
+      children: [
+        { path: '', loadComponent: () => import('./componentes/admin/salas/salas').then(m => m.Salas) },
+        { path: 'crear', loadComponent: () => import('./componentes/admin/salas/crear-modificar/crear-modificar').then(m => m.CrearModificarSala) },
+      ],
+    },
     {
       path: 'peliculas',
       children: [

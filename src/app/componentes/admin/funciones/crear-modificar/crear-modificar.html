@@ -1,0 +1,142 @@
+<h1 class="titulo">{{ esEdicion() ? 'Modificar función' : 'Crear funciones' }}</h1>
+
+<div class="contenedor">
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  <form (submit)="onSubmit($event)" novalidate>
+
+    <!-- Columna 1: qué se proyecta -->
+    <fieldset class="bloque">
+      <legend>Qué se proyecta</legend>
+
+      <mat-form-field>
+        <mat-label>Película</mat-label>
+        <mat-select [value]="funcionForm.pelicula_id().value()" (selectionChange)="setPelicula($event.value)">
+          @for (p of peliculas(); track p.id) {
+            <mat-option [value]="p.id">{{ p.nombre }} ({{ p.duracion_minutos }} min)</mat-option>
+          }
+        </mat-select>
+        @if (intentoEnvio() && funcionForm.pelicula_id().invalid()) {
+          <mat-error>{{ funcionForm.pelicula_id().errors()[0].message }}</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="opcion">
+        <span class="opcion__titulo">Formato</span>
+        <mat-button-toggle-group [value]="funcionForm.formato().value()" (change)="setFormato($event.value)">
+          @for (f of formatos; track f) {
+            <mat-button-toggle [value]="f">{{ f }}</mat-button-toggle>
+          }
+        </mat-button-toggle-group>
+      </div>
+
+      <div class="opcion">
+        <span class="opcion__titulo">Idioma</span>
+        <mat-button-toggle-group [value]="funcionForm.idioma().value()" (change)="setIdioma($event.value)">
+          <mat-button-toggle value="castellano">Castellano</mat-button-toggle>
+          <mat-button-toggle value="subtitulada">Subtitulada</mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+    </fieldset>
+
+    <!-- Columna 2: cuándo -->
+    <fieldset class="bloque">
+      <legend>Cuándo</legend>
+
+      @if (esEdicion()) {
+        <mat-form-field>
+          <mat-label>Fecha</mat-label>
+          <input matInput [matDatepicker]="pickerUnico" [min]="hoy"
+                 [value]="fechaUnica()" (dateChange)="fechaUnica.set($event.value)" />
+          <mat-datepicker-toggle matIconSuffix [for]="pickerUnico" />
+          <mat-datepicker #pickerUnico />
+        </mat-form-field>
+      } @else {
+        <mat-form-field>
+          <mat-label>Desde - Hasta</mat-label>
+          <mat-date-range-input [rangePicker]="pickerRango" [min]="hoy">
+            <input matStartDate placeholder="Desde" [value]="desde()" (dateChange)="desde.set($event.value)" />
+            <input matEndDate placeholder="Hasta" [value]="hasta()" (dateChange)="hasta.set($event.value)" />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matIconSuffix [for]="pickerRango" />
+          <mat-date-range-picker #pickerRango />
+        </mat-form-field>
+
+        <div class="opcion">
+          <span class="opcion__titulo">Días de la semana</span>
+          <mat-button-toggle-group multiple [value]="diasElegidos()" (change)="diasElegidos.set($event.value)">
+            @for (d of diasSemana; track d.valor) {
+              <mat-button-toggle [value]="d.valor">{{ d.corto }}</mat-button-toggle>
+            }
+          </mat-button-toggle-group>
+        </div>
+      }
+
+      <mat-form-field>
+        <mat-label>Horario de inicio</mat-label>
+        <input matInput [matTimepicker]="pickerHora" [value]="hora()" (valueChange)="hora.set($event)" />
+        <mat-timepicker-toggle matIconSuffix [for]="pickerHora" />
+        <mat-timepicker #pickerHora interval="5m" />
+      </mat-form-field>
+
+      @if (!esEdicion() && fechasGeneradas().length > 0) {
+        <p class="resumen">
+          Se crearán <strong>{{ fechasGeneradas().length }}</strong>
+          {{ fechasGeneradas().length === 1 ? 'función' : 'funciones' }}. La sala se asigna automáticamente.
+        </p>
+      }
+    </fieldset>
+
+    <!-- Columna 3: precios -->
+    <fieldset class="bloque">
+      <legend>Precios</legend>
+
+      <mat-form-field>
+        <mat-label>Precio base ($)</mat-label>
+        <input matInput type="number" step="0.01" [formField]="funcionForm.precio_base" />
+        @if (funcionForm.precio_base().touched() && funcionForm.precio_base().invalid()) {
+          <mat-error>{{ funcionForm.precio_base().errors()[0].message }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Días de preventa</mat-label>
+        <input matInput type="number" [formField]="funcionForm.dias_preventa" />
+        <mat-hint>0 = sin preventa</mat-hint>
+        @if (funcionForm.dias_preventa().touched() && funcionForm.dias_preventa().invalid()) {
+          <mat-error>{{ funcionForm.dias_preventa().errors()[0].message }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Precio de preventa ($)</mat-label>
+        <input matInput type="number" step="0.01" [formField]="funcionForm.precio_preventa" />
+        @if (funcionForm.precio_preventa().touched() && funcionForm.precio_preventa().invalid()) {
+          <mat-error>{{ funcionForm.precio_preventa().errors()[0].message }}</mat-error>
+        }
+      </mat-form-field>
+
+      @if (peliculaElegida(); as pelicula) {
+        <p class="resumen">
+          Estreno: {{ pelicula.fecha_estreno }}. La preventa rige durante los días previos al estreno.
+        </p>
+      }
+    </fieldset>
+
+    <div class="mensajes">
+      @if (intentoEnvio()) {
+        @for (e of erroresFechas(); track e) {
+          <p class="error">{{ e }}</p>
+        }
+      }
+      @if (errorMsg()) {
+        <p class="error">{{ errorMsg() }}</p>
+      }
+      <button type="submit" [disabled]="funcionForm().submitting()">
+        {{ funcionForm().submitting() ? 'Guardando...' : (esEdicion() ? 'Modificar' : 'Crear') }}
+      </button>
+    </div>
+  </form>
+</div>

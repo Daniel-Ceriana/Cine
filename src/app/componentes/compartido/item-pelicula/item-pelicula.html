@@ -4,7 +4,7 @@
   <div class="item-pelicula__info">
     <h3 class="item-pelicula__nombre">{{ pelicula().nombre }}</h3>
     <p class="item-pelicula__meta">
-      <!--{{ pelicula().formato }} ·--> {{ pelicula().idioma.toUpperCase() }} · {{ pelicula().duracion_minutos }} min
+      {{ pelicula().duracion_minutos }} min
     </p>
     <p class="item-pelicula__restriccion">
       {{ pelicula().restriccion_edad === 0 ? 'ATP' : '+' + pelicula().restriccion_edad }}

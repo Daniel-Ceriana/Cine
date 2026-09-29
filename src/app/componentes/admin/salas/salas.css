@@ -1,0 +1,72 @@
+.salas__lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-20);
+    padding: var(--spacing-36) var(--spacing-8);
+}
+
+.sala {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--spacing-16);
+    width: 260px;
+    padding: var(--spacing-16);
+    background-color: var(--light-bg-solid);
+    border-radius: var(--spacing-8);
+    box-shadow: 0 2px 6px var(--dark-300);
+}
+
+.sala--inactiva {
+    opacity: .6;
+}
+
+.sala__nombre {
+    font-size: var(--font-small);
+    font-weight: 700;
+    margin: 0;
+}
+
+.sala__meta,
+.sala__estado {
+    font-size: var(--font-xsmall);
+    color: var(--dark-500);
+}
+
+.sala__estado {
+    font-weight: 600;
+}
+
+.sala__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+}
+
+button {
+    font-family: var(--base-font);
+    font-size: var(--font-xsmall);
+    color: var(--light-font-solid);
+    background-color: var(--primary-solid);
+    padding: var(--spacing-8) var(--spacing-12);
+    border: 0;
+    border-radius: var(--spacing-8);
+    cursor: pointer;
+    transition: background-color .2s ease-in-out;
+}
+
+button:hover {
+    background-color: var(--primary-900);
+}
+
+.sala__btn-secundario {
+    background-color: var(--dark-bg-solid);
+}
+
+.sala__btn-secundario:hover {
+    background-color: var(--dark-900);
+}
+
+.error {
+    color: var(--primary-solid);
+}

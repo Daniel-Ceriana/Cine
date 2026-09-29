@@ -1,0 +1,53 @@
+<h1>{{ esEdicion() ? 'Modificar sala' : 'Crear sala' }}</h1>
+
+<div class="contenedor-form">
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  <form (submit)="onSubmit($event)" novalidate>
+
+    <div class="item">
+      <section>
+        <label>Número de sala</label>
+        <input type="number" [formField]="salaForm.numero" />
+      </section>
+      @if (salaForm.numero().touched() && salaForm.numero().invalid()) {
+        <small class="error">{{ salaForm.numero().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Nombre</label>
+        <input type="text" [formField]="salaForm.nombre" />
+      </section>
+      @if (salaForm.nombre().touched() && salaForm.nombre().invalid()) {
+        <small class="error">{{ salaForm.nombre().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>
+          <input type="checkbox" [formField]="salaForm.activa" />
+          Activa
+        </label>
+      </section>
+    </div>
+
+    @if (!esEdicion()) {
+      <small>Al crear la sala se generan sus butacas con la distribución estándar del cine.</small>
+    }
+
+    @if (errorMsg()) {
+      <p class="error">{{ errorMsg() }}</p>
+    }
+
+    <div class="item">
+      <button type="submit" [disabled]="salaForm().submitting()">
+        {{ salaForm().submitting() ? 'Guardando...' : (esEdicion() ? 'Modificar' : 'Crear') }}
+      </button>
+    </div>
+  </form>
+</div>

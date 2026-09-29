@@ -29,8 +29,6 @@ export class CrearModificar implements OnInit {
   errorMsg = signal('');
   cargando = signal(false);
 
-  // formatos: Array<'2D' | '3D' | '4D' | '5D'> = ['2D', '3D', '4D', '5D'];
-
   peliculaId = signal<string | null>(null);
   esEdicion = computed(() => this.peliculaId() !== null);
 
@@ -45,13 +43,8 @@ export class CrearModificar implements OnInit {
     sinopsis: '',
     imagen_url: '',
     duracion_minutos: 0,
-    // formato: '2D',
-    idioma: 'castellano',
     restriccion_edad: '0',
     fecha_estreno: '',
-    precio_base: 0,
-    precio_preventa: 0,
-    dias_preventa: 0,
     activa: true,
     destacada: false,
 
@@ -77,11 +70,6 @@ export class CrearModificar implements OnInit {
       value() <= 0 ? { kind: 'min', message: 'Tiene que ser mayor a 0' } : null,
     );
 
-    // required(p.formato, { message: 'Seleccioná un formato' });
-
-    required(p.idioma, { message: 'El idioma es obligatorio' });
-    maxLength(p.idioma, 50, { message: 'Máximo 50 caracteres' });
-
     // restriccion_edad puede ser 0, por eso no uso required puro (0 es falsy)
     // sino que valido explícitamente que no sea null/undefined y no sea negativo
     // validate(p.restriccion_edad, ({ value }) => {
@@ -99,19 +87,6 @@ export class CrearModificar implements OnInit {
     // });
 
     required(p.fecha_estreno, { message: 'La fecha de estreno es obligatoria' });
-
-    required(p.precio_base, { message: 'El precio base es obligatorio' });
-    validate(p.precio_base, ({ value }) =>
-      value() <= 0 ? { kind: 'min', message: 'Tiene que ser mayor a 0' } : null,
-    );
-
-    validate(p.precio_preventa, ({ value }) =>
-      value() < 0 ? { kind: 'min', message: 'No puede ser negativo' } : null,
-    );
-
-    validate(p.dias_preventa, ({ value }) =>
-      value() < 0 ? { kind: 'min', message: 'No puede ser negativo' } : null,
-    );
   });
 
  async ngOnInit() {
@@ -134,13 +109,8 @@ export class CrearModificar implements OnInit {
       sinopsis: pelicula.sinopsis,
       imagen_url: pelicula.imagen_url,
       duracion_minutos: pelicula.duracion_minutos,
-      // formato: pelicula.formato,
-      idioma: pelicula.idioma,
       restriccion_edad: String(pelicula.restriccion_edad),
       fecha_estreno: pelicula.fecha_estreno,
-      precio_base: pelicula.precio_base,
-      precio_preventa: pelicula.precio_preventa,
-      dias_preventa: pelicula.dias_preventa,
       activa: pelicula.activa,
       destacada: pelicula.destacada,
     });

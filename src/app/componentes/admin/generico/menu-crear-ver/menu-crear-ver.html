@@ -2,11 +2,11 @@
     <h1 class="admin__title">Menú Admin</h1>
     <ul class="admin__menu">
         <li class="admin__item">
-            <a class="admin__link" routerLink="/admin/peliculas/crear">Crear pelicula</a>
+            <a class="admin__link" [routerLink]="ruta() + '/crear'">{{ etiquetaCrear() }}</a>
         </li>
         @if(modificar()){
             <li  class="admin__item">
-                <a class="admin__link" routerLink="/admin/peliculas/ver">Modificar pelicula</a>
+                <a class="admin__link" [routerLink]="ruta()">{{ etiquetaVer() }}</a>
             </li>
         }
     </ul>

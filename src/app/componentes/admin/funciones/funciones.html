@@ -1,1 +1,72 @@
-<p>funciones works!</p>
+<app-menu-crear-ver
+    [modificar]="false"
+    ruta="/admin/funciones"
+    etiquetaCrear="Crear funciones"
+    etiquetaVer="Ver funciones"></app-menu-crear-ver>
+
+<main class="container funciones">
+  <form class="funciones__filtros" (submit)="$event.preventDefault()">
+    <label>
+      Película
+      <select [formField]="filtrosForm.pelicula_id">
+        <option value="">Todas</option>
+        @for (p of peliculas(); track p.id) {
+          <option [value]="p.id">{{ p.nombre }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="funciones__check">
+      <input type="checkbox" [formField]="filtrosForm.incluirPasadas" />
+      Incluir funciones pasadas
+    </label>
+  </form>
+
+  @if (cargando()) {
+    <p>Cargando funciones...</p>
+  }
+  @if (errorMsg()) {
+    <p class="error">{{ errorMsg() }}</p>
+  }
+  @if (!cargando() && dias().length === 0) {
+    <p>No hay funciones para mostrar.</p>
+  }
+
+  @for (dia of dias(); track dia.fecha) {
+    <section class="dia">
+      <h2 class="dia__titulo">{{ dia.etiqueta }}</h2>
+
+      <div class="dia__funciones">
+        @for (f of dia.funciones; track f.id) {
+          <article class="funcion" [class.funcion--cancelada]="!f.activa">
+            <img class="funcion__imagen" [src]="f.peliculas.imagen_url" [alt]="f.peliculas.nombre" />
+
+            <div class="funcion__info">
+              <h3 class="funcion__nombre">{{ f.peliculas.nombre }}</h3>
+              <p class="funcion__horario">{{ hora(f.inicio) }} a {{ horaFin(f) }}</p>
+              <p class="funcion__meta">
+                Sala {{ f.salas.numero }} · {{ f.formato }} · {{ f.idioma }}
+              </p>
+              <p class="funcion__meta">
+                $ {{ f.precio_base }}
+                @if (f.dias_preventa > 0) {
+                  · preventa $ {{ f.precio_preventa }} ({{ f.dias_preventa }} días)
+                }
+              </p>
+              @if (!f.activa) {
+                <p class="funcion__estado">Cancelada</p>
+              }
+            </div>
+
+            @if (f.activa) {
+              <div class="funcion__acciones">
+                <button type="button" (click)="onClickModificar(f)">Modificar</button>
+                <button type="button" class="funcion__btn-secundario" (click)="cancelar(f)">Cancelar</button>
+              </div>
+            }
+          </article>
+        }
+      </div>
+    </section>
+  }
+</main>
