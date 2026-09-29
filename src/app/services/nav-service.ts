@@ -1,10 +1,7 @@
-import { Service,signal,computed, inject } from '@angular/core';
+import { Service, computed, inject } from '@angular/core';
 import { NavRoute } from '../interfaces/nav-route';
-import { NavigationEnd, Router } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter } from 'rxjs';
-
-
+import { Rol, RUTA_POR_ROL } from '../modelos/user-model';
+import { Auth } from './auth';
 
 const RUTAS_PUBLICAS: NavRoute[] = [
   { url: '/home', nombre: 'Home' },
@@ -19,71 +16,46 @@ const RUTAS_CLIENTE: NavRoute[] = [
 ];
 
 const RUTAS_ADMIN: NavRoute[] = [
-  { url: '/homeadmin', nombre: 'Home' },
+  { url: RUTA_POR_ROL.admin, nombre: 'Home' },
   { url: '/admin/funciones', nombre: 'Funciones' },
   { url: '/admin/peliculas', nombre: 'Peliculas' },
+  { url: '/admin/salas', nombre: 'Salas' },
   { url: '/admin/productos', nombre: 'Productos' },
   { url: '/admin/cupones', nombre: 'Cupones' },
   { url: '/logout', nombre: 'Salir' },
 ];
+
 const RUTAS_EMPLEADO_CANDY: NavRoute[] = [
   { url: '/home', nombre: 'Home' },
   { url: '/candy', nombre: 'Candy' },
   { url: '/logout', nombre: 'Salir' },
 ];
-const RUTAS_EMPLEADO_ENTRADA: NavRoute[] = [
+
+const RUTAS_EMPLEADO_ENTRADAS: NavRoute[] = [
   { url: '/home', nombre: 'Home' },
-  { url: '/entradas', nombre: 'Candy' },
+  { url: '/entradas', nombre: 'Entradas' },
   { url: '/logout', nombre: 'Salir' },
 ];
 
+// El menú que corresponde a cada rol
+const RUTAS_POR_ROL: Record<Rol, NavRoute[]> = {
+  cliente: RUTAS_CLIENTE,
+  admin: RUTAS_ADMIN,
+  empleado_candy: RUTAS_EMPLEADO_CANDY,
+  empleado_entradas: RUTAS_EMPLEADO_ENTRADAS,
+};
 
 @Service()
 export class NavService {
+  private auth = inject(Auth);
 
-private router = inject(Router);
-
-  private _rutaActual = signal(this.router.url);
-  // rutaActual = this._rutaActual.asReadonly();
-constructor() {
-    this.router.events
-      .pipe(
-        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-        takeUntilDestroyed(),
-      )
-      .subscribe((e) => {
-        this._rutaActual.set(e.urlAfterRedirects);
-      });
-  }
-
-
-  private _override = signal<NavRoute[] | null>(null);
-
-  
+  // El menú depende de quién es el usuario (no de la URL): sin sesión se ve el público;
+  // con sesión, el de su rol. Se recalcula solo cuando inicia o cierra sesión.
   rutas = computed<NavRoute[]>(() => {
-    const actual = this._rutaActual();
-    
-    if (actual.startsWith('/admin') || actual.startsWith('/homeadmin')) {
-      return RUTAS_ADMIN;
-    }
-    if (actual.startsWith('/cliente')) {
-      return RUTAS_CLIENTE;
-    }
-        if (actual.startsWith('/candy')) {
-      return RUTAS_EMPLEADO_CANDY;
-    }
-        if (actual.startsWith('/entrada')) {
-      return RUTAS_EMPLEADO_ENTRADA;
-    }
-    return RUTAS_PUBLICAS;
-    
-  });
-  // rutas = computed(() => this._override() ?? this.porDefecto);
-  // setRutas(rutas: NavRoute[]) {
-  //   this._override.set(rutas);
-  // }
+    if (!this.auth.haySesion()) return RUTAS_PUBLICAS;
 
-  // reset() {
-  //   this._override.set(null);
-  // }
+    const rol = this.auth.rol();
+    // hay sesión pero el perfil todavía no llegó: se muestra el menú del cliente, que es el más común
+    return rol ? RUTAS_POR_ROL[rol] : RUTAS_CLIENTE;
+  });
 }
