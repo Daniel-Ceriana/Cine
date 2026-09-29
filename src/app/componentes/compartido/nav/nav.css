@@ -1,112 +1,63 @@
-header {
-    font-family: var(--alternative-font);
-    color: var(--light-font-solid);
-    background-color: var(--dark-bg-solid);
-    gap: var(--spacing-36);
-    padding: var(--spacing-36);
-}
-
-*,
-*::before,
-*::after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    font-family: var(--base-font);
-    color: var(--dark-solid);
-    font-size: 62.5%;
-}
-
-img {
-    width: 100%;
-}
-
-a {
-    color: inherit;
-    text-decoration: none;
-    font-family: inherit;
-    /* en el figma dice 20px */
-}
-
-ul,
-ol {
-    list-style-type: none;
-}
-
-p {
-    font-size: var(--font-medium);
+.cabecera {
+    background-color: var(--bordo);
+    color: var(--crema-superficie);
+    padding-top: var(--spacing-12);
+    border-bottom: 4px solid var(--mostaza);
 }
 
 .navbar {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
+    gap: var(--spacing-8) var(--spacing-20);
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 var(--spacing-16) var(--spacing-12);
 }
 
+/* Nombre del cine como letrero luminoso */
 .navbar__logo {
-    max-width: 300px;
+    font-family: var(--font-titulo);
+    font-size: var(--font-large);
+    letter-spacing: 0.08em;
+    color: var(--mostaza);
+    text-shadow: 0 0 10px rgba(224, 165, 38, 0.55);
 }
 
 .navbar__menu {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-20);
-}
-
-.navbar__link {
-    font-size: var(--font-medium);
-    padding: var(--spacing-8) var(--spacing-16);
-    display: inline-block;
-    transition: background .3s ease-in-out;
-    position: relative;
-}
-
-.navbar__link:hover {
-    background-color: var(--primary-900);
-}
-
-.width-icon {
-    display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--spacing-8);
 }
 
+.navbar__link {
+    display: inline-block;
+    font-size: var(--font-xsmall);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: var(--spacing-8) var(--spacing-12);
+    border-radius: var(--radio);
+    transition: background-color .2s ease-in-out, color .2s ease-in-out;
+}
 
+.navbar__link:hover {
+    background-color: var(--bordo-claro);
+}
 
-/* 
-.navbar{
-    background-color: #333;
-    overflow: hidden;
-    
-    a{
-        float: left;
-        display: block;
-        color: #f2f2f2;
-        text-align: center;
-        padding: 14px 16px;
-        text-decoration: none;
+.navbar__link--activo {
+    background-color: var(--mostaza);
+    color: var(--bordo);
+}
+
+.navbar__link--activo:hover {
+    background-color: var(--mostaza);
+}
+
+@media (max-width: 600px) {
+    .navbar {
+        justify-content: center;
     }
-} */
-
-   /* a{
-        float: left;
-        display: block;
-        color: #f2f2f2;
-        text-align: center;
-        padding: 14px 16px;
-        text-decoration: none;
-    }
-.navbar a:hover{
-    background-color: var();
-    color: black;
-}*/
-
-
-.active{
-    background-color: rgb(4, 170, 109);
-    color: white;
-} 
+}

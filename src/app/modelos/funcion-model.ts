@@ -2,7 +2,6 @@ import { FormatoSala } from './sala-model';
 
 export type IdiomaFuncion = 'castellano' | 'subtitulada';
 
-// El formato (2D/3D/...) no se guarda en la función: lo determina su sala
 export interface FuncionModel {
   id: string;
   pelicula_id: string;

@@ -1,20 +1,14 @@
-    <header>
-        <nav class="navbar">
-            <!-- <picture class="navbar__logo">
-                <a href="./index.html"><img src="./img/multimedia/branding/logo_light_horizontal.svg" alt="logo Funkoshop"></a>
-            </picture> -->
+<header class="cabecera">
+    <nav class="navbar">
+        <a class="navbar__logo" routerLink="/home">Cine</a>
 
-            <a [routerLink]="'/home'" routerLinkActive="active">Logo/nombre</a>
-            
-
-            <ul class="navbar__menu">
-                @for (ruta of navService.rutas(); track ruta.url) {
-                    <li class="navbar__item">
-                          <a class="navbar__link" [routerLink]="ruta.url" routerLinkActive="active">{{ ruta.nombre }}</a>
-                    </li>
-                }
-            </ul>
-
-
-        </nav>
-    </header>
+        <ul class="navbar__menu">
+            @for (ruta of navService.rutas(); track ruta.url) {
+                <li>
+                    <a class="navbar__link" [routerLink]="ruta.url" routerLinkActive="navbar__link--activo">{{ ruta.nombre }}</a>
+                </li>
+            }
+        </ul>
+    </nav>
+    <div class="marquesina"></div>
+</header>

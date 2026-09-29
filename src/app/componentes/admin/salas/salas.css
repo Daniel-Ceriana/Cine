@@ -1,72 +1,78 @@
 .salas__lista {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: var(--spacing-20);
-    padding: var(--spacing-36) var(--spacing-8);
 }
 
 .sala {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: var(--spacing-16);
-    width: 260px;
-    padding: var(--spacing-16);
-    background-color: var(--light-bg-solid);
-    border-radius: var(--spacing-8);
-    box-shadow: 0 2px 6px var(--dark-300);
+}
+
+/* las muescas van sobre la línea de corte (ver .sala__acciones), no al medio */
+.sala::before,
+.sala::after {
+    display: none;
 }
 
 .sala--inactiva {
-    opacity: .6;
+    opacity: .65;
+}
+
+.sala__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--spacing-20);
+}
+
+.sala__numero {
+    font-size: var(--font-xsmall);
+    color: var(--rojo);
+    letter-spacing: 0.15em;
 }
 
 .sala__nombre {
-    font-size: var(--font-small);
-    font-weight: 700;
-    margin: 0;
+    font-size: var(--font-medium);
 }
 
-.sala__meta,
-.sala__estado {
+.sala__meta {
     font-size: var(--font-xsmall);
-    color: var(--dark-500);
+    color: var(--tinta-suave);
 }
 
-.sala__estado {
-    font-weight: 600;
+.sala__chips {
+    display: flex;
+    gap: var(--spacing-8);
+    margin-top: var(--spacing-8);
 }
 
+/* línea de corte del ticket entre los datos y las acciones */
 .sala__acciones {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     gap: var(--spacing-8);
+    padding: var(--spacing-16) var(--spacing-20);
+    border-top: 2px dashed var(--crema-borde);
 }
 
-button {
-    font-family: var(--base-font);
-    font-size: var(--font-xsmall);
-    color: var(--light-font-solid);
-    background-color: var(--primary-solid);
-    padding: var(--spacing-8) var(--spacing-12);
-    border: 0;
-    border-radius: var(--spacing-8);
-    cursor: pointer;
-    transition: background-color .2s ease-in-out;
+.sala__acciones::before,
+.sala__acciones::after {
+    content: '';
+    position: absolute;
+    top: -11px;
+    width: 18px;
+    height: 18px;
+    background-color: var(--crema-fondo);
+    border: 2px solid var(--crema-borde);
+    border-radius: 50%;
 }
 
-button:hover {
-    background-color: var(--primary-900);
+.sala__acciones::before {
+    left: -11px;
 }
 
-.sala__btn-secundario {
-    background-color: var(--dark-bg-solid);
-}
-
-.sala__btn-secundario:hover {
-    background-color: var(--dark-900);
-}
-
-.error {
-    color: var(--primary-solid);
+.sala__acciones::after {
+    right: -11px;
 }

@@ -1,28 +1,21 @@
-<article class="item-pelicula">
-  <img class="item-pelicula__imagen" [src]="pelicula().imagen_url" [alt]="pelicula().nombre" />
-
-  <div class="item-pelicula__info">
-    <h3 class="item-pelicula__nombre">{{ pelicula().nombre }}</h3>
-    <p class="item-pelicula__meta">
-      {{ pelicula().duracion_minutos }} min
-    </p>
-    <p class="item-pelicula__restriccion">
+<article class="pelicula">
+  <div class="pelicula__cartel">
+    <img class="pelicula__imagen" [src]="pelicula().imagen_url" [alt]="pelicula().nombre" />
+    <span class="pelicula__restriccion chip" [class.chip--rojo]="pelicula().restriccion_edad > 0">
       {{ pelicula().restriccion_edad === 0 ? 'ATP' : '+' + pelicula().restriccion_edad }}
-    </p>
+    </span>
   </div>
 
-  <div class="item-pelicula__acciones">
+  <div class="pelicula__info">
+    <h3 class="pelicula__nombre">{{ pelicula().nombre }}</h3>
+    <p class="pelicula__meta texto-ticket">{{ pelicula().duracion_minutos }} min</p>
+  </div>
+
+  <div class="pelicula__acciones">
     @if (esAdmin()) {
-      <button
-        type="button"
-        class="item-pelicula__btn-modificar"
-        (click)="onClickModificar()">
-        Modificar
-      </button>
+      <button type="button" (click)="onClickModificar()">Modificar</button>
     } @else {
-      <a class="item-pelicula__btn-sinopsis" [routerLink]="['/peliculas', pelicula().id]">
-        Sinopsis
-      </a>
+      <a class="btn btn--secundario" [routerLink]="['/peliculas', pelicula().id]">Sinopsis</a>
     }
   </div>
 </article>

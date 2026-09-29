@@ -1,57 +1,48 @@
-<main class="container">
+<main class="pagina listado">
 
-    <!-- section buscar -->
-    <form class="ui-search-filter" (submit)="$event.preventDefault()">
-        <div class="ui-search-filter__search-container">
-            <h4 class="ui-search-filter__search-container--title" for="buscar">BUSCAR</h4>
-            <input class="ui-search-filter__search-container--input" type="text" [formField]="filtrosForm.nombre"
-                placeholder="nombre">
+    <form class="filtros" (submit)="$event.preventDefault()">
+        <div class="filtros__campo filtros__campo--buscar">
+            <label for="buscar">Buscar</label>
+            <input id="buscar" type="text" [formField]="filtrosForm.nombre" placeholder="Nombre de la película">
         </div>
-        <div class="ui-search-filter__order">
-            <h4 class="ui-search-filter__order--title" for="orden">GENERO</h4>
-            <select class="ui-search-filter__order--select" [formField]="filtrosForm.genero">
-                <option value="" disabled selected hidden>Seleccioná...</option>
-                <!-- <option class="ui-search-filter__order--select__max-to-min" [value]="">Sin filtro</option> -->
-                        @for (g of generos(); track g) {
-                <option class="ui-search-filter__order--select__min-to-max" [value]="g.nombre">{{ g.nombre }}</option>
-                        }
+
+        <div class="filtros__campo">
+            <label for="genero">Género</label>
+            <select id="genero" [formField]="filtrosForm.genero">
+                <option value="">Todos</option>
+                @for (g of generos(); track g.id) {
+                <option [value]="g.nombre">{{ g.nombre }}</option>
+                }
             </select>
         </div>
 
-        <div class="ui-search-filter__filter-container">
-            <h4 class="ui-search-filter__filter-container--title">FILTRAR</h4>
-            <div>
-                <input class="ui-search-filter__filter-container--checkbox" type="checkbox" [formField]="filtrosForm.destacada">
-                <label class="ui-search-filter__filter-container--label" for="destacada">DESTACADA</label>
-            </div>
-        </div>
+        <label class="filtros__check">
+            <input type="checkbox" [formField]="filtrosForm.destacada">
+            Destacadas
+        </label>
 
-      <button type="button" class="filtros__limpiar" (click)="limpiarFiltros()">Limpiar</button>
-    
+        @if (hayFiltrosActivos()) {
+        <button type="button" class="btn--secundario" (click)="limpiarFiltros()">Limpiar</button>
+        }
     </form>
 
-    <section class="search-results listado-peliculas__grid">
-        @if (cargando()) {
-        <p>Cargando películas...</p>
+    @if (cargando()) {
+    <p class="listado__mensaje">Cargando películas...</p>
+    }
+    @if (errorMsg()) {
+    <p class="error">{{ errorMsg() }}</p>
+    }
+    @if (!cargando() && peliculas().length === 0) {
+    <p class="listado__mensaje">No hay películas disponibles.</p>
+    }
+    @if (!cargando() && peliculas().length > 0 && peliculasFiltradas().length === 0) {
+    <p class="listado__mensaje">Ninguna película coincide con la búsqueda.</p>
+    }
+
+    <section class="grilla">
+        @for (pelicula of peliculasFiltradas(); track pelicula.id) {
+        <app-item-pelicula [pelicula]="pelicula" [esAdmin]="esAdmin()" />
         }
-        @if (errorMsg()) {
-        <p class="error">{{ errorMsg() }}</p>
-        }
-
-        @if (!cargando() && peliculas().length === 0) {
-        <p>No hay películas disponibles.</p>
-        }
-        <section class="search-results__container">
-            @for (pelicula of peliculasFiltradas(); track pelicula.id) {
-            <app-item-pelicula [pelicula]="pelicula" [esAdmin]="esAdmin()" />
-            }
-
-        </section>
-
-
     </section>
-
-
-
 
 </main>

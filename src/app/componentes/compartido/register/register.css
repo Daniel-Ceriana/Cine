@@ -1,0 +1,10 @@
+.enlace-alterno {
+    text-align: center;
+    padding-bottom: var(--spacing-36);
+}
+
+.enlace-alterno a {
+    color: var(--rojo);
+    font-weight: 700;
+    text-decoration: underline;
+}

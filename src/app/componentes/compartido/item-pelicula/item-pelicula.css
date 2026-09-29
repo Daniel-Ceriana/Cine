@@ -1,83 +1,60 @@
-.item-pelicula {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    background-color: var(--light-bg-solid);
-    border-radius: var(--spacing-8);
-    overflow: hidden;
-    cursor: pointer;
-    box-shadow: 0 2px 6px var(--dark-300);
-    transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
-    width: 220px;
-    height: 450px;
-}
-
-.item-pelicula:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 16px var(--dark-300);
-}
-
-.item-pelicula__imagen {
-    width: 100%;
-    aspect-ratio: 2 / 3;
-    object-fit: cover;
-    display: block;
-    background-color: var(--dark-300);
-}
-
-.item-pelicula__info {
+/* Tarjeta de película: el póster va enmarcado como un cartel de cine */
+.pelicula {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-8);
-    padding: var(--spacing-16);
+    height: 100%;
 }
 
-.item-pelicula__nombre {
-    font-size: var(--font-small);
-    font-weight: 700;
-    color: var(--dark-solid);
-    margin: 0;
-    line-height: 1.3;
+.pelicula__cartel {
+    position: relative;
+    border: 4px solid var(--bordo);
+    outline: 2px solid var(--mostaza);
+    outline-offset: -8px;
+    border-radius: 4px;
+    background-color: var(--bordo);
+    overflow: hidden;
+    box-shadow: var(--sombra);
+    transition: transform .2s ease-in-out;
 }
 
-.item-pelicula__meta {
-    font-size: var(--font-xsmall);
-    color: var(--dark-500);
-    margin: 0;
+.pelicula:hover .pelicula__cartel {
+    transform: translateY(-4px);
 }
 
-.item-pelicula__restriccion {
-    align-self: flex-start;
-    font-size: var(--font-xsmall);
-    font-weight: 600;
-    padding: 2px var(--spacing-8);
-    border-radius: var(--spacing-8);
-    background-color: var(--secundary-300);
-    color: var(--dark-solid);
-    margin: 0;
+.pelicula__imagen {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
 }
 
-.item-pelicula__btn-modificar {
+.pelicula__restriccion {
     position: absolute;
-    top: var(--spacing-8);
-    right: var(--spacing-8);
-    border: none;
-    border-radius: var(--spacing-8);
-    padding: var(--spacing-8) var(--spacing-12);
+    top: var(--spacing-12);
+    right: var(--spacing-12);
+}
+
+.pelicula__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pelicula__nombre {
+    font-size: var(--font-small);
+    line-height: 1.25;
+}
+
+.pelicula__meta {
     font-size: var(--font-xsmall);
-    font-weight: 600;
-    font-family: var(--base-font);
-    background-color: var(--primary-solid);
-    color: var(--light-font-solid);
-    cursor: pointer;
-    transition: background-color .2s ease-in-out;
+    color: var(--tinta-suave);
 }
 
-.item-pelicula__btn-modificar:hover {
-    background-color: var(--primary-900);
+.pelicula__acciones {
+    margin-top: auto;
 }
 
-.item-pelicula__btn-modificar:focus-visible {
-    outline: 2px solid var(--secundary-solid);
-    outline-offset: 2px;
+.pelicula__acciones .btn,
+.pelicula__acciones button {
+    width: 100%;
 }

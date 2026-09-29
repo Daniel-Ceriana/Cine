@@ -1,16 +1,10 @@
-.titulo {
-    text-align: center;
-    font-size: var(--font-large);
-    margin: var(--spacing-24) 0;
-}
-
 .contenedor {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 0 var(--spacing-16);
+    padding: 0 var(--spacing-16) var(--spacing-36);
 }
 
-/* Tres bloques lado a lado en pantallas grandes para evitar el scroll */
+/* Tres bloques lado a lado en pantallas grandes (poco scroll); uno debajo del otro en el celular */
 form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -22,15 +16,22 @@ form {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-12);
-    padding: var(--spacing-16);
-    border: 2px solid var(--dark-300);
-    border-radius: var(--spacing-8);
+    padding: var(--spacing-16) var(--spacing-20) var(--spacing-20);
+    background-color: var(--crema-superficie);
+    border: 2px solid var(--crema-borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
 }
 
 .bloque legend {
+    font-family: var(--font-titulo);
     font-size: var(--font-small);
-    font-weight: 700;
-    padding: 0 var(--spacing-8);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--crema-superficie);
+    background-color: var(--bordo);
+    padding: var(--spacing-8) var(--spacing-16);
+    border-radius: var(--radio);
 }
 
 .opcion {
@@ -46,7 +47,7 @@ form {
 
 .resumen {
     font-size: var(--font-xsmall);
-    color: var(--dark-500);
+    color: var(--tinta-suave);
 }
 
 .fechas {
@@ -57,38 +58,30 @@ form {
 }
 
 .fechas__item {
+    font-family: var(--font-ticket);
     font-size: var(--font-xsmall);
     padding: 2px var(--spacing-8);
-    border-radius: var(--spacing-8);
-    background-color: var(--secundary-300);
-    color: var(--dark-solid);
+    border-radius: 4px;
+    background-color: var(--mostaza-suave);
+    border: 1px solid var(--mostaza);
+    color: var(--tinta);
 }
 
 .mensajes {
     grid-column: 1 / -1;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: var(--spacing-8);
 }
 
-.error {
-    color: var(--primary-solid);
-    font-size: var(--font-xsmall);
+.mensajes button[type='submit'] {
+    align-self: center;
+    min-width: min(100%, 280px);
+    padding: var(--spacing-12) var(--spacing-24);
+    font-size: var(--font-small);
 }
 
-button[type='submit'] {
-    font-family: var(--base-font);
-    font-size: var(--font-medium);
-    color: var(--light-font-solid);
-    background-color: var(--primary-solid);
-    padding: var(--spacing-8) var(--spacing-24);
-    border: 0;
-    border-radius: var(--spacing-8);
-    cursor: pointer;
-    transition: background-color .2s ease-in-out;
-}
-
-button[type='submit']:hover {
-    background-color: var(--primary-900);
+.mensajes .error {
+    text-align: center;
 }

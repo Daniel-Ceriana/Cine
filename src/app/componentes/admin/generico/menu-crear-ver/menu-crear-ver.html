@@ -1,5 +1,5 @@
 <div class="contenedor-admin">
-    <h1 class="admin__title">Menú Admin</h1>
+    <h1 class="admin__title">{{ titulo() }}</h1>
     <ul class="admin__menu">
         <li class="admin__item">
             <a class="admin__link" [routerLink]="ruta() + '/crear'">{{ etiquetaCrear() }}</a>

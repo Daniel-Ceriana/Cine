@@ -11,6 +11,7 @@ export class MenuCrearVer {
  modificar = input<boolean>(true);
  // ruta base de la sección, ej: '/admin/salas' (crear queda en ruta + '/crear')
  ruta = input.required<string>();
+ titulo = input.required<string>();
  etiquetaCrear = input.required<string>();
  etiquetaVer = input.required<string>();
 
