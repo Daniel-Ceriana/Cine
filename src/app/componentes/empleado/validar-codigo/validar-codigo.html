@@ -1,0 +1,83 @@
+<main class="pagina validar">
+  <h1 class="titulo-pagina">{{ textos.titulo }}</h1>
+  <p class="validar__subtitulo texto-ticket">{{ textos.subtitulo }}</p>
+
+  <!-- No hay lector de QR: se avisa y solo se puede ingresar el código a mano -->
+  <div class="lector" role="note">
+    <span class="chip chip--rojo">Lector de QR no disponible</span>
+    <p>El lector de QR no está disponible en este momento. Ingresá el código de la entrada a mano.</p>
+  </div>
+
+  <form class="validar__form" (submit)="consultar($event)" novalidate>
+    <label for="codigo">Código (ej.: K7Q2-9XMD)</label>
+    <div class="validar__campo">
+      <input
+        id="codigo"
+        type="text"
+        class="validar__input texto-ticket"
+        [formField]="codigoForm.codigo"
+        autocomplete="off"
+        autocapitalize="characters"
+        placeholder="XXXX-XXXX" />
+      <button type="submit" [disabled]="consultando()">{{ consultando() ? 'Buscando...' : 'Consultar' }}</button>
+    </div>
+  </form>
+
+  @if (errorMsg()) {
+    <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+  }
+
+  <!-- Validación recién hecha -->
+  @if (confirmado(); as ok) {
+    <section class="resultado resultado--ok ticket" role="status">
+      <h2>{{ textos.exito }}</h2>
+      <p class="texto-ticket">{{ ok.pelicula }} · {{ ok.inicio | horaAr }} hs · Sala {{ ok.sala_numero }}</p>
+      <p>Código {{ ok.codigo }} · {{ ok.comprador }}</p>
+      <button type="button" (click)="limpiar()">Validar otro código</button>
+    </section>
+  }
+
+  <!-- Compra encontrada (todavía sin confirmar) -->
+  @if (resultado(); as r) {
+    @if (!r.encontrada) {
+      <section class="resultado resultado--error ticket" role="alert">
+        <h2>Código no válido</h2>
+        <p>{{ r.motivo }}</p>
+      </section>
+    } @else {
+      <section class="resultado ticket" [class.resultado--error]="!r.puede_validar">
+        <h2>{{ r.pelicula }}</h2>
+
+        <dl class="resultado__datos">
+          <dt>Función</dt>
+          <dd class="texto-ticket">{{ r.inicio | diaAr }} · {{ r.inicio | horaAr }} hs</dd>
+          <dt>Sala</dt>
+          <dd class="texto-ticket">Sala {{ r.sala_numero }} · {{ r.formato | formatoSala }} · {{ r.idioma | idiomaFuncion }}</dd>
+          <dt>{{ r.butacas!.length === 1 ? 'Butaca' : 'Butacas' }}</dt>
+          <dd class="texto-ticket">
+            @for (b of r.butacas; track b.codigo; let ultima = $last) {
+              {{ b.codigo }}@if (b.tipo !== 'normal') { ({{ b.tipo | tipoButaca }}) }@if (!ultima) {, }
+            }
+          </dd>
+          <dt>A nombre de</dt>
+          <dd>{{ r.comprador }}</dd>
+        </dl>
+
+        @if (r.restriccion_edad! > 0) {
+          <p class="aviso aviso--edad">
+            Película {{ r.restriccion_edad | restriccionEdad }}: verificá que asista un adulto.
+          </p>
+        }
+
+        @if (r.puede_validar) {
+          <button type="button" (click)="confirmar()" [disabled]="validando()">
+            {{ validando() ? 'Registrando...' : textos.boton }}
+          </button>
+        } @else {
+          <p class="resultado__motivo" role="alert">{{ r.motivo }}</p>
+          <button type="button" class="btn--secundario" (click)="limpiar()">Probar otro código</button>
+        }
+      </section>
+    }
+  }
+</main>

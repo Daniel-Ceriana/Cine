@@ -184,3 +184,39 @@
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+/* Entrada confirmada: QR y código */
+.entrada {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-8);
+}
+
+.entrada__qr {
+    width: 200px;
+    height: 200px;
+    padding: var(--spacing-8);
+    background-color: #ffffff;
+    border: 2px solid var(--crema-borde);
+    border-radius: var(--radio);
+}
+
+.entrada__etiqueta {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.entrada .codigo {
+    font-size: var(--font-large);
+    letter-spacing: 0.15em;
+    color: var(--bordo);
+}
+
+.entrada__ayuda {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+    text-align: center;
+}

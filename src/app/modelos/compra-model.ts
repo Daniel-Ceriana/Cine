@@ -13,9 +13,11 @@ export interface CompraModel {
   subtotal: number;
   descuento: number;
   total: number;
-  qr_token: string; // lo que lleva el QR
+  codigo: string; // 'K7Q2-9XMD': es lo que lleva el QR y lo que el empleado puede escribir a mano
   pagada_at: string | null;
-  entrada_validada_at: string | null;
+  entrada_validada_at: string | null; // la entrada se usa una sola vez
+  tiene_candy: boolean;
+  candy_entregado_at: string | null; // el candy también, por separado
   created_at: string;
 }
 

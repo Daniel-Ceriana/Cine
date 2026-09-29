@@ -88,8 +88,11 @@ tablas usa ese número.
 | RF-35 | Se puede comprar sin cuenta (anónimo) o con cuenta. | 1 | Hecho |
 | RF-36 | Menores de 13 o de 18 años no pueden comprar entradas de películas con esa restricción. Toda entrada de esas películas aclara que debe ir un adulto. | 6 | Hecho |
 | RF-37 | Pago de la compra. | 1 | Parcial |
-| RF-38 | Al confirmar la compra se genera un **PDF** con los datos de la entrada y un **código QR**. | 1 | Pendiente |
+| RF-38 | Al confirmar la compra se genera un **PDF** con los datos de la entrada y un **código QR**. | 1 | Hecho |
 | RF-39 | El usuario puede cancelar hasta 2 horas antes de la función. No se devuelve dinero: se acredita **crédito** en su cuenta, usable junto con otros medios de pago. | 10 | Pendiente |
+
+> RF-62: la entrada ya funciona con un solo uso. El candy también, pero recién se podrá probar de punta a punta
+> cuando la compra incluya productos (RF-51).
 
 > RF-37: el pago está **simulado** (no hay cobro real). La compra queda pendiente hasta confirmarse.
 
@@ -118,16 +121,16 @@ tablas usa ese número.
 
 | ID | Requerimiento | Origen | Estado |
 |----|---------------|--------|--------|
-| RF-60 | Los empleados validan entradas escaneando el QR (cine y candy). | 5 | Pendiente |
-| RF-61 | También se puede ingresar el código a mano si el lector no funciona. | 5 | Pendiente |
-| RF-62 | Una vez validada la entrada o entregada la comida, el QR **deja de funcionar** (la entrada y el candy se validan por separado). | 5 | Pendiente |
+| RF-60 | Los empleados validan entradas y candy con el código de la compra (cine y candy). | 5 | Hecho |
+| RF-61 | Se puede ingresar el código a mano (no hay lector de QR real: solo se genera el QR). | 5 | Hecho |
+| RF-62 | Una vez validada la entrada o entregada la comida, el QR **deja de funcionar** (la entrada y el candy se validan por separado). | 5 | Parcial |
 
 ### 3.7 Administración, reportes y auditoría
 
 | ID | Requerimiento | Origen | Estado |
 |----|---------------|--------|--------|
 | RF-70 | Usuario admin que controla salas, funciones, distribución de butacas, productos, etc. | 5 | Parcial |
-| RF-71 | Gestión de empleados (usuarios que validan QR). | 5 | Pendiente |
+| RF-71 | Gestión de empleados (usuarios que validan QR). | 5 | Hecho |
 | RF-72 | Reporte de facturación por día y de cantidad de entradas vendidas. | 7 | Pendiente |
 | RF-73 | Exportar el reporte de facturación a PDF y a Excel. | 10 | Pendiente |
 | RF-74 | Gráfico de películas más vistas por semana y por mes, y producto del candy más vendido. | 10 | Pendiente |
@@ -198,7 +201,9 @@ Filas R–T   1  2  3  4  |  6 … 25                        | 27 28 29 30   VIP
 12. Menores: con cuenta se verifica con la fecha de nacimiento y se bloquea la compra; sin cuenta se exige tildar una
     declaración de edad. Toda entrada de una película con restricción indica que debe asistir un adulto.
 13. Se puede comprar hasta que empieza la función.
-14. Un solo QR por compra, con validación del cine y del candy por separado.
+14. Un solo código por compra (`K7Q2-9XMD`), que es el contenido del QR y también se puede escribir a mano. La entrada y
+    el candy se validan por separado y una sola vez cada una.
+    La validación de la entrada se habilita desde 60 minutos antes de la función y hasta que termina.
 
 **Usuarios**
 15. Se puede registrar cualquier persona de **10 años o más**.

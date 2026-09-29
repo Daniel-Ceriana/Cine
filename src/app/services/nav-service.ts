@@ -20,20 +20,19 @@ const RUTAS_ADMIN: NavRoute[] = [
   { url: '/admin/funciones', nombre: 'Funciones' },
   { url: '/admin/peliculas', nombre: 'Peliculas' },
   { url: '/admin/salas', nombre: 'Salas' },
+  { url: '/admin/empleados', nombre: 'Empleados' },
   { url: '/admin/productos', nombre: 'Productos' },
   { url: '/admin/cupones', nombre: 'Cupones' },
   { url: '/logout', nombre: 'Salir' },
 ];
 
 const RUTAS_EMPLEADO_CANDY: NavRoute[] = [
-  { url: '/home', nombre: 'Home' },
-  { url: '/candy', nombre: 'Candy' },
+  { url: RUTA_POR_ROL.empleado_candy, nombre: 'Candy' },
   { url: '/logout', nombre: 'Salir' },
 ];
 
 const RUTAS_EMPLEADO_ENTRADAS: NavRoute[] = [
-  { url: '/home', nombre: 'Home' },
-  { url: '/entradas', nombre: 'Entradas' },
+  { url: RUTA_POR_ROL.empleado_entradas, nombre: 'Entradas' },
   { url: '/logout', nombre: 'Salir' },
 ];
 

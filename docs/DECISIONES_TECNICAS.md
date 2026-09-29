@@ -40,6 +40,8 @@ pedir datos y avisar al usuario. Así, aunque alguien saltee la interfaz, las re
 | Angular Material 22 | Selector de hora y controles del formulario de funciones | Se pidió expresamente para fechas y horas |
 | CSS propio con variables | Estilo general | Identidad visual propia (ver sección 7) |
 | Google Fonts | Bungee, Special Elite, Inter | Tipografías de la identidad visual |
+| `qrcode` | Generar el código QR de cada compra | Genera la imagen del QR en el navegador; es pequeña y no depende de Angular |
+| `jsPDF` | Generar el PDF de la entrada | Arma el PDF en el navegador, sin servidor; se reutilizará para exportar reportes |
 
 Decisión: **no** se usó una librería de componentes para toda la interfaz. Se eligió CSS propio para lograr un
 estilo único, y Material queda limitado a los controles donde aporta más (selector de hora, botones de opción,
@@ -263,6 +265,7 @@ Los scripts están en `supabase/` y se ejecutan **en orden** desde el editor SQL
 | `002_formato_en_sala_y_series.sql` | El formato pasa a la sala; series de funciones; nuevas funciones SQL |
 | `003_series_funciones_viejas.sql` | Asigna serie a las funciones creadas antes de la 002 |
 | `004_compras_butacas.sql` | Butacas, configuración, compras, reservas, tiempo real |
+| `005_codigos_validacion.sql` | Código corto de la compra, validación de entrada y candy (un uso por sección) |
 
 ---
 
@@ -376,6 +379,62 @@ cambia, hay que actualizar ambos lugares.
 
 ---
 
+### 6.15 Código de la compra, QR, PDF y validación en el cine
+
+**Un solo código por compra.** Cada compra recibe, al crearse, un código corto con el formato `K7Q2-9XMD`
+(8 caracteres). Ese código es **el contenido del QR** y también lo que el empleado puede **escribir a mano**: lo que
+lee un escáner (si algún día hubiera uno) y lo que se teclea son exactamente lo mismo.
+
+- **Alfabeto sin ambiguos:** no incluye `0`, `O`, `1`, `I` ni `L`, para que no se confundan al leerlo o dictarlo.
+  Quedan 31 símbolos, es decir más de 850 mil millones de combinaciones.
+- **Lo genera la base** (`generar_codigo_compra`), con una fuente de azar segura (`gen_random_uuid()`), y es único.
+  Se acepta con o sin guión, en mayúsculas o minúsculas.
+- Reemplaza al `qr_token` (UUID largo) que existía antes: es incómodo de escribir.
+
+**Dos secciones, un solo uso cada una.** Con el mismo código se valida la **entrada** (ingreso a la sala) y el **candy**
+(retiro de productos), pero cada sección se marca como usada **por separado y una sola vez**
+(`entrada_validada_at` y `candy_entregado_at`). Ejemplo: alguien puede entrar a la sala y retirar el candy más tarde
+con el mismo código, pero no entrar dos veces.
+
+**Toda la lógica está en la base**, en dos funciones SQL:
+- `evaluar_codigo` (solo consulta): dice a qué compra corresponde el código y, si no se puede validar, **por qué**
+  (compra sin pagar, función cancelada, ya usado —con fecha y quién—, todavía es pronto, la función ya terminó, o la
+  compra no incluye candy).
+- `validar_codigo`: marca la sección como usada. Usa `UPDATE ... WHERE ... IS NULL` y comprueba cuántas filas
+  modificó, de modo que **si dos empleados validan el mismo código a la vez, solo uno lo consigue**.
+- Los permisos también se validan ahí: solo el admin y el empleado de esa sección pueden usarlas. Un cliente que
+  llame a la función directamente recibe un error.
+
+**Ventana de validación:** desde **60 minutos antes** del inicio hasta que **termina** la función. Evita que se
+"gaste" una entrada días antes o que se use la de una función que ya terminó.
+
+**Pantalla de empleados.** Es **una sola** (`ValidarCodigo`) usada por dos rutas (`/entradas` y `/candy`), y la ruta
+indica cuál es mediante `data.seccion`. Así no se repite código. El flujo es: el empleado escribe el código →
+**Consultar** muestra película, función, sala, butacas y comprador (y avisa si la película tiene restricción de
+edad) → **Confirmar** registra el ingreso o la entrega. Como no hay un lector de QR real, la pantalla muestra un
+aviso de que el lector no está disponible y solo ofrece el ingreso manual; por eso el sistema **genera** QR pero no
+tiene funciones para **leerlos**.
+
+**Generación del QR y del PDF (en el navegador, sin servidor):**
+- Se usan dos librerías: `qrcode` (arma el QR como imagen) y `jsPDF` (arma el PDF).
+- Se cargan con **importación dinámica**, solo cuando el usuario descarga su entrada: no engordan el paquete inicial
+  (jsPDF pesa unos 410 kB sin comprimir y solo se descarga en ese momento).
+- El PDF tiene el aspecto de una entrada de cine con la identidad visual del sistema: datos de la función a la
+  izquierda, línea de corte punteada y talón con el QR y el código a la derecha. Incluye el aviso de adulto si la
+  película tiene restricción de edad, y las indicaciones de uso.
+- El QR y el PDF se generan **al confirmar el pago**; después el PDF se puede descargar desde la pantalla de
+  confirmación.
+
+**Empleados.** Las cuentas del personal se crean como cualquier otra (registro). El admin, desde la pantalla
+**Empleados**, busca la cuenta por email y le asigna el rol (`empleado_entradas`, `empleado_candy` o `admin`) o se
+lo quita. No puede quitarse a sí mismo el rol de administrador (evita quedarse sin acceso por error).
+
+**Candy.** La compra todavía no incluye productos, así que la columna `tiene_candy` queda en `false` y la pantalla
+de candy responde "la compra no incluye productos". Cuando se implemente el candy, la compra marcará `tiene_candy` y
+la entrega funcionará sin cambios. Para probar la pantalla antes, se puede marcar una compra a mano en la base.
+
+---
+
 ## 7. Tiempo real
 
 Se usa **Supabase Realtime** (`postgres_changes`) suscripto a la tabla `compra_butacas`, filtrando por la función
@@ -429,8 +488,7 @@ que se está viendo.
 
 ## 10. Limitaciones y decisiones abiertas
 
-**Pendiente de implementar** (detalle en `docs/REQUERIMIENTOS.md`): generación de PDF con QR, validación de QR por
-empleados, candy bar, cupones, puntos, crédito y cancelación, reseñas, "Próximamente", "Mis películas", reportes y
+**Pendiente de implementar** (detalle en `docs/REQUERIMIENTOS.md`): candy bar, cupones, puntos, crédito y cancelación, reseñas, "Próximamente", "Mis películas", reportes y
 exportaciones, log de actividad, PWA y despliegue.
 
 **Limitaciones conocidas**

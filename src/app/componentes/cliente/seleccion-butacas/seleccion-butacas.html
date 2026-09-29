@@ -148,8 +148,24 @@
         <h2>¡Compra confirmada!</h2>
         <p>Butacas: <strong class="texto-ticket">{{ seleccionadas().join(', ') }}</strong></p>
         <p>Total pagado: <strong class="texto-ticket">{{ compra()!.total | pesos }}</strong></p>
-        <p>Código de tu entrada:</p>
-        <p class="codigo texto-ticket">{{ compra()!.qr_token }}</p>
+        <div class="entrada">
+          @if (qrUrl()) {
+            <img class="entrada__qr" [src]="qrUrl()" alt="Código QR de tu entrada" />
+          }
+          <p class="entrada__etiqueta">Código de tu entrada</p>
+          <p class="codigo texto-ticket">{{ compra()!.codigo }}</p>
+          <p class="entrada__ayuda">
+            Presentá el QR o este código en la puerta de la sala. Sirve una sola vez para la entrada y, si tu compra
+            incluye productos, otra vez para retirarlos en el candy.
+          </p>
+        </div>
+
+        @if (errorMsg()) {
+          <p class="error">{{ errorMsg() }}</p>
+        }
+        <button type="button" (click)="descargarPdf()" [disabled]="descargando()">
+          {{ descargando() ? 'Generando PDF...' : 'Descargar entrada en PDF' }}
+        </button>
         @if (restriccion() > 0) {
           <p class="aviso aviso--edad">Recordá: para esta película (+{{ restriccion() }}) debe asistir un adulto.</p>
         }

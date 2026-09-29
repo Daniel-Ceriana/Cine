@@ -1,0 +1,114 @@
+.validar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+    max-width: 640px;
+}
+
+.validar__subtitulo {
+    text-align: center;
+    color: var(--tinta-suave);
+    margin-top: calc(var(--spacing-8) * -1);
+}
+
+/* Aviso de que no hay lector de QR */
+.lector {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-12);
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: var(--mostaza-suave);
+    border: 2px solid var(--mostaza);
+    border-radius: var(--radio);
+}
+
+.lector p {
+    flex: 1;
+    min-width: 200px;
+    font-size: var(--font-xsmall);
+}
+
+.validar__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+}
+
+.validar__campo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-12);
+}
+
+/* el código se escribe en mayúsculas grandes para que se lea bien */
+.validar__input {
+    flex: 1;
+    min-width: 180px;
+    font-size: var(--font-large);
+    letter-spacing: 0.2em;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.resultado {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+    padding: var(--spacing-20);
+}
+
+.resultado::before,
+.resultado::after {
+    display: none;
+}
+
+.resultado--ok {
+    border-color: #6FA267;
+    background-color: #EAF3E6;
+}
+
+.resultado--error {
+    border-color: var(--error);
+    background-color: #FFF1EE;
+}
+
+.resultado__datos {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--spacing-8) var(--spacing-16);
+}
+
+.resultado__datos dt {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.resultado__datos dd {
+    font-weight: 600;
+}
+
+.resultado__motivo {
+    font-weight: 700;
+    color: var(--error);
+}
+
+.aviso {
+    padding: var(--spacing-12) var(--spacing-16);
+    border: 2px solid var(--rojo);
+    border-radius: var(--radio);
+    background-color: #FBE3DF;
+    font-size: var(--font-xsmall);
+    font-weight: 600;
+}
+
+@media (max-width: 480px) {
+    .resultado__datos {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .resultado__datos dd {
+        margin-bottom: var(--spacing-8);
+    }
+}

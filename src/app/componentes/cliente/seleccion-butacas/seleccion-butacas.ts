@@ -11,6 +11,7 @@ import { CompraModel, OcupacionButaca } from '../../../modelos/compra-model';
 import { BUTACAS } from '../../../modelos/sala-plantilla';
 import { MapaButacas } from '../../compartido/mapa-butacas/mapa-butacas';
 import { precioVigente } from '../../../utilidades/precio-funcion';
+import { generarQr, descargarEntradaPdf } from '../../../utilidades/entrada-pdf';
 import { PesosPipe } from '../../../pipes/comunes/pesos.pipe';
 import { DiaArPipe, HoraArPipe } from '../../../pipes/comunes/fechas-ar.pipes';
 import { FormatoSalaPipe } from '../../../pipes/sala/sala.pipes';
@@ -69,6 +70,8 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
   compra = signal<CompraModel | null>(null);
   segundosRestantes = signal(0);
   procesando = signal(false);
+  qrUrl = signal(''); // imagen del QR de la compra confirmada
+  descargando = signal(false);
 
   // Datos del comprador sin sesión y declaración de edad
   private model = signal({ nombre: '', email: '', mayor_declarado: false });
@@ -240,14 +243,46 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
     this.errorMsg.set('');
     this.procesando.set(true);
     try {
-      this.compra.set(await this.compraService.confirmarPago(compra.id));
+      const confirmada = await this.compraService.confirmarPago(compra.id);
+      this.compra.set(confirmada);
       this.detenerCuentaRegresiva();
       this.paso.set('listo');
+
+      // El QR se genera solo, con el mismo código de la compra
+      this.qrUrl.set(await generarQr(confirmada.codigo).catch(() => ''));
     } catch (e: any) {
       this.errorMsg.set(e?.message ?? 'No se pudo confirmar el pago');
       this.volverAElegir(true);
     } finally {
       this.procesando.set(false);
+    }
+  }
+
+  // Descarga la entrada en PDF (datos de la función, butacas, QR y código)
+  async descargarPdf() {
+    const compra = this.compra();
+    const f = this.funcion();
+    if (!compra || !f) return;
+
+    this.descargando.set(true);
+    this.errorMsg.set('');
+    try {
+      await descargarEntradaPdf({
+        codigo: compra.codigo,
+        pelicula: f.peliculas.nombre,
+        inicio: f.inicio,
+        salaNumero: f.salas.numero,
+        formato: f.salas.formato,
+        idioma: f.idioma,
+        butacas: this.seleccionadas().map((codigo) => ({ codigo, tipo: this.tipoDe(codigo) })),
+        comprador: compra.nombre,
+        total: compra.total,
+        restriccionEdad: this.restriccion(),
+      });
+    } catch (e: any) {
+      this.errorMsg.set(e?.message ?? 'No se pudo generar el PDF');
+    } finally {
+      this.descargando.set(false);
     }
   }
 

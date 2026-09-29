@@ -1,0 +1,85 @@
+.empleados {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-20);
+    max-width: 760px;
+}
+
+.bloque {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+    padding: var(--spacing-20);
+}
+
+.bloque::before,
+.bloque::after {
+    display: none;
+}
+
+.bloque__ayuda {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.busqueda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-12);
+}
+
+.busqueda input {
+    flex: 1;
+    min-width: 220px;
+}
+
+.cuenta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    padding: var(--spacing-16);
+    background-color: var(--crema-fondo);
+    border: 2px dashed var(--crema-borde);
+    border-radius: var(--radio);
+}
+
+.cuenta button {
+    align-self: flex-start;
+}
+
+.ok {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: #EAF3E6;
+    border: 2px solid #6FA267;
+    border-radius: var(--radio);
+    font-size: var(--font-xsmall);
+    font-weight: 600;
+}
+
+.lista {
+    display: flex;
+    flex-direction: column;
+}
+
+.lista__item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-12);
+    padding: var(--spacing-12) 0;
+    border-bottom: 1px dashed var(--crema-borde);
+}
+
+.lista__item > div {
+    flex: 1;
+    min-width: 180px;
+}
+
+.lista__nombre {
+    font-weight: 700;
+}
+
+.lista__meta {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}

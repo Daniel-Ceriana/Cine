@@ -12,9 +12,10 @@ import { Rol, RUTA_POR_ROL } from '../modelos/user-model';
 // Lo único que esperan es que termine la carga inicial de la sesión.
 // -----------------------------------------------------------------------
 
-// Roles que ya tienen un panel propio. Cuando existan los del personal (candy y entradas),
-// se agregan acá; mientras tanto ven la cartelera en lugar de caer en una ruta inexistente.
-const ROLES_CON_PANEL: Rol[] = ['admin'];
+// Roles que tienen un panel propio (ver RUTA_POR_ROL). Al entrar a la cartelera se los manda ahí.
+// Si se suma un rol nuevo, se agrega acá recién cuando exista su pantalla; si no, quedaría
+// redirigiendo a una ruta inexistente.
+const ROLES_CON_PANEL: Rol[] = ['admin', 'empleado_entradas', 'empleado_candy'];
 
 // Exige sesión iniciada; si no hay, va a la pantalla que explica que hay que iniciar sesión
 export const sesionMatch: CanMatchFn = async () => {

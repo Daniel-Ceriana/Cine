@@ -24,6 +24,20 @@ export const routes: Routes = [
   canDeactivate: [confirmarSalidaGuard],
   loadComponent: () => import('./componentes/cliente/seleccion-butacas/seleccion-butacas').then(m => m.SeleccionButacas),
 },
+// Pantallas del personal: validan entradas y candy ingresando el código a mano.
+// La misma pantalla sirve para las dos secciones; `data.seccion` indica cuál es.
+{
+  path: 'entradas',
+  canMatch: [rolMatch],
+  data: { roles: ['empleado_entradas', 'admin'], seccion: 'entrada' },
+  loadComponent: () => import('./componentes/empleado/validar-codigo/validar-codigo').then(m => m.ValidarCodigo),
+},
+{
+  path: 'candy',
+  canMatch: [rolMatch],
+  data: { roles: ['empleado_candy', 'admin'], seccion: 'candy' },
+  loadComponent: () => import('./componentes/empleado/validar-codigo/validar-codigo').then(m => m.ValidarCodigo),
+},
     {
   path: 'admin',
   canMatch: [rolMatch],

@@ -1,1 +1,68 @@
-<p>empleados works!</p>
+<main class="pagina empleados">
+  <h1 class="titulo-pagina">Empleados</h1>
+
+  <!-- Buscar una cuenta para darle un rol -->
+  <section class="bloque ticket">
+    <h2>Asignar un rol</h2>
+    <p class="bloque__ayuda">
+      Buscá la cuenta por su email. La persona tiene que haberse registrado antes.
+    </p>
+
+    <form class="busqueda" (submit)="buscar($event)" novalidate>
+      <input type="email" [formField]="busquedaForm.email" placeholder="email@ejemplo.com" autocomplete="off" />
+      <button type="submit">Buscar</button>
+    </form>
+
+    @if (encontrada(); as cuenta) {
+      <div class="cuenta">
+        <p>
+          <strong>{{ cuenta.nombre }} {{ cuenta.apellido }}</strong><br />
+          {{ cuenta.email }} · rol actual: {{ cuenta.rol | rolUsuario }}
+        </p>
+
+        <label for="rol">Nuevo rol</label>
+        <select id="rol" [value]="rolElegido()" (change)="rolElegido.set($any($event.target).value)">
+          @for (r of roles; track r.valor) {
+            <option [value]="r.valor" [selected]="r.valor === rolElegido()">{{ r.etiqueta }}</option>
+          }
+        </select>
+
+        <button type="button" (click)="guardar()" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando...' : 'Guardar rol' }}
+        </button>
+      </div>
+    }
+  </section>
+
+  @if (errorMsg()) {
+    <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+  }
+  @if (okMsg()) {
+    <p class="ok" role="status">{{ okMsg() }}</p>
+  }
+
+  <!-- Personal actual -->
+  <section class="bloque ticket">
+    <h2>Personal actual</h2>
+
+    @if (cargando()) {
+      <p>Cargando...</p>
+    }
+    @if (!cargando() && personal().length === 0) {
+      <p class="bloque__ayuda">Todavía no hay personal con rol asignado.</p>
+    }
+
+    <ul class="lista">
+      @for (p of personal(); track p.id) {
+        <li class="lista__item">
+          <div>
+            <p class="lista__nombre">{{ p.nombre }} {{ p.apellido }}</p>
+            <p class="lista__meta">{{ p.email }}</p>
+          </div>
+          <span class="chip" [class.chip--rojo]="p.rol === 'admin'">{{ p.rol | rolUsuario }}</span>
+          <button type="button" class="btn--secundario" (click)="quitar(p)" [disabled]="guardando()">Quitar rol</button>
+        </li>
+      }
+    </ul>
+  </section>
+</main>
