@@ -1,0 +1,86 @@
+.volver {
+    display: inline-flex;
+}
+
+.subtitulo {
+    text-align: center;
+    color: var(--tinta-suave);
+    margin-bottom: var(--spacing-20);
+}
+
+.contadores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-16);
+    margin-bottom: var(--spacing-24);
+}
+
+.contador {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-12);
+}
+
+.contador__valor {
+    font-size: var(--font-large);
+    color: var(--rojo);
+}
+
+.contador__nombre {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+/* mapa a la izquierda y detalle a la derecha; en el celular, uno debajo del otro */
+.contenido {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: var(--spacing-20);
+    align-items: start;
+}
+
+.detalle {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-8);
+    padding: var(--spacing-20);
+}
+
+.detalle::before,
+.detalle::after {
+    display: none;
+}
+
+.detalle__titulo {
+    font-size: var(--font-medium);
+}
+
+.detalle__vacio {
+    color: var(--tinta-suave);
+}
+
+.detalle__datos {
+    display: grid;
+    gap: 2px;
+    width: 100%;
+    margin-top: var(--spacing-8);
+}
+
+.detalle__datos dt {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+    margin-top: var(--spacing-8);
+}
+
+.detalle__datos dd {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+    .contenido {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

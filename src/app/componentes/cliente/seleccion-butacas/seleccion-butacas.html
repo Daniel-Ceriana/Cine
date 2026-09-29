@@ -1,0 +1,167 @@
+<main class="pagina">
+
+  @if (cargando()) {
+    <p>Cargando función...</p>
+  }
+
+  @if (funcion(); as f) {
+    <header class="cabecera-funcion">
+      <img class="cabecera-funcion__poster" [src]="f.peliculas.imagen_url" [alt]="f.peliculas.nombre" />
+      <div>
+        <h1>{{ f.peliculas.nombre }}</h1>
+        <p class="texto-ticket">{{ dia(f.inicio) }} · {{ hora(f.inicio) }}</p>
+        <p class="texto-ticket">Sala {{ f.salas.numero }}</p>
+        <div class="cabecera-funcion__chips">
+          <span class="chip">{{ f.salas.formato }}</span>
+          <span class="chip">{{ f.idioma }}</span>
+          @if (restriccion() > 0) {
+            <span class="chip chip--rojo">+{{ restriccion() }}</span>
+          }
+        </div>
+      </div>
+    </header>
+
+    @if (restriccion() > 0) {
+      <div class="aviso aviso--edad" role="note">
+        <strong>Película +{{ restriccion() }}.</strong>
+        Los menores de {{ restriccion() }} años no pueden comprar entradas para esta película.
+        Toda entrada requiere que asista un adulto.
+      </div>
+    }
+
+    @if (paso() === 'elegir') {
+      <!-- ============ PASO 1: elegir butacas ============ -->
+      @if (avisoMsg()) {
+        <p class="aviso aviso--info" role="status">{{ avisoMsg() }}</p>
+      }
+      @if (errorMsg()) {
+        <p class="error">{{ errorMsg() }}</p>
+      }
+
+      <section class="contenido">
+        <app-mapa-butacas
+          [ocupacion]="ocupacion()"
+          [seleccionadas]="seleccionadas()"
+          (butacaClick)="onButacaClick($event)" />
+
+        <aside class="resumen ticket">
+          <h2 class="resumen__titulo">Tu compra</h2>
+
+          @if (seleccionadas().length === 0) {
+            <p class="resumen__vacio">Tocá las butacas que querés en el mapa (hasta {{ maxButacas }}).</p>
+          } @else {
+            <ul class="resumen__lista">
+              @for (c of seleccionadas(); track c) {
+                <li>
+                  <span class="texto-ticket">{{ c }}</span>
+                  <span>{{ tipoDe(c) }}</span>
+                  <span class="texto-ticket">{{ pesos(precioDe(c)) }}</span>
+                </li>
+              }
+            </ul>
+            @if (hayVip()) {
+              <p class="aviso aviso--vip">
+                Elegiste butacas <strong>VIP</strong>: tienen un recargo de {{ pesos(recargoVip()) }} cada una.
+              </p>
+            }
+            <p class="resumen__total">Total <span class="texto-ticket">{{ pesos(total()) }}</span></p>
+          }
+
+          <!-- Sin sesión iniciada: hay que pedir los datos para enviar la entrada -->
+          @if (!tieneSesion()) {
+            <div class="datos">
+              <p class="datos__titulo">Comprás sin iniciar sesión</p>
+              <label for="nombre">Nombre</label>
+              <input id="nombre" type="text" [formField]="datosForm.nombre" autocomplete="name" />
+              <label for="email">Email (te enviamos la entrada)</label>
+              <input id="email" type="email" [formField]="datosForm.email" autocomplete="email" />
+
+              @if (restriccion() > 0) {
+                <label class="declaracion">
+                  <input type="checkbox" [formField]="datosForm.mayor_declarado" />
+                  Declaro tener {{ restriccion() }} años o más
+                </label>
+              }
+              <p class="datos__ayuda">
+                ¿Tenés cuenta? <a routerLink="/login">Iniciá sesión</a> y aprovechá tus beneficios.
+              </p>
+            </div>
+          }
+
+          @if (intentoEnvio() && faltantes().length > 0) {
+            <div class="faltantes" role="alert">
+              <p class="faltantes__titulo">Falta completar:</p>
+              <ul class="faltantes__lista">
+                @for (m of faltantes(); track m) {
+                  <li>{{ m }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          <button type="button" (click)="continuar()" [disabled]="procesando()">
+            {{ procesando() ? 'Reservando...' : 'Continuar' }}
+          </button>
+        </aside>
+      </section>
+    }
+
+    @if (paso() === 'pagar') {
+      <!-- ============ PASO 2: pagar (la reserva dura 5 minutos) ============ -->
+      <section class="paso-pago ticket">
+        <p class="cuenta texto-ticket" [class.cuenta--urgente]="segundosRestantes() < 60">
+          Tus butacas están reservadas por <strong>{{ tiempo() }}</strong>
+        </p>
+
+        <h2>Confirmá tu compra</h2>
+        <ul class="resumen__lista">
+          @for (c of seleccionadas(); track c) {
+            <li>
+              <span class="texto-ticket">{{ c }}</span>
+              <span>{{ tipoDe(c) }}</span>
+              <span class="texto-ticket">{{ pesos(precioDe(c)) }}</span>
+            </li>
+          }
+        </ul>
+        <p class="resumen__total">Total <span class="texto-ticket">{{ pesos(compra()!.total) }}</span></p>
+        <p class="datos__ayuda">A nombre de {{ compra()!.nombre }} · {{ compra()!.email }}</p>
+
+        @if (errorMsg()) {
+          <p class="error">{{ errorMsg() }}</p>
+        }
+
+        <div class="paso-pago__acciones">
+          <button type="button" (click)="pagar()" [disabled]="procesando()">
+            {{ procesando() ? 'Procesando...' : 'Pagar ' + pesos(compra()!.total) }}
+          </button>
+          <button type="button" class="btn--secundario" (click)="cambiarButacas()" [disabled]="procesando()">
+            Cambiar butacas
+          </button>
+        </div>
+        <p class="datos__ayuda">Pago simulado: no se realiza ningún cobro real.</p>
+      </section>
+    }
+
+    @if (paso() === 'listo') {
+      <!-- ============ PASO 3: compra confirmada ============ -->
+      <section class="paso-pago ticket">
+        <h2>¡Compra confirmada!</h2>
+        <p>Butacas: <strong class="texto-ticket">{{ seleccionadas().join(', ') }}</strong></p>
+        <p>Total pagado: <strong class="texto-ticket">{{ pesos(compra()!.total) }}</strong></p>
+        <p>Código de tu entrada:</p>
+        <p class="codigo texto-ticket">{{ compra()!.qr_token }}</p>
+        @if (restriccion() > 0) {
+          <p class="aviso aviso--edad">Recordá: para esta película (+{{ restriccion() }}) debe asistir un adulto.</p>
+        }
+        <a class="btn" routerLink="/home">Volver a la cartelera</a>
+      </section>
+    }
+  }
+
+  @if (!cargando() && !funcion()) {
+    @if (errorMsg()) {
+      <p class="error">{{ errorMsg() }}</p>
+    }
+    <a class="btn btn--secundario" routerLink="/home">Volver a la cartelera</a>
+  }
+</main>

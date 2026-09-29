@@ -1,0 +1,77 @@
+<main class="pagina">
+  <a class="btn btn--secundario volver" routerLink="/admin/funciones">← Volver a las funciones</a>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+  @if (errorMsg()) {
+    <p class="error">{{ errorMsg() }}</p>
+  }
+
+  @if (funcion(); as f) {
+    <h1 class="titulo-pagina">{{ f.peliculas.nombre }}</h1>
+    <p class="subtitulo texto-ticket">
+      {{ dia(f.inicio) }} · {{ hora(f.inicio) }} · Sala {{ f.salas.numero }} · {{ f.salas.formato }}
+      @if (!f.activa) { · CANCELADA }
+    </p>
+
+    <section class="contadores">
+      <div class="contador ticket">
+        <span class="contador__valor texto-ticket">{{ vendidas().length }}</span>
+        <span class="contador__nombre">Vendidas</span>
+      </div>
+      <div class="contador ticket">
+        <span class="contador__valor texto-ticket">{{ enProceso() }}</span>
+        <span class="contador__nombre">En proceso</span>
+      </div>
+      <div class="contador ticket">
+        <span class="contador__valor texto-ticket">{{ libres() }}</span>
+        <span class="contador__nombre">Libres</span>
+      </div>
+      <div class="contador ticket">
+        <span class="contador__valor texto-ticket">{{ pesos(recaudacion()) }}</span>
+        <span class="contador__nombre">Recaudado</span>
+      </div>
+    </section>
+
+    <section class="contenido">
+      <app-mapa-butacas
+        [ocupacion]="ocupacion()"
+        [resaltada]="codigoElegido()"
+        (butacaClick)="onButacaClick($event)" />
+
+      <aside class="detalle ticket">
+        @if (detalle(); as d) {
+          <h2 class="detalle__titulo">Butaca {{ d.codigo }}</h2>
+          <p class="texto-ticket">
+            {{ d.tipo === 'vip' ? 'VIP' : d.tipo === 'accesible' ? 'Accesible' : 'Común' }}
+          </p>
+
+          @if (d.ocupacion; as o) {
+            <span class="chip" [class.chip--rojo]="o.estado === 'vendida'">
+              {{ o.estado === 'vendida' ? 'Vendida' : 'En proceso de pago' }}
+            </span>
+            <dl class="detalle__datos">
+              <dt>Comprador</dt>
+              <dd>{{ o.compras.nombre }}</dd>
+              <dt>Email</dt>
+              <dd>{{ o.compras.email }}</dd>
+              <dt>Cuenta</dt>
+              <dd>{{ o.compras.usuario_id ? 'Usuario registrado' : 'Sin sesión (anónimo)' }}</dd>
+              <dt>Precio de la butaca</dt>
+              <dd>{{ pesos(o.precio) }}</dd>
+              <dt>Total de la compra</dt>
+              <dd>{{ pesos(o.compras.total) }}</dd>
+              <dt>{{ o.estado === 'vendida' ? 'Pagada' : 'Reservada hasta' }}</dt>
+              <dd>{{ fechaHora((o.estado === 'vendida' ? o.compras.pagada_at : o.reservada_hasta) ?? o.compras.created_at) }}</dd>
+            </dl>
+          } @else {
+            <span class="chip">Libre</span>
+          }
+        } @else {
+          <p class="detalle__vacio">Tocá una butaca del mapa para ver los datos de la compra.</p>
+        }
+      </aside>
+    </section>
+  }
+</main>

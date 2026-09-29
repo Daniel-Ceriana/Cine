@@ -20,18 +20,11 @@ export interface SalaModelForm {
   activa: boolean;
 }
 
-// Supabase devuelve el conteo de una relación como [{ count: n }]
-export interface SalaConButacas extends SalaModel {
-  butacas: { count: number }[];
-}
-
+// Fila de la tabla "butacas": hay una sola distribución, compartida por todas las salas
 export interface ButacaModel {
-  id: string;
-  sala_id: string;
+  codigo: string; // 'A6'
   fila: string;
   bloque: 1 | 2 | 3; // 1 = izquierda, 2 = centro, 3 = derecha
   numero: number;
   tipo: TipoButaca;
 }
-
-export type ButacaPayload = Omit<ButacaModel, 'id'>;

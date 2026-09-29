@@ -12,6 +12,16 @@ export const routes: Routes = [
   canActivate: [clienteGuard],
   loadComponent: () => import('./componentes/cliente/home-cliente/home-cliente').then(m => m.HomeCliente),
 },
+{
+  path: 'peliculas/:id',
+  canActivate: [clienteGuard],
+  loadComponent: () => import('./componentes/cliente/detalle-pelicula/detalle-pelicula').then(m => m.DetallePelicula),
+},
+{
+  path: 'funcion/:id/butacas',
+  canActivate: [clienteGuard],
+  loadComponent: () => import('./componentes/cliente/seleccion-butacas/seleccion-butacas').then(m => m.SeleccionButacas),
+},
     //cambiar path a home cuando tenga los guards activos, asi el canMatch pasa del anterior a este
     //en caso de admin o de algun empleado
     // {path:'homeadmin',loadComponent:()=>import('./componentes/admin/menu-admin/menu-admin').then(m=>m.MenuAdmin)},
@@ -37,6 +47,7 @@ export const routes: Routes = [
       children: [
         { path: '', loadComponent: () => import('./componentes/admin/funciones/funciones').then(m => m.Funciones) },
         { path: 'crear', loadComponent: () => import('./componentes/admin/funciones/crear-modificar/crear-modificar').then(m => m.CrearModificarFuncion) },
+        { path: ':id/butacas', loadComponent: () => import('./componentes/admin/funciones/butacas-funcion/butacas-funcion').then(m => m.ButacasFuncion) },
       ],
     },
     { path: 'empleados', loadComponent: () => import('./componentes/admin/empleados/empleados').then(m => m.Empleados) },

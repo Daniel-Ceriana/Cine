@@ -1,0 +1,186 @@
+.pagina {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+}
+
+.cabecera-funcion {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-16);
+}
+
+.cabecera-funcion__poster {
+    width: 90px;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border: 3px solid var(--bordo);
+    border-radius: 4px;
+}
+
+.cabecera-funcion__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: var(--spacing-8);
+}
+
+/* ---- Avisos ---- */
+.aviso {
+    padding: var(--spacing-12) var(--spacing-16);
+    border-radius: var(--radio);
+    border: 2px solid;
+    font-size: var(--font-xsmall);
+}
+
+.aviso--edad {
+    background-color: #FBE3DF;
+    border-color: var(--rojo);
+}
+
+.aviso--info {
+    background-color: var(--mostaza-suave);
+    border-color: var(--mostaza);
+}
+
+.aviso--vip {
+    background-color: #D3E1EE;
+    border-color: #5B84A6;
+}
+
+/* ---- Mapa + resumen ---- */
+.contenido {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: var(--spacing-20);
+    align-items: start;
+}
+
+.resumen,
+.paso-pago {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+    padding: var(--spacing-20);
+}
+
+.resumen::before,
+.resumen::after,
+.paso-pago::before,
+.paso-pago::after {
+    display: none;
+}
+
+.resumen__titulo {
+    font-size: var(--font-medium);
+}
+
+.resumen__vacio,
+.datos__ayuda {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.resumen__lista {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.resumen__lista li {
+    display: grid;
+    grid-template-columns: 50px 1fr auto;
+    gap: var(--spacing-8);
+    padding-bottom: 4px;
+    border-bottom: 1px dashed var(--crema-borde);
+    font-size: var(--font-xsmall);
+}
+
+.resumen__total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    border-top: 2px dashed var(--crema-borde);
+    padding-top: var(--spacing-8);
+}
+
+.datos {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: var(--spacing-8);
+    border-top: 2px dashed var(--crema-borde);
+}
+
+.datos__titulo {
+    font-weight: 700;
+    font-size: var(--font-xsmall);
+}
+
+.declaracion {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-8);
+    margin-top: var(--spacing-8);
+    cursor: pointer;
+}
+
+.faltantes {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: #FBE3DF;
+    border: 2px solid var(--error);
+    border-radius: var(--radio);
+}
+
+.faltantes__titulo {
+    font-size: var(--font-xsmall);
+    font-weight: 700;
+    color: var(--error);
+}
+
+.faltantes__lista {
+    margin: var(--spacing-8) 0 0 var(--spacing-20);
+    list-style: disc;
+    font-size: var(--font-xsmall);
+}
+
+/* ---- Pago y confirmación ---- */
+.paso-pago {
+    max-width: 520px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.paso-pago__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-12);
+}
+
+.cuenta {
+    padding: var(--spacing-8) var(--spacing-12);
+    text-align: center;
+    background-color: var(--mostaza-suave);
+    border-radius: var(--radio);
+}
+
+.cuenta--urgente {
+    background-color: #FBE3DF;
+    color: var(--error);
+}
+
+.codigo {
+    padding: var(--spacing-12);
+    text-align: center;
+    font-size: var(--font-xsmall);
+    overflow-wrap: anywhere;
+    background-color: var(--crema-fondo);
+    border: 2px dashed var(--crema-borde);
+    border-radius: var(--radio);
+}
+
+@media (max-width: 900px) {
+    .contenido {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

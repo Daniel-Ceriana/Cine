@@ -19,7 +19,13 @@ export interface FuncionModel {
 
 // Función con los datos de la película y la sala que se piden en el select
 export interface FuncionConRelaciones extends FuncionModel {
-  peliculas: { nombre: string; duracion_minutos: number; imagen_url: string };
+  peliculas: {
+    nombre: string;
+    duracion_minutos: number;
+    imagen_url: string;
+    fecha_estreno: string;
+    restriccion_edad: number;
+  };
   salas: { numero: number; nombre: string; formato: FormatoSala };
 }
 

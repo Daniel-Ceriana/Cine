@@ -1,0 +1,48 @@
+<div class="mapa">
+  <div class="mapa__pantalla texto-ticket">PANTALLA</div>
+
+  <div class="mapa__scroll">
+    <div class="mapa__salon">
+      @for (f of filas; track $index) {
+        @if (f.fila === '') {
+          <div class="mapa__hueco"></div>
+        } @else {
+          <div class="fila">
+            <span class="fila__letra texto-ticket">{{ f.fila }}</span>
+            <div class="fila__butacas" [style.grid-template-columns]="columnas">
+              @for (b of f.butacas; track b.codigo) {
+                <button
+                  type="button"
+                  class="butaca"
+                  [class.butaca--accesible]="b.tipo === 'accesible'"
+                  [class.butaca--vip]="b.tipo === 'vip'"
+                  [class.butaca--libre]="estadoDe(b.codigo) === 'libre'"
+                  [class.butaca--seleccionada]="estadoDe(b.codigo) === 'seleccionada'"
+                  [class.butaca--reservada]="estadoDe(b.codigo) === 'reservada'"
+                  [class.butaca--vendida]="estadoDe(b.codigo) === 'vendida'"
+                  [class.butaca--resaltada]="resaltada() === b.codigo"
+                  [style.grid-column]="b.numero"
+                  [attr.aria-label]="titulo(b)"
+                  [attr.aria-pressed]="estadoDe(b.codigo) === 'seleccionada'"
+                  [title]="titulo(b)"
+                  (click)="butacaClick.emit(b.codigo)">
+                  {{ b.numero }}
+                </button>
+              }
+            </div>
+            <span class="fila__letra texto-ticket">{{ f.fila }}</span>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  <ul class="leyenda">
+    <li><span class="butaca butaca--muestra butaca--libre"></span> Libre</li>
+    <li><span class="butaca butaca--muestra butaca--seleccionada"></span> Elegida</li>
+    <li><span class="butaca butaca--muestra butaca--reservada"></span> En proceso</li>
+    <li><span class="butaca butaca--muestra butaca--vendida"></span> Ocupada</li>
+    <li><span class="butaca butaca--muestra butaca--libre butaca--accesible"></span> Accesible</li>
+    <li><span class="butaca butaca--muestra butaca--libre butaca--vip"></span> VIP</li>
+  </ul>
+</div>

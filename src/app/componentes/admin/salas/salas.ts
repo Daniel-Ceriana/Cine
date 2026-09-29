@@ -2,7 +2,8 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuCrearVer } from '../generico/menu-crear-ver/menu-crear-ver';
 import { SalaService } from '../../../services/sala-service';
-import { SalaConButacas } from '../../../modelos/sala-model';
+import { SalaModel } from '../../../modelos/sala-model';
+import { TOTAL_BUTACAS } from '../../../modelos/sala-plantilla';
 
 @Component({
   imports: [MenuCrearVer],
@@ -14,7 +15,7 @@ export class Salas implements OnInit {
   private salaService = inject(SalaService);
   private router = inject(Router);
 
-  salas = signal<SalaConButacas[]>([]);
+  salas = signal<SalaModel[]>([]);
   cargando = signal(false);
   errorMsg = signal('');
 
@@ -33,15 +34,14 @@ export class Salas implements OnInit {
     }
   }
 
-  cantidadButacas(sala: SalaConButacas): number {
-    return sala.butacas[0]?.count ?? 0;
-  }
+  // todas las salas comparten la misma distribución de butacas
+  readonly totalButacas = TOTAL_BUTACAS;
 
-  onClickModificar(sala: SalaConButacas) {
+  onClickModificar(sala: SalaModel) {
     this.router.navigate(['/admin/salas/crear'], { queryParams: { id: sala.id } });
   }
 
-  async alternarActiva(sala: SalaConButacas) {
+  async alternarActiva(sala: SalaModel) {
     this.errorMsg.set('');
     try {
       await this.salaService.modificar(sala.id, {
@@ -56,8 +56,8 @@ export class Salas implements OnInit {
     }
   }
 
-  async eliminar(sala: SalaConButacas) {
-    if (!confirm(`¿Eliminar la ${sala.nombre}? Se borrarán también sus butacas.`)) return;
+  async eliminar(sala: SalaModel) {
+    if (!confirm(`¿Eliminar la ${sala.nombre}?`)) return;
 
     this.errorMsg.set('');
     try {

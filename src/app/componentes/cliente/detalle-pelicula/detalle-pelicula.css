@@ -1,0 +1,172 @@
+.pagina {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-20);
+}
+
+.volver {
+    align-self: flex-start;
+}
+
+/* ---- Ficha de la película ---- */
+.ficha {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: var(--spacing-24);
+    align-items: start;
+}
+
+.ficha__cartel {
+    border: 4px solid var(--bordo);
+    outline: 2px solid var(--mostaza);
+    outline-offset: -8px;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: var(--bordo);
+    box-shadow: var(--sombra);
+}
+
+.ficha__cartel img {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+}
+
+.ficha__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+}
+
+.ficha__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ficha__sinopsis {
+    max-width: 65ch;
+}
+
+.aviso {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: #FBE3DF;
+    border: 2px solid var(--rojo);
+    border-radius: var(--radio);
+    font-size: var(--font-xsmall);
+}
+
+/* ---- Funciones ---- */
+.funciones {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+}
+
+.funciones__vacio {
+    color: var(--tinta-suave);
+}
+
+.dia__titulo {
+    font-family: var(--font-titulo);
+    font-weight: 400;
+    font-size: var(--font-medium);
+    text-transform: capitalize;
+    color: var(--bordo);
+    padding-bottom: var(--spacing-8);
+    margin-bottom: var(--spacing-16);
+    border-bottom: 2px solid var(--mostaza);
+}
+
+.dia__funciones {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-16);
+}
+
+/* Entrada: datos a la izquierda, talón con el botón a la derecha */
+.funcion {
+    display: flex;
+    align-items: stretch;
+}
+
+.funcion::before,
+.funcion::after {
+    display: none;
+}
+
+.funcion__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    padding: var(--spacing-16);
+}
+
+.funcion__horario {
+    font-size: var(--font-large);
+    color: var(--rojo);
+    line-height: 1;
+}
+
+.funcion__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.funcion__precio {
+    font-size: var(--font-small);
+}
+
+.funcion__precio--cerrada {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.funcion__accion {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-12);
+    border-left: 2px dashed var(--crema-borde);
+}
+
+.funcion__accion::before,
+.funcion__accion::after {
+    content: '';
+    position: absolute;
+    left: -11px;
+    width: 18px;
+    height: 18px;
+    background-color: var(--crema-fondo);
+    border: 2px solid var(--crema-borde);
+    border-radius: 50%;
+}
+
+.funcion__accion::before {
+    top: -11px;
+}
+
+.funcion__accion::after {
+    bottom: -11px;
+}
+
+.funcion__cerrada {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+    text-align: center;
+}
+
+/* En el celular el póster queda arriba y la información debajo */
+@media (max-width: 700px) {
+    .ficha {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ficha__cartel {
+        width: min(60%, 240px);
+        margin: 0 auto;
+    }
+}

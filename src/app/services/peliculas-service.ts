@@ -24,6 +24,17 @@ export class PeliculaService {
     return data as PeliculaModel;
   }
 
+  async getByIdConGeneros(id: string): Promise<PeliculaConGeneros> {
+    const { data, error } = await this.supabase.client
+      .from(this.tabla)
+      .select('*, generos(id, nombre)')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data as unknown as PeliculaConGeneros;
+  }
+
  async getAll(soloActivas = false): Promise<PeliculaConGeneros[]> {
   let query = this.supabase.client
     .from(this.tabla)

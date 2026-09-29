@@ -1,7 +1,6 @@
 import { Service, inject } from '@angular/core';
 import { SupabaseService } from './supabase-service';
-import { SalaModel, SalaPayload, SalaConButacas } from '../modelos/sala-model';
-import { generarButacas } from '../modelos/sala-plantilla';
+import { SalaModel, SalaPayload } from '../modelos/sala-model';
 
 @Service()
 export class SalaService {
@@ -19,20 +18,19 @@ export class SalaService {
     return data as SalaModel;
   }
 
-  async getAll(soloActivas = false): Promise<SalaConButacas[]> {
+  async getAll(soloActivas = false): Promise<SalaModel[]> {
     let query = this.supabase.client
       .from(this.tabla)
-      .select('*, butacas(count)')
+      .select('*')
       .order('numero');
 
     if (soloActivas) query = query.eq('activa', true);
 
     const { data, error } = await query;
     if (error) throw error;
-    return data as unknown as SalaConButacas[];
+    return data as SalaModel[];
   }
 
-  // Crea la sala y, con su id, todas sus butacas según sala-plantilla.ts
   async crear(payload: SalaPayload): Promise<SalaModel> {
     const { data, error } = await this.supabase.client
       .from(this.tabla)
@@ -41,19 +39,7 @@ export class SalaService {
       .single();
 
     if (error) throw error;
-    const sala = data as SalaModel;
-
-    const { error: errorButacas } = await this.supabase.client
-      .from('butacas')
-      .insert(generarButacas(sala.id));
-
-    if (errorButacas) {
-      // no dejar una sala sin butacas: se deshace la sala recién creada
-      await this.supabase.client.from(this.tabla).delete().eq('id', sala.id);
-      throw errorButacas;
-    }
-
-    return sala;
+    return data as SalaModel;
   }
 
   async modificar(id: string, payload: SalaPayload): Promise<SalaModel> {

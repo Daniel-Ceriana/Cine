@@ -47,12 +47,13 @@
                 }
               </div>
 
-              @if (f.activa) {
-                <div class="funcion__acciones">
+              <div class="funcion__acciones">
+                <a class="btn btn--secundario" [routerLink]="['/admin/funciones', f.id, 'butacas']">Butacas</a>
+                @if (f.activa) {
                   <button type="button" (click)="onClickModificar(f)">Modificar</button>
                   <button type="button" class="btn--secundario" (click)="cancelar(f)">Cancelar</button>
-                </div>
-              }
+                }
+              </div>
             </article>
           }
         </div>

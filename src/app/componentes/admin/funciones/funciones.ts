@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { form, FormField } from '@angular/forms/signals';
 import { MenuCrearVer } from '../generico/menu-crear-ver/menu-crear-ver';
 import { FuncionService } from '../../../services/funcion-service';
@@ -22,7 +22,7 @@ interface PeliculaConFunciones {
 }
 
 @Component({
-  imports: [MenuCrearVer, FormField],
+  imports: [MenuCrearVer, FormField, RouterLink],
   selector: 'app-funciones',
   styleUrl: './funciones.css',
   templateUrl: './funciones.html',

@@ -1,1 +1,87 @@
-<p>detalle-pelicula works!</p>
+<main class="pagina">
+  <a class="btn btn--secundario volver" routerLink="/home">← Cartelera</a>
+
+  @if (cargando()) {
+    <p>Cargando película...</p>
+  }
+  @if (errorMsg()) {
+    <p class="error">{{ errorMsg() }}</p>
+  }
+
+  @if (pelicula(); as p) {
+    <section class="ficha">
+      <div class="ficha__cartel">
+        <img [src]="p.imagen_url" [alt]="p.nombre" />
+      </div>
+
+      <div class="ficha__info">
+        <h1>{{ p.nombre }}</h1>
+
+        <div class="ficha__chips">
+          <span class="chip">{{ p.duracion_minutos }} min</span>
+          <span class="chip" [class.chip--rojo]="p.restriccion_edad > 0">
+            {{ p.restriccion_edad === 0 ? 'ATP' : '+' + p.restriccion_edad }}
+          </span>
+          @for (g of p.generos; track g.id) {
+            <span class="chip">{{ g.nombre }}</span>
+          }
+        </div>
+
+        <p class="ficha__sinopsis">{{ p.sinopsis }}</p>
+
+        @if (p.restriccion_edad > 0) {
+          <p class="aviso">
+            Película +{{ p.restriccion_edad }}: los menores de {{ p.restriccion_edad }} años no pueden comprar
+            entradas y toda entrada requiere que asista un adulto.
+          </p>
+        }
+      </div>
+    </section>
+
+    <section class="funciones">
+      <h2>Funciones</h2>
+
+      @if (dias().length === 0) {
+        <p class="funciones__vacio">Por ahora no hay funciones programadas para esta película.</p>
+      }
+
+      @for (dia of dias(); track dia.fecha) {
+        <div class="dia">
+          <h3 class="dia__titulo">{{ dia.etiqueta }}</h3>
+
+          <div class="dia__funciones">
+            @for (item of dia.funciones; track item.funcion.id) {
+              <article class="funcion ticket">
+                <div class="funcion__info">
+                  <p class="funcion__horario texto-ticket">{{ hora(item.funcion.inicio) }}</p>
+                  <div class="funcion__chips">
+                    <span class="chip">{{ item.funcion.salas.formato }}</span>
+                    <span class="chip">{{ item.funcion.idioma }}</span>
+                    @if (item.vigencia.estado === 'preventa') {
+                      <span class="chip chip--rojo">Preventa</span>
+                    }
+                  </div>
+                  @if (item.vigencia.precio !== null) {
+                    <p class="funcion__precio texto-ticket">{{ pesos(item.vigencia.precio) }}</p>
+                  } @else {
+                    <p class="funcion__precio funcion__precio--cerrada texto-ticket">
+                      Venta desde el {{ fechaLarga(item.vigencia.abreEl!) }}
+                    </p>
+                  }
+                </div>
+
+                <div class="funcion__accion">
+                  @if (item.vigencia.precio !== null) {
+                    <a class="btn" [routerLink]="['/funcion', item.funcion.id, 'butacas']">Elegir butacas</a>
+                  } @else {
+                    <span class="funcion__cerrada">Próximamente</span>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+        </div>
+      }
+    </section>
+  }
+</main>

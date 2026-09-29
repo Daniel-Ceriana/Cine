@@ -12,6 +12,10 @@ import {
   submit,
 } from '@angular/forms/signals';
 import { Auth } from '../../../services/auth';
+
+// Los menores pueden registrarse; la restricción de edad de cada película se controla al comprar
+const EDAD_MINIMA_REGISTRO = 10;
+
 @Component({
   imports: [FormField, RouterLink],
   selector: 'app-register',
@@ -51,7 +55,7 @@ export class Register {
     maxLength(p.apellido, 50, { message: 'Máximo 50 caracteres' });
     pattern(p.apellido, /^[\p{L}\s'-]+$/u, { message: 'Solo letras' });
 
-    // Fecha de nacimiento: obligatoria, no futura, mayor de 18
+    // Fecha de nacimiento: obligatoria, no futura, con la edad mínima
     required(p.fecha_nacimiento, { message: 'La fecha de nacimiento es obligatoria' });
     validate(p.fecha_nacimiento, ({ value }) => {
       const v = value();
@@ -61,9 +65,9 @@ export class Register {
       if (nacimiento > hoy) {
         return { kind: 'futura', message: 'La fecha no puede ser futura' };
       }
-      const limite = new Date(hoy.getFullYear() - 18, hoy.getMonth(), hoy.getDate());
+      const limite = new Date(hoy.getFullYear() - EDAD_MINIMA_REGISTRO, hoy.getMonth(), hoy.getDate());
       if (nacimiento > limite) {
-        return { kind: 'menor', message: 'Tenés que ser mayor de 18 años' };
+        return { kind: 'menor', message: `Tenés que tener al menos ${EDAD_MINIMA_REGISTRO} años para registrarte` };
       }
       return null;
     });

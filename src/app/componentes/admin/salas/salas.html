@@ -22,7 +22,7 @@
         <div class="sala__info">
           <span class="sala__numero texto-ticket">SALA {{ sala.numero }}</span>
           <h3 class="sala__nombre">{{ sala.nombre }}</h3>
-          <p class="sala__meta texto-ticket">{{ cantidadButacas(sala) }} butacas</p>
+          <p class="sala__meta texto-ticket">{{ totalButacas }} butacas</p>
           <div class="sala__chips">
             <span class="chip">{{ sala.formato }}</span>
             <span class="chip" [class.chip--rojo]="!sala.activa">{{ sala.activa ? 'Activa' : 'Inactiva' }}</span>

@@ -1,0 +1,156 @@
+.mapa {
+    --tam: 26px; /* lado de cada butaca */
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+}
+
+/* La pantalla del cine, arriba del salón */
+.mapa__pantalla {
+    align-self: center;
+    width: min(100%, 520px);
+    padding: var(--spacing-8) 0;
+    text-align: center;
+    letter-spacing: 0.4em;
+    font-size: var(--font-xsmall);
+    color: var(--crema-superficie);
+    background-color: var(--bordo);
+    border-bottom: 4px solid var(--mostaza);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+/* En el celular el salón es más ancho que la pantalla: se desliza hacia los costados */
+.mapa__scroll {
+    overflow-x: auto;
+    padding-bottom: var(--spacing-8);
+}
+
+.mapa__salon {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: max-content;
+    min-width: 100%;
+    margin: 0 auto;
+}
+
+.mapa__hueco {
+    height: var(--tam);
+}
+
+.fila {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-8);
+}
+
+.fila__letra {
+    width: 16px;
+    text-align: center;
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.fila__butacas {
+    display: grid;
+    gap: 3px;
+    width: calc(var(--tam) * 31.2);
+}
+
+/* ---- Butaca ---- */
+.butaca {
+    height: var(--tam);
+    padding: 0;
+    font-family: var(--font-ticket);
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--tinta);
+    border: 2px solid var(--crema-borde);
+    border-radius: 6px 6px 3px 3px;
+    box-shadow: none;
+    background-color: var(--crema-superficie);
+    cursor: pointer;
+    transition: transform .1s ease-in-out;
+}
+
+.butaca:hover:not(.butaca--vendida):not(.butaca--reservada) {
+    transform: scale(1.15);
+    background-color: var(--mostaza-suave);
+}
+
+.butaca:active {
+    transform: none;
+    box-shadow: none;
+}
+
+/* accesibles (verde) y VIP (azul), como en el plano del cine */
+.butaca--accesible {
+    background-color: #D5E8CF;
+    border-color: #6FA267;
+}
+
+.butaca--vip {
+    background-color: #D3E1EE;
+    border-color: #5B84A6;
+}
+
+.butaca--seleccionada,
+.butaca--seleccionada:hover {
+    color: var(--bordo);
+    font-weight: 700;
+    background-color: var(--mostaza);
+    border-color: #B98418;
+}
+
+/* reservada por otra persona que está pagando */
+.butaca--reservada,
+.butaca--reservada:hover {
+    color: var(--tinta-suave);
+    background: repeating-linear-gradient(45deg, var(--crema-borde) 0 4px, var(--crema-superficie) 4px 8px);
+    border-color: #8C7A5B;
+    cursor: not-allowed;
+}
+
+.butaca--vendida,
+.butaca--vendida:hover {
+    color: var(--crema-borde);
+    background-color: var(--bordo-claro);
+    border-color: var(--bordo);
+    cursor: not-allowed;
+}
+
+/* la que el admin está mirando */
+.butaca--resaltada {
+    outline: 3px solid var(--rojo);
+    outline-offset: 1px;
+}
+
+/* ---- Leyenda ---- */
+.leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-8) var(--spacing-16);
+    font-size: var(--font-xsmall);
+}
+
+.leyenda li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.butaca--muestra {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    cursor: default;
+}
+
+@media (max-width: 600px) {
+    .mapa {
+        --tam: 22px;
+    }
+}

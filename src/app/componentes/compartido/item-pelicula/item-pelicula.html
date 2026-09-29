@@ -15,7 +15,7 @@
     @if (esAdmin()) {
       <button type="button" (click)="onClickModificar()">Modificar</button>
     } @else {
-      <a class="btn btn--secundario" [routerLink]="['/peliculas', pelicula().id]">Sinopsis</a>
+      <a class="btn btn--secundario" [routerLink]="['/peliculas', pelicula().id]">Ver funciones</a>
     }
   </div>
 </article>

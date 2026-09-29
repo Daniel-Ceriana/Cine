@@ -7,7 +7,7 @@ import {
 } from '../modelos/funcion-model';
 
 const SELECT_CON_RELACIONES =
-  '*, peliculas(nombre, duracion_minutos, imagen_url), salas(numero, nombre, formato)';
+  '*, peliculas(nombre, duracion_minutos, imagen_url, fecha_estreno, restriccion_edad), salas(numero, nombre, formato)';
 
 @Service()
 export class FuncionService {
@@ -29,6 +29,20 @@ export class FuncionService {
     const { data, error } = await this.supabase.client
       .from(this.tabla)
       .select(SELECT_CON_RELACIONES)
+      .order('inicio');
+
+    if (error) throw error;
+    return data as unknown as FuncionConRelaciones[];
+  }
+
+  // Funciones activas de una película que todavía no empezaron (para la cartelera del cliente)
+  async getProximasDePelicula(peliculaId: string): Promise<FuncionConRelaciones[]> {
+    const { data, error } = await this.supabase.client
+      .from(this.tabla)
+      .select(SELECT_CON_RELACIONES)
+      .eq('pelicula_id', peliculaId)
+      .eq('activa', true)
+      .gte('inicio', new Date().toISOString())
       .order('inicio');
 
     if (error) throw error;
