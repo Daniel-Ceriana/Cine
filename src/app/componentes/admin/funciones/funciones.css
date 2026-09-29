@@ -21,14 +21,67 @@
     font-weight: 600;
 }
 
-.funciones__filtros select {
-    font-size: var(--font-small);
-    min-width: 220px;
-}
-
 .funciones__check {
     flex-direction: row !important;
     align-items: center;
+}
+
+.funciones__titulo {
+    font-size: var(--font-large);
+}
+
+.funciones__volver {
+    align-self: flex-start;
+    background-color: var(--dark-bg-solid);
+}
+
+.peliculas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-20);
+}
+
+/* Tarjeta de película: es un botón, así se puede usar con teclado */
+.pelicula {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    width: 200px;
+    padding: 0 0 var(--spacing-12);
+    text-align: left;
+    color: var(--dark-solid);
+    background-color: var(--light-bg-solid);
+    border-radius: var(--spacing-8);
+    overflow: hidden;
+    box-shadow: 0 2px 6px var(--dark-300);
+    transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
+}
+
+.pelicula:hover {
+    background-color: var(--light-bg-solid);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px var(--dark-300);
+}
+
+.pelicula__imagen {
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    background-color: var(--dark-300);
+}
+
+.pelicula__nombre,
+.pelicula__meta {
+    padding: 0 var(--spacing-12);
+}
+
+.pelicula__nombre {
+    font-size: var(--font-small);
+    font-weight: 700;
+}
+
+.pelicula__meta {
+    font-size: var(--font-xsmall);
+    color: var(--dark-500);
 }
 
 .dia__titulo {
@@ -59,14 +112,6 @@
 
 .funcion--cancelada {
     opacity: .5;
-}
-
-.funcion__imagen {
-    width: 64px;
-    aspect-ratio: 2 / 3;
-    object-fit: cover;
-    border-radius: 4px;
-    background-color: var(--dark-300);
 }
 
 .funcion__info {

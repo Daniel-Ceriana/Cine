@@ -10,7 +10,7 @@ import {
   submit,
 } from '@angular/forms/signals';
 import { SalaService } from '../../../../services/sala-service';
-import { SalaModelForm } from '../../../../modelos/sala-model';
+import { SalaModelForm, FormatoSala } from '../../../../modelos/sala-model';
 
 @Component({
   imports: [FormField],
@@ -32,8 +32,11 @@ export class CrearModificarSala implements OnInit {
   private model = signal<SalaModelForm>({
     numero: 0,
     nombre: '',
+    formato: '2D',
     activa: true,
   });
+
+  formatos: FormatoSala[] = ['2D', '3D', '4D', '5D'];
 
   salaForm = form(this.model, (s) => {
     required(s.numero, { message: 'El número de sala es obligatorio' });
@@ -56,7 +59,12 @@ export class CrearModificarSala implements OnInit {
     this.cargando.set(true);
     try {
       const sala = await this.salaService.getById(id);
-      this.model.set({ numero: sala.numero, nombre: sala.nombre, activa: sala.activa });
+      this.model.set({
+        numero: sala.numero,
+        nombre: sala.nombre,
+        formato: sala.formato,
+        activa: sala.activa,
+      });
     } catch (e: any) {
       this.errorMsg.set(e?.message ?? 'No se pudo cargar la sala');
     } finally {

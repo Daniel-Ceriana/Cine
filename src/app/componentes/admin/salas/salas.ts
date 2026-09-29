@@ -47,6 +47,7 @@ export class Salas implements OnInit {
       await this.salaService.modificar(sala.id, {
         numero: sala.numero,
         nombre: sala.nombre,
+        formato: sala.formato,
         activa: !sala.activa,
       });
       await this.cargar();

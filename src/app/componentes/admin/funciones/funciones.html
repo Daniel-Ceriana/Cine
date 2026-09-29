@@ -6,16 +6,6 @@
 
 <main class="container funciones">
   <form class="funciones__filtros" (submit)="$event.preventDefault()">
-    <label>
-      Película
-      <select [formField]="filtrosForm.pelicula_id">
-        <option value="">Todas</option>
-        @for (p of peliculas(); track p.id) {
-          <option [value]="p.id">{{ p.nombre }}</option>
-        }
-      </select>
-    </label>
-
     <label class="funciones__check">
       <input type="checkbox" [formField]="filtrosForm.incluirPasadas" />
       Incluir funciones pasadas
@@ -28,45 +18,63 @@
   @if (errorMsg()) {
     <p class="error">{{ errorMsg() }}</p>
   }
-  @if (!cargando() && dias().length === 0) {
-    <p>No hay funciones para mostrar.</p>
-  }
 
-  @for (dia of dias(); track dia.fecha) {
-    <section class="dia">
-      <h2 class="dia__titulo">{{ dia.etiqueta }}</h2>
+  @if (peliculaElegida(); as pelicula) {
+    <!-- Detalle: días y horarios de la película elegida -->
+    <button type="button" class="funciones__volver" (click)="peliculaId.set(null)">← Volver a las películas</button>
+    <h2 class="funciones__titulo">{{ pelicula.nombre }}</h2>
 
-      <div class="dia__funciones">
-        @for (f of dia.funciones; track f.id) {
-          <article class="funcion" [class.funcion--cancelada]="!f.activa">
-            <img class="funcion__imagen" [src]="f.peliculas.imagen_url" [alt]="f.peliculas.nombre" />
+    @for (dia of dias(); track dia.fecha) {
+      <section class="dia">
+        <h3 class="dia__titulo">{{ dia.etiqueta }}</h3>
 
-            <div class="funcion__info">
-              <h3 class="funcion__nombre">{{ f.peliculas.nombre }}</h3>
-              <p class="funcion__horario">{{ hora(f.inicio) }} a {{ horaFin(f) }}</p>
-              <p class="funcion__meta">
-                Sala {{ f.salas.numero }} · {{ f.formato }} · {{ f.idioma }}
-              </p>
-              <p class="funcion__meta">
-                $ {{ f.precio_base }}
-                @if (f.dias_preventa > 0) {
-                  · preventa $ {{ f.precio_preventa }} ({{ f.dias_preventa }} días)
+        <div class="dia__funciones">
+          @for (f of dia.funciones; track f.id) {
+            <article class="funcion" [class.funcion--cancelada]="!f.activa">
+              <div class="funcion__info">
+                <p class="funcion__horario">{{ hora(f.inicio) }} a {{ horaFin(f) }}</p>
+                <p class="funcion__meta">
+                  Sala {{ f.salas.numero }} · {{ f.salas.formato }} · {{ f.idioma }}
+                </p>
+                <p class="funcion__meta">
+                  $ {{ f.precio_base }}
+                  @if (f.dias_preventa > 0) {
+                    · preventa $ {{ f.precio_preventa }} ({{ f.dias_preventa }} días)
+                  }
+                </p>
+                @if (!f.activa) {
+                  <p class="funcion__estado">Cancelada</p>
                 }
-              </p>
-              @if (!f.activa) {
-                <p class="funcion__estado">Cancelada</p>
-              }
-            </div>
-
-            @if (f.activa) {
-              <div class="funcion__acciones">
-                <button type="button" (click)="onClickModificar(f)">Modificar</button>
-                <button type="button" class="funcion__btn-secundario" (click)="cancelar(f)">Cancelar</button>
               </div>
-            }
-          </article>
-        }
-      </div>
+
+              @if (f.activa) {
+                <div class="funcion__acciones">
+                  <button type="button" (click)="onClickModificar(f)">Modificar</button>
+                  <button type="button" class="funcion__btn-secundario" (click)="cancelar(f)">Cancelar</button>
+                </div>
+              }
+            </article>
+          }
+        </div>
+      </section>
+    }
+  } @else {
+    <!-- Listado: una tarjeta por película con funciones -->
+    @if (!cargando() && peliculas().length === 0) {
+      <p>No hay funciones para mostrar.</p>
+    }
+
+    <section class="peliculas">
+      @for (p of peliculas(); track p.id) {
+        <button type="button" class="pelicula" (click)="peliculaId.set(p.id)">
+          <img class="pelicula__imagen" [src]="p.imagen_url" [alt]="p.nombre" />
+          <span class="pelicula__nombre">{{ p.nombre }}</span>
+          <span class="pelicula__meta">
+            {{ p.cantidad }} {{ p.cantidad === 1 ? 'función' : 'funciones' }} · {{ p.formatos.join(' / ') }}
+          </span>
+          <span class="pelicula__meta">Próxima: {{ dia(p.proxima) }} {{ hora(p.proxima) }}</span>
+        </button>
+      }
     </section>
   }
 </main>

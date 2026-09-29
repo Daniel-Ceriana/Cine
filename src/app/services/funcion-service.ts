@@ -1,38 +1,50 @@
 import { Service, inject } from '@angular/core';
 import { SupabaseService } from './supabase-service';
 import {
-  FuncionModel,
   FuncionConRelaciones,
-  FuncionModificarPayload,
   CrearFuncionesParams,
+  ModificarFuncionesParams,
 } from '../modelos/funcion-model';
+
+const SELECT_CON_RELACIONES =
+  '*, peliculas(nombre, duracion_minutos, imagen_url), salas(numero, nombre, formato)';
 
 @Service()
 export class FuncionService {
   private supabase = inject(SupabaseService);
   private tabla = 'funciones';
 
-  async getById(id: string): Promise<FuncionModel> {
+  async getById(id: string): Promise<FuncionConRelaciones> {
     const { data, error } = await this.supabase.client
       .from(this.tabla)
-      .select('*')
+      .select(SELECT_CON_RELACIONES)
       .eq('id', id)
       .single();
 
     if (error) throw error;
-    return data as FuncionModel;
+    return data as unknown as FuncionConRelaciones;
   }
 
-  // desde: 'YYYY-MM-DD' en hora argentina; si no se pasa, trae todas
-  async getAll(desde?: string): Promise<FuncionConRelaciones[]> {
-    let query = this.supabase.client
+  async getAll(): Promise<FuncionConRelaciones[]> {
+    const { data, error } = await this.supabase.client
       .from(this.tabla)
-      .select('*, peliculas(nombre, duracion_minutos, imagen_url), salas(numero, nombre)')
+      .select(SELECT_CON_RELACIONES)
       .order('inicio');
 
-    if (desde) query = query.gte('inicio', `${desde}T00:00:00-03:00`);
+    if (error) throw error;
+    return data as unknown as FuncionConRelaciones[];
+  }
 
-    const { data, error } = await query;
+  // Funciones activas de una serie desde un momento en adelante (para precargar el modificar)
+  async getSerieDesde(serieId: string, desdeIso: string): Promise<FuncionConRelaciones[]> {
+    const { data, error } = await this.supabase.client
+      .from(this.tabla)
+      .select(SELECT_CON_RELACIONES)
+      .eq('serie_id', serieId)
+      .eq('activa', true)
+      .gte('inicio', desdeIso)
+      .order('inicio');
+
     if (error) throw error;
     return data as unknown as FuncionConRelaciones[];
   }
@@ -55,14 +67,23 @@ export class FuncionService {
     return data as number;
   }
 
-  async modificar(id: string, payload: FuncionModificarPayload): Promise<void> {
-    const { error } = await this.supabase.client.from(this.tabla).update(payload).eq('id', id);
+  // Modifica una función o esa y las siguientes de su serie (ver modificar_funciones en el SQL)
+  async modificarVarias(params: ModificarFuncionesParams): Promise<number> {
+    const { data, error } = await this.supabase.client.rpc('modificar_funciones', {
+      p_funcion_id: params.funcion_id,
+      p_alcance: params.alcance,
+      p_fechas: params.fechas,
+      p_hora: params.hora,
+      p_pelicula_id: params.pelicula_id,
+      p_formato: params.formato,
+      p_idioma: params.idioma,
+      p_precio_base: params.precio_base,
+      p_precio_preventa: params.precio_preventa,
+      p_dias_preventa: params.dias_preventa,
+    });
 
-    // 23P01 = exclusion_violation: la sala ya tiene otra función en ese horario
-    if (error?.code === '23P01') {
-      throw new Error('La sala de esta función ya está ocupada en ese horario.');
-    }
     if (error) throw error;
+    return data as number;
   }
 
   // Se cancela con activa = false (no se borra) para conservar el historial

@@ -4,28 +4,29 @@ import { form, FormField, required, validate, submit } from '@angular/forms/sign
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FuncionService } from '../../../../services/funcion-service';
 import { PeliculaService } from '../../../../services/peliculas-service';
 import {
-  FormatoFuncion,
   IdiomaFuncion,
-  FuncionModificarPayload,
+  AlcanceModificar,
+  FuncionConRelaciones,
 } from '../../../../modelos/funcion-model';
+import { FormatoSala } from '../../../../modelos/sala-model';
 import { PeliculaModel } from '../../../../modelos/pelicula-model';
 import {
-  fechaISO,
   fechaDesdeISO,
   partesAr,
-  aIsoAr,
   horaADate,
   dateAHora,
+  hoyAr,
+  sumarDias,
+  lunesDe,
+  diaSemana,
+  etiquetaCorta,
+  etiquetaLarga,
 } from '../../../../utilidades/fechas-ar';
-
-// Se evita generar rangos enormes por error (ej: un año mal tipeado)
-const MAX_FECHAS = 120;
 
 // Valores de Date.getDay(): domingo = 0
 const DIAS_SEMANA = [
@@ -38,9 +39,12 @@ const DIAS_SEMANA = [
   { valor: 0, corto: 'Dom' },
 ];
 
+const OPCIONES_SEMANAS = [1, 2, 3, 4, 6, 8, 12];
+const DIAS_A_ELEGIR_UNA_FUNCION = 28;
+
 interface FuncionFormModel {
   pelicula_id: string;
-  formato: FormatoFuncion;
+  formato: FormatoSala;
   idioma: IdiomaFuncion;
   precio_base: number;
   precio_preventa: number;
@@ -53,7 +57,6 @@ interface FuncionFormModel {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatDatepickerModule,
     MatTimepickerModule,
     MatButtonToggleModule,
   ],
@@ -71,19 +74,23 @@ export class CrearModificarFuncion implements OnInit {
   cargando = signal(false);
   intentoEnvio = signal(false);
 
-  funcionId = signal<string | null>(null);
-  esEdicion = computed(() => this.funcionId() !== null);
+  // Al modificar: la función elegida y si pertenece a una serie (creadas juntas)
+  funcionBase = signal<FuncionConRelaciones | null>(null);
+  esEdicion = computed(() => this.funcionBase() !== null);
+  tieneSerie = computed(() => !!this.funcionBase()?.serie_id);
+  alcance = signal<AlcanceModificar>('una');
 
   peliculas = signal<PeliculaModel[]>([]);
   readonly diasSemana = DIAS_SEMANA;
-  readonly formatos: FormatoFuncion[] = ['2D', '3D', '4D', '5D'];
-  readonly hoy = new Date();
+  readonly formatos: FormatoSala[] = ['2D', '3D', '4D', '5D'];
+  readonly etiqueta = etiquetaCorta;
+  readonly etiquetaLarga = etiquetaLarga;
 
-  // Valores que manejan los componentes de Material (fechas, hora, días)
-  desde = signal<Date | null>(null);
-  hasta = signal<Date | null>(null);
+  // Valores que manejan los componentes de Material
   diasElegidos = signal<number[]>([]);
-  fechaUnica = signal<Date | null>(null); // solo al modificar una función
+  semanas = signal(1);
+  inicioSemana = signal<'esta' | 'proxima'>('esta'); // solo al crear
+  diaUnico = signal(''); // 'YYYY-MM-DD', solo al modificar una función
   hora = signal<Date | null>(null);
 
   private model = signal<FuncionFormModel>({
@@ -111,20 +118,43 @@ export class CrearModificarFuncion implements OnInit {
     );
   });
 
-  // Fechas concretas que se van a crear: cada día del rango cuyo día de semana esté elegido
+  // true cuando se eligen varios días (crear, o modificar "esta y las siguientes")
+  modoVarias = computed(() => !this.esEdicion() || this.alcance() === 'siguientes');
+
+  // Fecha de la función que se está modificando ('YYYY-MM-DD')
+  private fechaBase = computed(() => {
+    const f = this.funcionBase();
+    return f ? partesAr(f.inicio).fecha : hoyAr();
+  });
+
+  // Fechas concretas: en cada una de las N semanas, los días de la semana elegidos.
+  // Nunca se generan fechas pasadas (ni anteriores a la función que se modifica).
   fechasGeneradas = computed<string[]>(() => {
-    const desde = this.desde();
-    const hasta = this.hasta();
     const dias = this.diasElegidos();
-    if (!desde || !hasta || dias.length === 0 || hasta < desde) return [];
+    if (dias.length === 0) return [];
+
+    const minima = this.fechaBase();
+    let lunes = lunesDe(minima);
+    if (!this.esEdicion() && this.inicioSemana() === 'proxima') lunes = sumarDias(lunes, 7);
 
     const fechas: string[] = [];
-    const cursor = new Date(desde.getFullYear(), desde.getMonth(), desde.getDate(), 12);
-    while (cursor <= hasta && fechas.length <= MAX_FECHAS) {
-      if (dias.includes(cursor.getDay())) fechas.push(fechaISO(cursor));
-      cursor.setDate(cursor.getDate() + 1);
+    for (let i = 0; i < this.semanas() * 7; i++) {
+      const fecha = sumarDias(lunes, i);
+      if (fecha >= minima && dias.includes(diaSemana(fecha))) fechas.push(fecha);
     }
     return fechas;
+  });
+
+  opcionesSemanas = computed(() =>
+    [...new Set([...OPCIONES_SEMANAS, this.semanas()])].sort((a, b) => a - b),
+  );
+
+  // Lista de días para elegir al modificar una sola función (evita abrir un calendario)
+  opcionesDia = computed<string[]>(() => {
+    const hoy = hoyAr();
+    const dias = Array.from({ length: DIAS_A_ELEGIR_UNA_FUNCION }, (_, i) => sumarDias(hoy, i));
+    const actual = this.fechaBase();
+    return dias.includes(actual) ? dias : [actual, ...dias];
   });
 
   peliculaElegida = computed(() =>
@@ -135,18 +165,13 @@ export class CrearModificarFuncion implements OnInit {
   erroresFechas = computed<string[]>(() => {
     const errores: string[] = [];
 
-    if (this.esEdicion()) {
-      if (!this.fechaUnica()) errores.push('Elegí la fecha de la función');
-    } else {
-      if (!this.desde() || !this.hasta()) errores.push('Elegí el rango de fechas');
-      else if (this.hasta()! < this.desde()!) errores.push('La fecha final es anterior a la inicial');
+    if (this.modoVarias()) {
       if (this.diasElegidos().length === 0) errores.push('Elegí al menos un día de la semana');
-      else if (this.desde() && this.hasta() && this.fechasGeneradas().length === 0) {
-        errores.push('Ningún día del rango coincide con los días elegidos');
+      else if (this.fechasGeneradas().length === 0) {
+        errores.push('Con esos días y semanas no queda ninguna fecha futura');
       }
-      if (this.fechasGeneradas().length > MAX_FECHAS) {
-        errores.push(`Son demasiadas funciones a la vez (máximo ${MAX_FECHAS})`);
-      }
+    } else if (!this.diaUnico()) {
+      errores.push('Elegí el día de la función');
     }
 
     const hora = this.hora();
@@ -164,20 +189,35 @@ export class CrearModificarFuncion implements OnInit {
       const id = this.route.snapshot.queryParamMap.get('id');
       if (!id) return;
 
-      this.funcionId.set(id);
       const funcion = await this.funcionService.getById(id);
       const { fecha, hora } = partesAr(funcion.inicio);
 
       this.model.set({
         pelicula_id: funcion.pelicula_id,
-        formato: funcion.formato,
+        formato: funcion.salas.formato,
         idioma: funcion.idioma,
         precio_base: funcion.precio_base,
         precio_preventa: funcion.precio_preventa,
         dias_preventa: funcion.dias_preventa,
       });
-      this.fechaUnica.set(fechaDesdeISO(fecha));
+      this.diaUnico.set(fecha);
       this.hora.set(horaADate(hora));
+
+      // Si es parte de una serie, se precargan sus días y su cantidad de semanas
+      if (funcion.serie_id) {
+        const serie = await this.funcionService.getSerieDesde(funcion.serie_id, funcion.inicio);
+        const fechas = serie.map((s) => partesAr(s.inicio).fecha);
+        const ultima = fechas[fechas.length - 1] ?? fecha;
+
+        this.diasElegidos.set([...new Set(fechas.map(diaSemana))]);
+        const msPorSemana = 7 * 24 * 60 * 60 * 1000;
+        const diferencia = fechaDesdeISO(lunesDe(ultima)).getTime() - fechaDesdeISO(lunesDe(fecha)).getTime();
+        this.semanas.set(Math.round(diferencia / msPorSemana) + 1);
+      } else {
+        this.diasElegidos.set([diaSemana(fecha)]);
+      }
+
+      this.funcionBase.set(funcion);
     } catch (e: any) {
       this.errorMsg.set(e?.message ?? 'No se pudo cargar la información');
     } finally {
@@ -186,7 +226,7 @@ export class CrearModificarFuncion implements OnInit {
   }
 
   // Los botones de opción de Material actualizan el modelo del formulario
-  setFormato(formato: FormatoFuncion) {
+  setFormato(formato: FormatoSala) {
     this.model.update((m) => ({ ...m, formato }));
   }
 
@@ -215,19 +255,18 @@ export class CrearModificarFuncion implements OnInit {
       try {
         this.cargando.set(true);
         const hora = dateAHora(this.hora()!);
+        const fechas = this.modoVarias() ? this.fechasGeneradas() : [this.diaUnico()];
 
         if (this.esEdicion()) {
-          const payload: FuncionModificarPayload = {
+          await this.funcionService.modificarVarias({
             ...m,
-            inicio: aIsoAr(fechaISO(this.fechaUnica()!), hora),
-          };
-          await this.funcionService.modificar(this.funcionId()!, payload);
-        } else {
-          await this.funcionService.crearVarias({
-            ...m,
-            fechas: this.fechasGeneradas(),
+            funcion_id: this.funcionBase()!.id,
+            alcance: this.alcance(),
+            fechas,
             hora,
           });
+        } else {
+          await this.funcionService.crearVarias({ ...m, fechas, hora });
         }
 
         this.router.navigate(['/admin/funciones']);

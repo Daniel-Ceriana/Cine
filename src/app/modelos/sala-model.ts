@@ -1,9 +1,11 @@
 export type TipoButaca = 'normal' | 'accesible' | 'vip';
+export type FormatoSala = '2D' | '3D' | '4D' | '5D';
 
 export interface SalaModel {
   id: string;
   numero: number;
   nombre: string;
+  formato: FormatoSala; // toda función de la sala se proyecta en este formato
   activa: boolean;
   created_at: string;
 }
@@ -14,6 +16,7 @@ export type SalaPayload = Omit<SalaModel, 'id' | 'created_at'>;
 export interface SalaModelForm {
   numero: number;
   nombre: string;
+  formato: FormatoSala;
   activa: boolean;
 }
 

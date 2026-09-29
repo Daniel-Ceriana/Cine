@@ -20,7 +20,7 @@
       <article class="sala" [class.sala--inactiva]="!sala.activa">
         <div class="sala__info">
           <h3 class="sala__nombre">{{ sala.nombre }}</h3>
-          <p class="sala__meta">Sala N° {{ sala.numero }} · {{ cantidadButacas(sala) }} butacas</p>
+          <p class="sala__meta">Sala N° {{ sala.numero }} · {{ sala.formato }} · {{ cantidadButacas(sala) }} butacas</p>
           <p class="sala__estado">{{ sala.activa ? 'Activa' : 'Inactiva' }}</p>
         </div>
 

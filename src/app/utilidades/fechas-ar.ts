@@ -16,6 +16,44 @@ export function fechaDesdeISO(iso: string): Date {
   return new Date(y, m - 1, d, 12);
 }
 
+// Día de hoy en Argentina, 'YYYY-MM-DD'
+export function hoyAr(): string {
+  return partesAr(new Date().toISOString()).fecha;
+}
+
+// 'YYYY-MM-DD' + n días -> 'YYYY-MM-DD'
+export function sumarDias(iso: string, dias: number): string {
+  const d = fechaDesdeISO(iso);
+  d.setDate(d.getDate() + dias);
+  return fechaISO(d);
+}
+
+// Lunes de la semana de esa fecha (la semana va de lunes a domingo)
+export function lunesDe(iso: string): string {
+  const d = fechaDesdeISO(iso);
+  const diasDesdeLunes = (d.getDay() + 6) % 7; // lunes = 0 ... domingo = 6
+  return sumarDias(iso, -diasDesdeLunes);
+}
+
+// Día de la semana de una fecha 'YYYY-MM-DD' (domingo = 0, como Date.getDay)
+export function diaSemana(iso: string): number {
+  return fechaDesdeISO(iso).getDay();
+}
+
+// 'lun 05/10'
+export function etiquetaCorta(iso: string): string {
+  const d = fechaDesdeISO(iso);
+  const dia = new Intl.DateTimeFormat('es-AR', { weekday: 'short' }).format(d).replace('.', '');
+  return `${dia} ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+// 'lunes 5 de octubre'
+export function etiquetaLarga(iso: string): string {
+  return new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).format(
+    fechaDesdeISO(iso),
+  );
+}
+
 // Momento absoluto (ISO con zona) -> día y hora tal como se ven en Argentina
 export function partesAr(iso: string): { fecha: string; hora: string } {
   const partes = new Intl.DateTimeFormat('en-CA', {

@@ -57,6 +57,22 @@ export class SalaService {
   }
 
   async modificar(id: string, payload: SalaPayload): Promise<SalaModel> {
+    // Cambiar el formato dejaría funciones futuras en una sala de otro tipo
+    const actual = await this.getById(id);
+    if (actual.formato !== payload.formato) {
+      const { count, error: errorCount } = await this.supabase.client
+        .from('funciones')
+        .select('id', { count: 'exact', head: true })
+        .eq('sala_id', id)
+        .eq('activa', true)
+        .gte('inicio', new Date().toISOString());
+
+      if (errorCount) throw errorCount;
+      if (count) {
+        throw new Error('No se puede cambiar el formato: la sala tiene funciones futuras activas.');
+      }
+    }
+
     const { data, error } = await this.supabase.client
       .from(this.tabla)
       .update(payload)

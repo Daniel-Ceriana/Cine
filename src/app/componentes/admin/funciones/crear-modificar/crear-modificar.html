@@ -45,24 +45,28 @@
     <fieldset class="bloque">
       <legend>Cuándo</legend>
 
-      @if (esEdicion()) {
-        <mat-form-field>
-          <mat-label>Fecha</mat-label>
-          <input matInput [matDatepicker]="pickerUnico" [min]="hoy"
-                 [value]="fechaUnica()" (dateChange)="fechaUnica.set($event.value)" />
-          <mat-datepicker-toggle matIconSuffix [for]="pickerUnico" />
-          <mat-datepicker #pickerUnico />
-        </mat-form-field>
-      } @else {
-        <mat-form-field>
-          <mat-label>Desde - Hasta</mat-label>
-          <mat-date-range-input [rangePicker]="pickerRango" [min]="hoy">
-            <input matStartDate placeholder="Desde" [value]="desde()" (dateChange)="desde.set($event.value)" />
-            <input matEndDate placeholder="Hasta" [value]="hasta()" (dateChange)="hasta.set($event.value)" />
-          </mat-date-range-input>
-          <mat-datepicker-toggle matIconSuffix [for]="pickerRango" />
-          <mat-date-range-picker #pickerRango />
-        </mat-form-field>
+      @if (tieneSerie()) {
+        <div class="opcion">
+          <span class="opcion__titulo">Modificar</span>
+          <mat-button-toggle-group [value]="alcance()" (change)="alcance.set($event.value)">
+            <mat-button-toggle value="una">Solo esta función</mat-button-toggle>
+            <mat-button-toggle value="siguientes">Esta y las siguientes</mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      }
+
+      @if (modoVarias()) {
+        @if (!esEdicion()) {
+          <div class="opcion">
+            <span class="opcion__titulo">Empezar</span>
+            <mat-button-toggle-group [value]="inicioSemana()" (change)="inicioSemana.set($event.value)">
+              <mat-button-toggle value="esta">Esta semana</mat-button-toggle>
+              <mat-button-toggle value="proxima">Próxima semana</mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+        } @else {
+          <p class="resumen">Desde {{ etiquetaLarga(diaUnico()) }} en adelante.</p>
+        }
 
         <div class="opcion">
           <span class="opcion__titulo">Días de la semana</span>
@@ -72,6 +76,24 @@
             }
           </mat-button-toggle-group>
         </div>
+
+        <div class="opcion">
+          <span class="opcion__titulo">Durante cuántas semanas</span>
+          <mat-button-toggle-group [value]="semanas()" (change)="semanas.set($event.value)">
+            @for (s of opcionesSemanas(); track s) {
+              <mat-button-toggle [value]="s">{{ s }}</mat-button-toggle>
+            }
+          </mat-button-toggle-group>
+        </div>
+      } @else {
+        <mat-form-field>
+          <mat-label>Día</mat-label>
+          <mat-select [value]="diaUnico()" (selectionChange)="diaUnico.set($event.value)">
+            @for (d of opcionesDia(); track d) {
+              <mat-option [value]="d">{{ etiquetaLarga(d) }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
       }
 
       <mat-form-field>
@@ -81,11 +103,21 @@
         <mat-timepicker #pickerHora interval="5m" />
       </mat-form-field>
 
-      @if (!esEdicion() && fechasGeneradas().length > 0) {
-        <p class="resumen">
-          Se crearán <strong>{{ fechasGeneradas().length }}</strong>
-          {{ fechasGeneradas().length === 1 ? 'función' : 'funciones' }}. La sala se asigna automáticamente.
-        </p>
+      @if (modoVarias() && fechasGeneradas().length > 0) {
+        <div class="resumen">
+          <p>
+            {{ esEdicion() ? 'Quedarán' : 'Se crearán' }} <strong>{{ fechasGeneradas().length }}</strong>
+            {{ fechasGeneradas().length === 1 ? 'función' : 'funciones' }}; la sala se asigna automáticamente:
+          </p>
+          <ul class="fechas">
+            @for (f of fechasGeneradas(); track f) {
+              <li class="fechas__item">{{ etiqueta(f) }}</li>
+            }
+          </ul>
+          @if (esEdicion()) {
+            <p>Las funciones siguientes de la serie que no estén en esta lista se cancelan.</p>
+          }
+        </div>
       }
     </fieldset>
 

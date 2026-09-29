@@ -49,6 +49,21 @@ form {
     color: var(--dark-500);
 }
 
+.fechas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: var(--spacing-8) 0;
+}
+
+.fechas__item {
+    font-size: var(--font-xsmall);
+    padding: 2px var(--spacing-8);
+    border-radius: var(--spacing-8);
+    background-color: var(--secundary-300);
+    color: var(--dark-solid);
+}
+
 .mensajes {
     grid-column: 1 / -1;
     display: flex;

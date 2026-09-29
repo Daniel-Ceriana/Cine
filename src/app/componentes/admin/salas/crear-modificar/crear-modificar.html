@@ -29,6 +29,17 @@
 
     <div class="item">
       <section>
+        <label>Formato</label>
+        <select [formField]="salaForm.formato">
+          @for (f of formatos; track f) {
+            <option [value]="f">{{ f }}</option>
+          }
+        </select>
+      </section>
+    </div>
+
+    <div class="item">
+      <section>
         <label>
           <input type="checkbox" [formField]="salaForm.activa" />
           Activa
