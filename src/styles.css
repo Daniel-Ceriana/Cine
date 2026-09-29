@@ -414,5 +414,4 @@ button:not([class*='mat-']):disabled {
 .mat-button-toggle-checked {
     outline: 2px solid var(--mostaza);
     outline-offset: -2px;
-    font-weight: 700;
 }

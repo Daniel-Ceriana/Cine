@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { form, FormField, required, validate, submit } from '@angular/forms/signals';
+import { form, FormField, submit } from '@angular/forms/signals';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -102,21 +102,8 @@ export class CrearModificarFuncion implements OnInit {
     dias_preventa: 0,
   });
 
-  funcionForm = form(this.model, (f) => {
-    required(f.pelicula_id, { message: 'Elegí una película' });
-
-    validate(f.precio_base, ({ value }) =>
-      value() <= 0 ? { kind: 'min', message: 'Tiene que ser mayor a 0' } : null,
-    );
-    validate(f.precio_preventa, ({ value }) =>
-      value() < 0 ? { kind: 'min', message: 'No puede ser negativo' } : null,
-    );
-    validate(f.dias_preventa, ({ value }) =>
-      value() < 0 || !Number.isInteger(value())
-        ? { kind: 'min', message: 'Tiene que ser un entero, 0 o mayor' }
-        : null,
-    );
-  });
+  // Las validaciones están en "faltantes" (más abajo), que junta todo lo que impide guardar
+  funcionForm = form(this.model);
 
   // true cuando se eligen varios días (crear, o modificar "esta y las siguientes")
   modoVarias = computed(() => !this.esEdicion() || this.alcance() === 'siguientes');
@@ -181,6 +168,23 @@ export class CrearModificarFuncion implements OnInit {
     return errores;
   });
 
+  // Todo lo que impide guardar, en lenguaje claro: campos del formulario + fechas y horario
+  faltantes = computed<string[]>(() => {
+    const m = this.model();
+    const faltan: string[] = [];
+
+    if (!m.pelicula_id) faltan.push('Elegí una película');
+    if (!(m.precio_base > 0)) faltan.push('Ingresá un precio base mayor a 0');
+    if (m.precio_preventa < 0) faltan.push('El precio de preventa no puede ser negativo');
+    if (m.dias_preventa < 0 || !Number.isInteger(m.dias_preventa)) {
+      faltan.push('Los días de preventa tienen que ser un número entero, 0 o mayor');
+    } else if (m.dias_preventa > 0 && !(m.precio_preventa > 0)) {
+      faltan.push('Si hay días de preventa, ingresá el precio de preventa');
+    }
+
+    return [...faltan, ...this.erroresFechas()];
+  });
+
   async ngOnInit() {
     this.cargando.set(true);
     try {
@@ -243,14 +247,11 @@ export class CrearModificarFuncion implements OnInit {
     this.errorMsg.set('');
     this.intentoEnvio.set(true);
 
+    // Si falta algo no se guarda; el resumen de "faltantes" se muestra porque intentoEnvio ya es true
+    if (this.faltantes().length > 0) return;
+
     await submit(this.funcionForm, async () => {
       const m = this.model();
-
-      if (this.erroresFechas().length > 0) return;
-      if (m.dias_preventa > 0 && m.precio_preventa <= 0) {
-        this.errorMsg.set('Si hay días de preventa tenés que indicar el precio de preventa');
-        return;
-      }
 
       try {
         this.cargando.set(true);

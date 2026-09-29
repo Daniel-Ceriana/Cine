@@ -7,12 +7,35 @@
 /* Tres bloques lado a lado en pantallas grandes (poco scroll); uno debajo del otro en el celular */
 form {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
     gap: var(--spacing-20);
     align-items: start;
 }
 
+/* Resumen de lo que falta completar */
+.faltantes {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: #FBE3DF;
+    border: 2px solid var(--error);
+    border-radius: var(--radio);
+}
+
+.faltantes__titulo {
+    font-size: var(--font-xsmall);
+    font-weight: 700;
+    color: var(--error);
+}
+
+.faltantes__lista {
+    margin: var(--spacing-8) 0 0 var(--spacing-20);
+    list-style: disc;
+    font-size: var(--font-xsmall);
+}
+
 .bloque {
+    /* los fieldset no se achican por defecto (min-width: min-content): sin esto, un bloque
+       con contenido ancho se estira y se pisa con el de al lado */
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-12);
