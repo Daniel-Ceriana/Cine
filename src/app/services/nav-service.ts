@@ -23,6 +23,7 @@ const RUTAS_ADMIN: NavRoute[] = [
   { url: '/admin/empleados', nombre: 'Empleados' },
   { url: '/admin/productos', nombre: 'Productos' },
   { url: '/admin/cupones', nombre: 'Cupones' },
+  { url: '/admin/puntos', nombre: 'Puntos' },
   { url: '/logout', nombre: 'Salir' },
 ];
 

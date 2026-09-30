@@ -1,1 +1,124 @@
-<p>cupones works!</p>
+<main class="pagina cupones">
+  <h1 class="titulo-pagina">Cupones</h1>
+
+  <p class="cupones__intro">
+    Los cupones se aplican solos al comprar y solo a cuentas registradas. Si a una persona le corresponden varios,
+    se aplica el de <strong>mayor descuento</strong>.
+  </p>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+  @if (errorMsg()) {
+    <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+  }
+  @if (okMsg()) {
+    <p class="ok" role="status">{{ okMsg() }}</p>
+  }
+
+  <!-- Primera compra: único, solo cambia el porcentaje -->
+  @if (primera(); as p) {
+    <section class="bloque ticket">
+      <h2>Primera compra</h2>
+      <p class="bloque__ayuda">
+        Descuento para quien todavía no pagó ninguna compra con su cuenta. Es un cupón único: acá se cambia su porcentaje.
+      </p>
+
+      <div class="fila">
+        <label for="pct-primera">Descuento (%)</label>
+        <input
+          id="pct-primera"
+          type="text"
+          inputmode="decimal"
+          class="fila__numero"
+          [value]="porcentajePrimera()"
+          (input)="porcentajePrimera.set($any($event.target).value)" />
+
+        <label class="check">
+          <input type="checkbox" [checked]="activoPrimera()" (change)="activoPrimera.set($any($event.target).checked)" />
+          Activo
+        </label>
+
+        <button type="button" (click)="guardarPrimera()" [disabled]="guardando()">Guardar</button>
+      </div>
+    </section>
+  }
+
+  <!-- Cupones por rango de edad -->
+  <section class="bloque ticket">
+    <h2>Por rango de edad</h2>
+
+    @if (porEdad().length === 0 && !cargando()) {
+      <p class="bloque__ayuda">Todavía no hay cupones por edad. Creá el primero abajo.</p>
+    }
+
+    <ul class="lista">
+      @for (c of porEdad(); track c.id) {
+        <li class="lista__item" [class.lista__item--inactivo]="!c.activo">
+          <div class="lista__info">
+            <p class="lista__nombre">{{ c.nombre }}</p>
+            <p class="lista__meta">{{ rango(c) }}</p>
+          </div>
+          <span class="chip chip--rojo">{{ c.porcentaje }}% OFF</span>
+          <span class="chip">{{ c.activo ? 'Activo' : 'Inactivo' }}</span>
+          <button type="button" (click)="editar(c)">Modificar</button>
+          <button type="button" class="btn--secundario" (click)="alternarActivo(c)" [disabled]="guardando()">
+            {{ c.activo ? 'Desactivar' : 'Activar' }}
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="bloque ticket">
+    <h2>{{ editandoId() ? 'Modificar cupón' : 'Nuevo cupón por edad' }}</h2>
+
+    <form class="formulario" (submit)="guardarPorEdad($event)" novalidate>
+      <div class="campo">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" type="text" [formField]="cuponForm.nombre" placeholder="Ej.: Jubilados" />
+      </div>
+
+      <div class="campos-fila">
+        <div class="campo">
+          <label for="desde">Edad desde</label>
+          <input id="desde" type="text" inputmode="numeric" [formField]="cuponForm.edad_min" placeholder="51" />
+        </div>
+        <div class="campo">
+          <label for="hasta">Edad hasta <small>(opcional)</small></label>
+          <input id="hasta" type="text" inputmode="numeric" [formField]="cuponForm.edad_max" placeholder="Sin tope" />
+        </div>
+        <div class="campo">
+          <label for="pct">Descuento (%)</label>
+          <input id="pct" type="text" inputmode="decimal" [formField]="cuponForm.porcentaje" placeholder="30" />
+        </div>
+      </div>
+      <p class="bloque__ayuda">
+        El rango incluye ambas edades. Para "más de 50 años" poné desde 51. Sin "hasta", no tiene tope.
+      </p>
+
+      <label class="check">
+        <input type="checkbox" [formField]="cuponForm.activo" />
+        Activo
+      </label>
+
+      @if (intentoEnvio() && faltantes().length > 0) {
+        <div class="faltantes" role="alert">
+          <p class="faltantes__titulo">Falta completar:</p>
+          <ul class="faltantes__lista">
+            @for (m of faltantes(); track m) {
+              <li>{{ m }}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      <div class="acciones">
+        <button type="submit" [disabled]="guardando()">{{ editandoId() ? 'Guardar cambios' : 'Crear cupón' }}</button>
+        @if (editandoId()) {
+          <button type="button" class="btn--secundario" (click)="cancelarEdicion()">Cancelar</button>
+        }
+      </div>
+    </form>
+  </section>
+</main>

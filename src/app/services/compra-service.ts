@@ -15,6 +15,7 @@ export class CompraService {
       p_email: params.email ?? null,
       p_nombre: params.nombre ?? null,
       p_mayor_declarado: params.mayor_declarado ?? false,
+      p_butacas_con_puntos: params.butacas_con_puntos ?? [],
     });
 
     if (error) throw error;

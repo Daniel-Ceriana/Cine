@@ -1,0 +1,60 @@
+<main class="pagina puntos">
+  <h1 class="titulo-pagina">Puntos</h1>
+
+  <section class="reglas ticket">
+    <p><strong>Cómo se ganan:</strong> los usuarios registrados suman <strong>1 punto por cada peso pagado</strong>
+      (ya con el descuento aplicado), al confirmar la compra.</p>
+    <p><strong>Cómo se canjean:</strong> al comprar, cada butaca se puede pagar con puntos. Los puntos cubren el precio de
+      la entrada; el recargo de una butaca VIP se paga en dinero. Los puntos no se transfieren entre usuarios.</p>
+  </section>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+  @if (errorMsg()) {
+    <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+  }
+  @if (okMsg()) {
+    <p class="ok" role="status">{{ okMsg() }}</p>
+  }
+
+  <section class="bloque ticket">
+    <h2>Recompensas</h2>
+    <p class="bloque__ayuda">Cuántos puntos cuesta canjear cada cosa. Si la desactivás, deja de poder canjearse.</p>
+
+    <ul class="lista">
+      @for (r of recompensas(); track r.id) {
+        <li class="lista__item">
+          <div class="lista__info">
+            <p class="lista__nombre">{{ r.nombre }}</p>
+            <span class="chip">{{ r.tipo === 'entrada' ? 'Entrada' : 'Producto del candy' }}</span>
+          </div>
+
+          <label class="campo">
+            Costo (puntos)
+            <input
+              type="text"
+              inputmode="numeric"
+              class="campo__numero"
+              [value]="ediciones()[r.id]?.costo"
+              (input)="editar(r.id, { costo: $any($event.target).value })" />
+          </label>
+
+          <label class="check">
+            <input
+              type="checkbox"
+              [checked]="ediciones()[r.id]?.activa"
+              (change)="editar(r.id, { activa: $any($event.target).checked })" />
+            Activa
+          </label>
+
+          <button type="button" (click)="guardar(r)" [disabled]="guardandoId() === r.id">
+            {{ guardandoId() === r.id ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </li>
+      }
+    </ul>
+
+    <p class="bloque__ayuda">Los productos del candy se agregan a esta lista cuando esté el candy bar.</p>
+  </section>
+</main>

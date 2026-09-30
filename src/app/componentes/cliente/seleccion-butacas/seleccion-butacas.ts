@@ -5,9 +5,12 @@ import { ConfirmarSalida } from '../../../guards/salida-guard';
 import { FuncionService } from '../../../services/funcion-service';
 import { ButacaService } from '../../../services/butaca-service';
 import { CompraService } from '../../../services/compra-service';
+import { CuponService } from '../../../services/cupon-service';
+import { PuntosService } from '../../../services/puntos-service';
 import { Auth } from '../../../services/auth';
 import { FuncionConRelaciones } from '../../../modelos/funcion-model';
 import { CompraModel, OcupacionButaca } from '../../../modelos/compra-model';
+import { CuponAplicable } from '../../../modelos/cupon-model';
 import { BUTACAS } from '../../../modelos/sala-plantilla';
 import { MapaButacas } from '../../compartido/mapa-butacas/mapa-butacas';
 import { precioVigente } from '../../../utilidades/precio-funcion';
@@ -48,6 +51,8 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
   private funcionService = inject(FuncionService);
   private butacaService = inject(ButacaService);
   private compraService = inject(CompraService);
+  private cuponService = inject(CuponService);
+  private puntosService = inject(PuntosService);
   private auth = inject(Auth);
 
   private funcionId = '';
@@ -59,6 +64,9 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
   ocupacion = signal<OcupacionButaca[]>([]);
   seleccionadas = signal<string[]>([]);
   recargoVip = signal(0);
+  cuponMio = signal<CuponAplicable | null>(null); // el cupón que le corresponde hoy (solo con cuenta)
+  costoEntradaPuntos = signal<number | null>(null); // puntos que cuesta canjear una entrada (null = no disponible)
+  conPuntos = signal<string[]>([]); // butacas que se eligió pagar con puntos
   // Perfil de quien tiene sesión (null = compra sin sesión). Lo guarda Auth en memoria, sin pedidos extra.
   perfil = this.auth.perfil;
   cargando = signal(false);
@@ -108,15 +116,42 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
 
   private ocupadas = computed(() => new Set(this.ocupacion().map((o) => o.butaca_codigo)));
 
+  // Lo que se cobra en dinero por una butaca: los puntos cubren la entrada, pero el recargo VIP se paga igual
   precioDe(codigo: string): number {
-    return (this.precioBase() ?? 0) + (this.tipoDe(codigo) === 'vip' ? this.recargoVip() : 0);
+    const recargo = this.tipoDe(codigo) === 'vip' ? this.recargoVip() : 0;
+    const entrada = this.conPuntosValidas().includes(codigo) ? 0 : (this.precioBase() ?? 0);
+    return entrada + recargo;
   }
 
   tipoDe(codigo: string): TipoButaca {
     return BUTACAS.find((b) => b.codigo === codigo)?.tipo ?? 'normal';
   }
 
-  total = computed(() => this.seleccionadas().reduce((suma, c) => suma + this.precioDe(c), 0));
+  // ---- Puntos y cupón ----
+  saldoPuntos = computed(() => this.perfil()?.puntos ?? 0);
+  puedeCanjear = computed(() => this.tieneSesion() && this.costoEntradaPuntos() !== null);
+
+  // Solo cuentan las butacas para canje que siguen elegidas (si se desmarca una butaca, deja de canjearse)
+  conPuntosValidas = computed(() => this.conPuntos().filter((c) => this.seleccionadas().includes(c)));
+  puntosUsados = computed(() => this.conPuntosValidas().length * (this.costoEntradaPuntos() ?? 0));
+
+  // ¿alcanzan los puntos para canjear una butaca más?
+  alcanzanPuntos = computed(
+    () => this.saldoPuntos() >= this.puntosUsados() + (this.costoEntradaPuntos() ?? Infinity),
+  );
+
+  // La base vuelve a calcular todo esto al reservar; acá es para mostrarlo antes
+  subtotal = computed(() => this.seleccionadas().reduce((suma, c) => suma + this.precioDe(c), 0));
+  descuento = computed(() => {
+    const cupon = this.cuponMio();
+    return cupon ? Math.round(this.subtotal() * cupon.porcentaje) / 100 : 0;
+  });
+  total = computed(() => this.subtotal() - this.descuento());
+
+  // 1 punto por cada peso pagado (solo con cuenta)
+  puntosGanados = computed(() => (this.tieneSesion() ? Math.floor(this.total()) : 0));
+  puntosGanadosCompra = computed(() => Math.floor(this.compra()?.total ?? 0));
+
   hayVip = computed(() => this.seleccionadas().some((c) => this.tipoDe(c) === 'vip'));
 
   // Lo que impide continuar, en lenguaje claro
@@ -148,6 +183,17 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
       ]);
       this.funcion.set(funcion);
       this.recargoVip.set(recargo);
+
+      // Con cuenta: cupón que le corresponde y cuánto cuesta canjear una entrada
+      if (this.tieneSesion()) {
+        const [cupon, costo] = await Promise.all([
+          this.cuponService.getMio().catch(() => null),
+          this.puntosService.getCostoEntrada().catch(() => null),
+        ]);
+        this.cuponMio.set(cupon);
+        this.costoEntradaPuntos.set(costo);
+      }
+
       await this.cargarOcupacion();
 
       this.cancelarSuscripcion = this.butacaService.suscribirCambios(this.funcionId, () => this.cargarOcupacion());
@@ -207,6 +253,15 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
     }
   }
 
+  // Marca o desmarca una butaca para pagarla con puntos
+  alternarPuntos(codigo: string) {
+    if (this.conPuntosValidas().includes(codigo)) {
+      this.conPuntos.update((c) => c.filter((x) => x !== codigo));
+    } else if (this.alcanzanPuntos()) {
+      this.conPuntos.update((c) => [...c, codigo]);
+    }
+  }
+
   // Reserva las butacas por 5 minutos y pasa al pago
   async continuar() {
     this.errorMsg.set('');
@@ -223,6 +278,7 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
         email: this.tieneSesion() ? undefined : m.email.trim(),
         nombre: this.tieneSesion() ? undefined : m.nombre.trim(),
         mayor_declarado: m.mayor_declarado,
+        butacas_con_puntos: this.conPuntosValidas(),
       });
       this.compra.set(compra);
       this.paso.set('pagar');
@@ -247,6 +303,7 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
       this.compra.set(confirmada);
       this.detenerCuentaRegresiva();
       this.paso.set('listo');
+      this.auth.refrescarPerfil(); // para que el saldo de puntos quede actualizado
 
       // El QR se genera solo, con el mismo código de la compra
       this.qrUrl.set(await generarQr(confirmada.codigo).catch(() => ''));
@@ -296,7 +353,10 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
   private volverAElegir(limpiarSeleccion: boolean) {
     this.detenerCuentaRegresiva();
     this.compra.set(null);
-    if (limpiarSeleccion) this.seleccionadas.set([]);
+    if (limpiarSeleccion) {
+      this.seleccionadas.set([]);
+      this.conPuntos.set([]);
+    }
     this.paso.set('elegir');
     this.cargarOcupacion();
   }

@@ -39,7 +39,12 @@ export class ButacasFuncion implements OnInit, OnDestroy {
   vendidas = computed(() => this.ocupacion().filter((o) => o.estado === 'vendida'));
   enProceso = computed(() => this.ocupacion().filter((o) => o.estado === 'reservada').length);
   libres = computed(() => TOTAL_BUTACAS - this.ocupacion().length);
-  recaudacion = computed(() => this.vendidas().reduce((suma, o) => suma + Number(o.precio), 0));
+  // Lo que se cobró en dinero: el total de cada compra pagada, contada una sola vez
+  // (una compra tiene varias butacas, y su total ya incluye el cupón y los puntos canjeados)
+  recaudacion = computed(() => {
+    const totales = new Map(this.vendidas().map((o) => [o.compra_id, Number(o.compras.total)]));
+    return [...totales.values()].reduce((suma, total) => suma + total, 0);
+  });
 
   // Datos de la butaca que se tocó en el mapa
   detalle = computed(() => {

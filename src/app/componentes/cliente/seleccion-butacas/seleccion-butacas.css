@@ -220,3 +220,30 @@
     color: var(--tinta-suave);
     text-align: center;
 }
+
+/* Canje con puntos, cupón y renglones de descuento */
+.canje {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-8);
+    font-size: var(--font-xsmall);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.aviso--cupon {
+    background-color: #EAF3E6;
+    border-color: #6FA267;
+}
+
+.resumen__linea {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--font-xsmall);
+}
+
+.resumen__linea--descuento {
+    color: #2F6B2A;
+    font-weight: 600;
+}

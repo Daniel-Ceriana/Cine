@@ -13,6 +13,9 @@ export interface CompraModel {
   subtotal: number;
   descuento: number;
   total: number;
+  cupon_nombre: string | null; // cupón aplicado (snapshot del momento de la compra)
+  cupon_porcentaje: number | null;
+  puntos_usados: number; // puntos canjeados en esta compra
   codigo: string; // 'K7Q2-9XMD': es lo que lleva el QR y lo que el empleado puede escribir a mano
   pagada_at: string | null;
   entrada_validada_at: string | null; // la entrada se usa una sola vez
@@ -26,7 +29,8 @@ export interface CompraButacaModel {
   compra_id: string;
   funcion_id: string;
   butaca_codigo: string;
-  precio: number;
+  precio: number; // lo que se cobra en dinero por esta butaca (0 si se pagó con puntos, salvo recargo VIP)
+  con_puntos: boolean;
   estado: EstadoCompraButaca;
   reservada_hasta: string | null;
 }
@@ -43,6 +47,7 @@ export interface ReservarButacasParams {
   email?: string;
   nombre?: string;
   mayor_declarado?: boolean;
+  butacas_con_puntos?: string[]; // butacas que se pagan canjeando puntos
 }
 
 export type ButacaEstadoVista = 'libre' | 'seleccionada' | 'reservada' | 'vendida';

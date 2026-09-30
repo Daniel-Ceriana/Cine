@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { clienteMatch, invitadoMatch, rolMatch } from './guards/auth-guard';
+import { clienteMatch, invitadoMatch, rolMatch, sesionMatch } from './guards/auth-guard';
 import { confirmarSalidaGuard } from './guards/salida-guard';
 
 
@@ -17,6 +17,11 @@ export const routes: Routes = [
   path: 'peliculas/:id',
   canMatch: [clienteMatch],
   loadComponent: () => import('./componentes/cliente/detalle-pelicula/detalle-pelicula').then(m => m.DetallePelicula),
+},
+{
+  path: 'perfil',
+  canMatch: [sesionMatch],
+  loadComponent: () => import('./componentes/cliente/perfil/perfil').then(m => m.Perfil),
 },
 {
   path: 'funcion/:id/butacas',
@@ -69,6 +74,7 @@ export const routes: Routes = [
       ],
     },
     { path: 'productos', loadComponent: () => import('./componentes/admin/productos/productos').then(m => m.Productos) },
+    { path: 'puntos', loadComponent: () => import('./componentes/admin/puntos/puntos').then(m => m.Puntos) },
     { path: 'cupones', loadComponent: () => import('./componentes/admin/cupones/cupones').then(m => m.Cupones) },
   ],
 },

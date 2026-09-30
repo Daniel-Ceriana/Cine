@@ -1,0 +1,218 @@
+.perfil {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+    max-width: 820px;
+}
+
+/* ---- Cabecera con saldos ---- */
+.perfil__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-16);
+    padding: var(--spacing-20);
+}
+
+.perfil__cabecera::before,
+.perfil__cabecera::after {
+    display: none;
+}
+
+.perfil__nombre {
+    font-size: var(--font-medium);
+}
+
+.perfil__email {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.saldos {
+    display: flex;
+    gap: var(--spacing-20);
+}
+
+.saldo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 90px;
+    padding: var(--spacing-8) var(--spacing-16);
+    background-color: var(--crema-fondo);
+    border: 2px dashed var(--crema-borde);
+    border-radius: var(--radio);
+}
+
+.saldo__valor {
+    font-size: var(--font-large);
+    color: var(--rojo);
+    line-height: 1.1;
+}
+
+.saldo__nombre {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* ---- Pestañas ---- */
+.pestanas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+}
+
+/* se ven como pestañas, no como botones de acción */
+.pestana {
+    color: var(--bordo);
+    background-color: var(--crema-superficie);
+    border: 2px solid var(--crema-borde);
+    box-shadow: none;
+}
+
+.pestana:hover {
+    background-color: var(--mostaza-suave);
+}
+
+.pestana--activa,
+.pestana--activa:hover {
+    color: var(--mostaza);
+    background-color: var(--bordo);
+    border-color: var(--bordo);
+}
+
+.pestana__contador {
+    display: inline-block;
+    min-width: 22px;
+    padding: 0 6px;
+    margin-left: 6px;
+    text-align: center;
+    color: var(--crema-superficie);
+    background-color: var(--rojo);
+    border-radius: 999px;
+}
+
+/* ---- Bloques ---- */
+.bloque {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+    padding: var(--spacing-20);
+}
+
+.bloque::before,
+.bloque::after {
+    display: none;
+}
+
+.bloque__encabezado {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-12);
+}
+
+.filtro {
+    display: flex;
+    gap: var(--spacing-8);
+}
+
+.filtro__opcion {
+    color: var(--bordo);
+    background-color: var(--crema-superficie);
+    border: 2px solid var(--crema-borde);
+    box-shadow: none;
+    padding: 4px var(--spacing-12);
+}
+
+.filtro__opcion--activo,
+.filtro__opcion--activo:hover {
+    color: var(--crema-superficie);
+    background-color: var(--rojo);
+    border-color: var(--rojo-oscuro);
+}
+
+.vacio {
+    color: var(--tinta-suave);
+}
+
+/* ---- Listas ---- */
+.lista {
+    display: flex;
+    flex-direction: column;
+}
+
+.lista__item,
+.notificacion {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-12);
+    padding: var(--spacing-12) 0;
+    border-bottom: 1px dashed var(--crema-borde);
+}
+
+.lista__info {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.lista__titulo {
+    font-weight: 700;
+}
+
+.lista__meta {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.lista__puntos {
+    min-width: 70px;
+    text-align: right;
+    font-size: var(--font-medium);
+    color: #2F6B2A;
+}
+
+.lista__puntos--baja {
+    color: var(--rojo);
+}
+
+.notificacion--nueva {
+    padding-left: var(--spacing-12);
+    background-color: #FFF1D6;
+    border-left: 4px solid var(--mostaza);
+}
+
+/* ---- Datos ---- */
+.datos {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--spacing-8) var(--spacing-20);
+}
+
+.datos dt {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.datos dd {
+    font-weight: 600;
+}
+
+@media (max-width: 480px) {
+    .datos {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .datos dd {
+        margin-bottom: var(--spacing-8);
+    }
+}

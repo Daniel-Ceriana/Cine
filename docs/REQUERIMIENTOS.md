@@ -102,12 +102,23 @@ tablas usa ese número.
 |----|---------------|--------|--------|
 | RF-40 | Registro con: email, nombre, apellido, fecha de nacimiento, tipo de sangre, color de ojos y días de vacaciones por año. | 1 | Hecho |
 | RF-41 | Inicio y cierre de sesión, con redirección según el rol. | 5 | Hecho |
-| RF-42 | Cupón de **20 % en la primera compra** para quien se registra. | 1 | Pendiente |
-| RF-43 | El admin puede cambiar el porcentaje del cupón de primera compra cuando quiera. | 4 | Pendiente |
-| RF-44 | El admin puede crear cupones que solo apliquen a usuarios de **más de 50 años**. | 4 | Pendiente |
-| RF-45 | Puntos de fidelización: 1 punto por cada peso gastado (solo usuarios registrados). | 8 | Pendiente |
-| RF-46 | Canje de puntos por entradas gratis o productos del candy. El admin configura cuántos puntos cuesta cada recompensa. | 8 | Pendiente |
-| RF-47 | El perfil muestra los puntos acumulados, el historial de canjes y el crédito. Los puntos no se transfieren. | 8, 10 | Pendiente |
+| RF-42 | Cupón de **20 % en la primera compra** para quien se registra. | 1 | Hecho |
+| RF-43 | El admin puede cambiar el porcentaje del cupón de primera compra cuando quiera. | 4 | Hecho |
+| RF-44 | El admin puede crear cupones que solo apliquen a usuarios de **más de 50 años**. | 4 | Hecho |
+| RF-45 | Puntos de fidelización: 1 punto por cada peso gastado (solo usuarios registrados). | 8 | Hecho |
+| RF-46 | Canje de puntos por entradas gratis o productos del candy. El admin configura cuántos puntos cuesta cada recompensa. | 8 | Parcial |
+| RF-47 | El perfil muestra los puntos acumulados, el historial de canjes y el crédito. Los puntos no se transfieren. | 8, 10 | Parcial |
+
+> RF-46: se pueden canjear **entradas**; los productos del candy se suman cuando exista el candy (RF-50 a 52).
+> RF-47: están los puntos, el historial de canjes y las notificaciones; el **crédito** se muestra pero todavía no se
+> acredita (depende de la cancelación, RF-39).
+
+| ID | Requerimiento | Origen | Estado |
+|----|---------------|--------|--------|
+| RF-48 | Los avisos al usuario (por ejemplo "estrenos" o compras) se ven en **Mi perfil → Notificaciones**. El sistema **no envía mails**. | 9 (aclaración) | Parcial |
+
+> RF-48: hoy se avisa cuando se confirma una compra y cuando se hace un canje. Las alertas de estreno (RF-08) y el
+> aviso de función cancelada usarán el mismo mecanismo cuando se implementen.
 
 ### 3.5 Candy bar
 
@@ -208,8 +219,15 @@ Filas R–T   1  2  3  4  |  6 … 25                        | 27 28 29 30   VIP
 **Usuarios**
 15. Se puede registrar cualquier persona de **10 años o más**.
 
+**Cupones y puntos**
+16. Los cupones se aplican solos y solo a cuentas registradas. Hay uno de primera compra (único, con porcentaje editable) y
+    los de rango de edad que el admin quiera. Si corresponden varios, se aplica el de mayor descuento.
+17. Se gana 1 punto por cada peso efectivamente pagado (con el descuento ya aplicado), al confirmar el pago.
+18. Los puntos cubren el precio de la entrada (el costo lo define el admin); el recargo VIP se paga en dinero.
+    Los puntos no se transfieren entre usuarios.
+
 **Cancelación (a implementar)**
-16. Cancelación hasta 2 horas antes, con crédito. Si se cancela una función que ya tiene entradas vendidas, se avisa
+19. Cancelación hasta 2 horas antes, con crédito. Si se cancela una función que ya tiene entradas vendidas, se avisa
     al admin y los compradores reciben puntos equivalentes.
 
 ---

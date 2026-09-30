@@ -54,6 +54,17 @@ export class Auth {
     }
   }
 
+  // Vuelve a leer el perfil (por ejemplo, para ver el saldo de puntos actualizado después de una compra)
+  async refrescarPerfil() {
+    const id = this._sesion()?.user.id;
+    if (!id) return;
+    try {
+      this._perfil.set(await this.getProfile(id));
+    } catch {
+      // si falla, queda el perfil anterior
+    }
+  }
+
   // Los guards esperan esto antes de decidir, para no juzgar con la sesión todavía sin cargar
   esperarInicio(): Promise<void> {
     return this.inicio;

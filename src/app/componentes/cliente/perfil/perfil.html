@@ -1,0 +1,135 @@
+<main class="pagina perfil">
+  <h1 class="titulo-pagina">Mi perfil</h1>
+
+  @if (perfil(); as p) {
+    <header class="perfil__cabecera ticket">
+      <div>
+        <h2 class="perfil__nombre">{{ p.nombre }} {{ p.apellido }}</h2>
+        <p class="perfil__email">{{ email() }}</p>
+      </div>
+
+      <div class="saldos">
+        <div class="saldo">
+          <span class="saldo__valor texto-ticket">{{ p.puntos | puntos }}</span>
+          <span class="saldo__nombre">Puntos</span>
+        </div>
+        <div class="saldo">
+          <span class="saldo__valor texto-ticket">{{ p.credito | pesos }}</span>
+          <span class="saldo__nombre">Crédito</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Pestañas: son botones reales, así se usan también con el teclado -->
+    <div class="pestanas" role="tablist">
+      <button
+        type="button"
+        role="tab"
+        class="pestana"
+        [class.pestana--activa]="pestana() === 'resumen'"
+        [attr.aria-selected]="pestana() === 'resumen'"
+        (click)="pestana.set('resumen')">
+        Mis puntos y datos
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="pestana"
+        [class.pestana--activa]="pestana() === 'notificaciones'"
+        [attr.aria-selected]="pestana() === 'notificaciones'"
+        (click)="pestana.set('notificaciones')">
+        Notificaciones
+        @if (noLeidas() > 0) {
+          <span class="pestana__contador">{{ noLeidas() }}</span>
+        }
+      </button>
+    </div>
+
+    @if (errorMsg()) {
+      <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+    }
+    @if (cargando()) {
+      <p>Cargando...</p>
+    }
+
+    @if (pestana() === 'resumen') {
+      <section class="bloque ticket">
+        <div class="bloque__encabezado">
+          <h2>Historial de puntos</h2>
+          <div class="filtro">
+            <button type="button" class="filtro__opcion" [class.filtro__opcion--activo]="filtro() === 'todos'" (click)="filtro.set('todos')">Todos</button>
+            <button type="button" class="filtro__opcion" [class.filtro__opcion--activo]="filtro() === 'canjes'" (click)="filtro.set('canjes')">Solo canjes</button>
+          </div>
+        </div>
+
+        @if (!cargando() && movimientosVisibles().length === 0) {
+          <p class="vacio">
+            {{ filtro() === 'canjes' ? 'Todavía no hiciste ningún canje.' : 'Todavía no tenés movimientos. Ganás 1 punto por cada peso que pagás.' }}
+          </p>
+        }
+
+        <ul class="lista">
+          @for (m of movimientosVisibles(); track m.id) {
+            <li class="lista__item">
+              <div class="lista__info">
+                <p class="lista__titulo">{{ m.descripcion }}</p>
+                <p class="lista__meta">{{ m.created_at | diaAr }} · {{ m.created_at | horaAr }}</p>
+              </div>
+              <span class="chip" [class.chip--rojo]="m.tipo === 'canje'">{{ m.tipo | tipoMovimiento }}</span>
+              <span class="lista__puntos texto-ticket" [class.lista__puntos--baja]="m.puntos < 0">
+                {{ m.puntos | puntos: 'signo' }}
+              </span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="bloque ticket">
+        <h2>Mis datos</h2>
+        <dl class="datos">
+          <dt>Fecha de nacimiento</dt>
+          <dd>{{ p.fecha_nacimiento }}</dd>
+          <dt>Tipo de sangre</dt>
+          <dd>{{ p.tipo_sangre }}</dd>
+          <dt>Color de ojos</dt>
+          <dd>{{ p.color_ojos }}</dd>
+          <dt>Días de vacaciones por año</dt>
+          <dd>{{ p.dias_vacaciones }}</dd>
+        </dl>
+      </section>
+    }
+
+    @if (pestana() === 'notificaciones') {
+      <section class="bloque ticket">
+        <div class="bloque__encabezado">
+          <h2>Notificaciones</h2>
+          @if (noLeidas() > 0) {
+            <button type="button" class="btn--secundario" (click)="marcarTodasLeidas()">Marcar todas como leídas</button>
+          }
+        </div>
+
+        @if (!cargando() && notificaciones().length === 0) {
+          <p class="vacio">No tenés notificaciones.</p>
+        }
+
+        <ul class="lista">
+          @for (n of notificaciones(); track n.id) {
+            <li class="notificacion" [class.notificacion--nueva]="!n.leida">
+              <div class="lista__info">
+                <p class="lista__titulo">
+                  {{ n.titulo }}
+                  @if (!n.leida) { <span class="chip chip--rojo">Nueva</span> }
+                </p>
+                <p>{{ n.mensaje }}</p>
+                <p class="lista__meta">{{ n.created_at | diaAr }} · {{ n.created_at | horaAr }}</p>
+              </div>
+              @if (!n.leida) {
+                <button type="button" class="btn--secundario" (click)="marcarLeida(n)">Marcar como leída</button>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+</main>

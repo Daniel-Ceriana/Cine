@@ -266,6 +266,7 @@ Los scripts están en `supabase/` y se ejecutan **en orden** desde el editor SQL
 | `003_series_funciones_viejas.sql` | Asigna serie a las funciones creadas antes de la 002 |
 | `004_compras_butacas.sql` | Butacas, configuración, compras, reservas, tiempo real |
 | `005_codigos_validacion.sql` | Código corto de la compra, validación de entrada y candy (un uso por sección) |
+| `006_cupones_puntos_notificaciones.sql` | Cupones, puntos, canje, notificaciones; reemplaza `reservar_butacas` y `confirmar_pago` |
 
 ---
 
@@ -432,6 +433,58 @@ lo quita. No puede quitarse a sí mismo el rol de administrador (evita quedarse 
 **Candy.** La compra todavía no incluye productos, así que la columna `tiene_candy` queda en `false` y la pantalla
 de candy responde "la compra no incluye productos". Cuando se implemente el candy, la compra marcará `tiene_candy` y
 la entrega funcionará sin cambios. Para probar la pantalla antes, se puede marcar una compra a mano en la base.
+
+---
+
+### 6.16 Cupones
+
+**Dos clases de cupón**, que el admin gestiona desde su pantalla:
+- **Primera compra:** es **único** (un índice parcial en la base lo garantiza). El admin solo le cambia el porcentaje
+  o lo activa y desactiva. Se aplica a la cuenta que todavía no tiene ninguna compra pagada.
+- **Por rango de edad:** se pueden crear varios (nombre, edad desde, edad hasta opcional, porcentaje, activo). El rango
+  incluye ambas edades; sin "hasta" no tiene tope. "Más de 50 años" se carga como "desde 51".
+
+**Se aplican solos, sin códigos que escribir.** Coincide con el pedido del cliente, que describe descuentos por
+condición (primera compra, edad) y no por código. Si a una cuenta le corresponden varios, se aplica **el de mayor
+descuento** (no se acumulan, para evitar descuentos desmedidos).
+
+**Solo para cuentas registradas:** la edad y la "primera compra" no se pueden verificar en una compra anónima.
+
+**La regla vive en la base** (`cupon_aplicable`), y `reservar_butacas` la usa al calcular el total. La pantalla de
+compra le pregunta a la base qué cupón le corresponde (`mi_cupon`) solo para mostrarlo antes de pagar, de modo que
+no haya dos versiones de la regla. El descuento se aplica sobre lo que se paga en dinero (no sobre lo canjeado con puntos).
+
+**La compra guarda una copia del cupón** (nombre y porcentaje, más el monto descontado). Si el admin cambia o
+desactiva el cupón después, las compras anteriores no se alteran.
+
+### 6.17 Puntos, canje y notificaciones
+
+**Cómo se ganan:** 1 punto por cada peso **efectivamente pagado**, es decir, con el descuento ya aplicado
+(`floor(total)`), solo con cuenta. Se acreditan al **confirmar el pago**, no al reservar, para que una reserva
+abandonada no sume puntos.
+
+**Cómo se canjean:** durante la compra, cada butaca puede marcarse como "pagar con puntos".
+- El costo de una entrada lo define el admin (tabla `recompensas`, editable desde su pantalla de Puntos).
+- Los puntos cubren el precio de la entrada; el **recargo VIP se sigue pagando en dinero**.
+- Como la tabla de recompensas admite tipo `entrada` y `producto`, los productos del candy se suman después sin
+  cambiar el modelo.
+- **Los puntos se descuentan al confirmar el pago**, con el perfil bloqueado (`FOR UPDATE`) y verificando de nuevo el
+  saldo. Así, aunque alguien abra dos compras a la vez, no puede gastar dos veces los mismos puntos.
+- `compra_butacas.precio` pasa a guardar lo cobrado **en dinero** por esa butaca (0 si se pagó con puntos, salvo el
+  recargo VIP). El "recaudado" del admin suma el total de cada compra pagada, contada una sola vez.
+
+**Historial:** cada ganancia o canje queda en `puntos_movimientos` (con la compra a la que corresponde). El perfil
+muestra el historial y permite filtrar solo los canjes. Los puntos no se transfieren entre usuarios: no existe ninguna
+operación que mueva puntos de una cuenta a otra.
+
+**Notificaciones dentro de la aplicación (el sistema no envía mails).** Cuando hay algo que avisar, se crea una fila
+en `notificaciones` y el usuario la ve en la pestaña "Notificaciones" de **Mi perfil**, con un contador de no leídas.
+Hoy se generan al **confirmar la compra** (con el código de la entrada) y al **realizar un canje**. Las alertas de
+estreno y el aviso de función cancelada usarán este mismo mecanismo cuando se implementen. Se crean dentro de las
+mismas funciones SQL que confirman el pago, así que no puede quedar una compra confirmada sin su aviso.
+
+**Mi perfil.** Muestra los datos de la cuenta, el saldo de puntos y de crédito, el historial y las notificaciones. El
+saldo se vuelve a leer al entrar, para que refleje la última compra.
 
 ---
 
