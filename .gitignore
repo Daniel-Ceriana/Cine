@@ -43,3 +43,8 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 docs
+# Claude / agentes
+.claude/
+.agents/
+skills-lock.json
+CLAUDE.md
