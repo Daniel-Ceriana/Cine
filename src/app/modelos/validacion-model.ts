@@ -5,7 +5,7 @@ import { EstadoCompra } from './compra-model';
 // La entrada y el candy se validan por separado con el mismo código
 export type SeccionValidacion = 'entrada' | 'candy';
 
-// Respuesta de evaluar_codigo / validar_codigo (funciones SQL de 005_codigos_validacion.sql)
+// Respuesta de evaluar_codigo / validar_codigo
 export interface ResultadoCodigo {
   encontrada: boolean;
   puede_validar: boolean;

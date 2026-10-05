@@ -2,10 +2,8 @@ import { TipoButaca } from './sala-model';
 
 // ---------------------------------------------------------------------
 // Distribución de butacas de TODAS las salas (es una sola, igual para todas).
-// Sirve para dibujar el mapa. Para cambiarla se edita este archivo y, si
-// cambian las butacas, también el SQL que carga la tabla "butacas"
-// (supabase/004_compras_butacas.sql), que tiene que quedar igual.
-//
+// Sirve para dibujar el mapa. Para cambiarla se edita este archivo.
+
 // Numeración (según el plano del cine): el número es absoluto en la fila.
 //   bloque izquierdo: 1-4    pasillo: 5
 //   bloque central:   6-25   pasillo: 26

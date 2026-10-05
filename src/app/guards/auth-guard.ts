@@ -3,18 +3,8 @@ import { CanMatchFn, Router } from '@angular/router';
 import { Auth } from '../services/auth';
 import { Rol, RUTA_POR_ROL } from '../modelos/user-model';
 
-// -----------------------------------------------------------------------
-// Guards de tipo canMatch: se evalúan al ELEGIR la ruta, antes de cargar su código.
-// Si no se cumple, en lugar de un `false` (que cae en la ruta comodín) se devuelve
-// un UrlTree que redirige al lugar correcto y explica por qué no se pudo entrar.
-//
-// Ninguno hace pedidos a la red: leen la sesión y el rol que guarda Auth en memoria.
-// Lo único que esperan es que termine la carga inicial de la sesión.
-// -----------------------------------------------------------------------
 
-// Roles que tienen un panel propio (ver RUTA_POR_ROL). Al entrar a la cartelera se los manda ahí.
-// Si se suma un rol nuevo, se agrega acá recién cuando exista su pantalla; si no, quedaría
-// redirigiendo a una ruta inexistente.
+
 const ROLES_CON_PANEL: Rol[] = ['admin', 'empleado_entradas', 'empleado_candy'];
 
 // Exige sesión iniciada; si no hay, va a la pantalla que explica que hay que iniciar sesión
