@@ -37,7 +37,7 @@ pedir datos y avisar al usuario. Así, aunque alguien saltee la interfaz, las re
 | Angular 22 | Aplicación | Requerido por la cátedra |
 | TypeScript | Lenguaje | Tipado estricto en modelos y servicios |
 | Supabase (Auth, Postgres, Storage, Realtime) | Backend | Requerido; evita mantener un servidor |
-| Angular Material 22 | Selector de hora y controles del formulario de funciones | Se pidió expresamente para fechas y horas |
+| Angular Material 22 | Selector de hora y controles del formulario de funciones | Para mejorar fechas y horas base |
 | CSS propio con variables | Estilo general | Identidad visual propia (ver sección 7) |
 | Google Fonts | Bungee, Special Elite, Inter | Tipografías de la identidad visual |
 | `qrcode` | Generar el código QR de cada compra | Genera la imagen del QR en el navegador; es pequeña y no depende de Angular |

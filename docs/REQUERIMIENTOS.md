@@ -71,7 +71,6 @@ tablas usa ese número.
 | RF-24 | La asignación de sala es **automática** y bajo ningún término dos funciones coinciden en la misma sala al mismo tiempo. | 5 | Hecho |
 | RF-25 | El admin puede programar una película para varios días de la semana a la misma hora (ej.: lunes, martes y viernes a las 18 h). | 5 | Hecho |
 | RF-26 | Preventa: abrir la venta antes del estreno con un **precio especial**, que vuelve al normal al pasar la fecha. Configurable película por película. | 9 | Parcial |
-| RF-27 | El admin puede ver, para cada función, qué butacas están compradas y por quién. | (acordado) | Hecho |
 
 > RF-26: el precio y los días de preventa se configuran por función y la regla ya se aplica al vender.
 > Falta la opción de configurarlos una sola vez por película.
@@ -187,7 +186,7 @@ Filas R–T   1  2  3  4  |  6 … 25                        | 27 28 29 30   VIP
 
 ---
 
-## 6. Reglas de negocio acordadas
+## 6. Reglas de negocio aplicadas
 
 **Funciones**
 1. El tipo de proyección (2D/3D/4D/5D) lo determina la **sala**, no la función.
