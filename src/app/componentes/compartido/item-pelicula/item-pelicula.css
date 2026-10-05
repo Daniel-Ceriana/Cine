@@ -28,10 +28,19 @@
     object-fit: cover;
 }
 
+/* Edad abajo a la derecha; la preventa va arriba y centrada */
 .pelicula__restriccion {
     position: absolute;
-    top: var(--spacing-12);
+    bottom: var(--spacing-12);
     right: var(--spacing-12);
+}
+
+.pelicula__preventa {
+    position: absolute;
+    top: var(--spacing-12);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
 }
 
 .pelicula__info {

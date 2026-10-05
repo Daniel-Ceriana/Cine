@@ -4,6 +4,9 @@
     <span class="pelicula__restriccion chip" [class.chip--rojo]="pelicula().restriccion_edad > 0">
       {{ pelicula().restriccion_edad | restriccionEdad }}
     </span>
+    @if (enPreventa()) {
+      <span class="pelicula__preventa chip chip--preventa">Preventa</span>
+    }
   </div>
 
   <div class="pelicula__info">

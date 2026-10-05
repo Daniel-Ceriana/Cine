@@ -14,6 +14,8 @@ import { DuracionPipe } from '../../../pipes/comunes/duracion.pipe';
 export class ItemPelicula {
   pelicula = input.required<PeliculaModel>();
   esAdmin = input<boolean>(false);
+  // lo calcula el listado: alguna función de la película está hoy en preventa
+  enPreventa = input<boolean>(false);
 
   private router = inject(Router);
 

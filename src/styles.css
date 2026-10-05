@@ -405,6 +405,13 @@ button:not([class*='mat-']):disabled {
     color: var(--crema-superficie);
 }
 
+/* Preventa: bordó con letra mostaza, distinto del rojo de la restricción de edad */
+.chip--preventa {
+    background-color: var(--bordo);
+    border-color: var(--mostaza);
+    color: var(--mostaza);
+}
+
 /* Datos "impresos" del ticket: hora, sala, precio */
 .texto-ticket {
     font-family: var(--font-ticket);

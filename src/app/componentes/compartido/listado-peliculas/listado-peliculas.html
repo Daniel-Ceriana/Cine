@@ -47,7 +47,7 @@
 
     <section class="grilla">
         @for (pelicula of filtradas; track pelicula.id) {
-        <app-item-pelicula [pelicula]="pelicula" [esAdmin]="esAdmin()" />
+        <app-item-pelicula [pelicula]="pelicula" [esAdmin]="esAdmin()" [enPreventa]="enPreventa().has(pelicula.id)" />
         }
     </section>
 

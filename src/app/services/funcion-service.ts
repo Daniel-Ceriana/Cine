@@ -1,5 +1,6 @@
 import { Service, inject } from '@angular/core';
 import { SupabaseService } from './supabase-service';
+import { precioVigente } from '../utilidades/precio-funcion';
 import {
   FuncionConRelaciones,
   CrearFuncionesParams,
@@ -47,6 +48,22 @@ export class FuncionService {
 
     if (error) throw error;
     return data as unknown as FuncionConRelaciones[];
+  }
+
+  // Ids de las películas que hoy tienen alguna función en preventa. La base solo filtra lo grueso
+  // (activas, futuras, con preventa configurada); si hoy rige la preventa lo decide precioVigente,
+  // la misma regla que ve el cliente en el detalle y que aplica reservar_butacas.
+  async getPeliculasEnPreventa(): Promise<Set<string>> {
+    const { data, error } = await this.supabase.client
+      .from(this.tabla)
+      .select(SELECT_CON_RELACIONES)
+      .eq('activa', true)
+      .gt('dias_preventa', 0)
+      .gte('inicio', new Date().toISOString());
+
+    if (error) throw error;
+    const funciones = data as unknown as FuncionConRelaciones[];
+    return new Set(funciones.filter((f) => precioVigente(f).estado === 'preventa').map((f) => f.pelicula_id));
   }
 
   // Funciones activas de una serie desde un momento en adelante (para precargar el modificar)
