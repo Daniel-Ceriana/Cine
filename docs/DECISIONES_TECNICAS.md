@@ -544,6 +544,15 @@ que se está viendo.
 **Pendiente de implementar** (detalle en `docs/REQUERIMIENTOS.md`): candy bar, cupones, puntos, crédito y cancelación, reseñas, "Próximamente", "Mis películas", reportes y
 exportaciones, log de actividad, PWA y despliegue.
 
+**PWA y despliegue (en curso)**
+- Hosting en **Firebase Hosting**. `firebase.json` publica `dist/tp1/browser` (la salida de `ng build`, no la carpeta
+  `public/`, que son los assets de Angular) y redirige toda ruta a `index.html` para que funcione el router de la SPA.
+- PWA con **`@angular/pwa`**: service worker de Angular (`ngsw-config.json`), solo activo en el build de producción.
+  Cachea los archivos de la app, no las llamadas a Supabase, así los datos de funciones y butacas nunca quedan viejos.
+- `ngsw-worker.js`, `ngsw.json` e `index.html` se sirven con `Cache-Control: no-cache` para que cada deploy llegue a
+  los usuarios. Si el navegador los guardara, se quedaría con la versión anterior de la app.
+- `@angular/service-worker` tiene que tener la misma versión que `@angular/core`, porque pide una versión exacta.
+
 **Limitaciones conocidas**
 - El plano de butacas está duplicado en `sala-plantilla.ts` y en el SQL de la tabla `butacas`.
 - La regla de precio vigente está en Angular y en SQL (ver 6.14).
