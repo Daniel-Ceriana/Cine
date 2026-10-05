@@ -7,10 +7,7 @@ import { SupabaseService } from './supabase-service';
 export class Auth {
   private supabase = inject(SupabaseService).client;
 
-  // ---------------------------------------------------------------------
-  // Estado de la sesión en memoria. Los guards y las pantallas lo leen de
-  // acá, en lugar de preguntarle a Supabase en cada navegación.
-  // ---------------------------------------------------------------------
+
   private _sesion = signal<Session | null>(null);
   private _perfil = signal<UserModel | null>(null);
 
@@ -25,8 +22,6 @@ export class Auth {
   constructor() {
     this.inicio = this.cargarSesionInicial();
 
-    // Supabase avisa cuando alguien inicia o cierra sesión (también desde otra pestaña).
-    // Dentro de este callback no se deben hacer pedidos a Supabase, por eso se difiere con setTimeout.
     this.supabase.auth.onAuthStateChange((_evento, session) => {
       setTimeout(() => this.aplicarSesion(session), 0);
     });
@@ -37,7 +32,6 @@ export class Auth {
     await this.aplicarSesion(data.session);
   }
 
-  // Guarda la sesión y, si es de otro usuario que el que ya teníamos, busca su perfil (una sola vez)
   private async aplicarSesion(session: Session | null) {
     this._sesion.set(session);
 
@@ -70,9 +64,6 @@ export class Auth {
     return this.inicio;
   }
 
-  // ---------------------------------------------------------------------
-  // Acciones
-  // ---------------------------------------------------------------------
   async signIn(email: string, password: string) {
     const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
     if (error) throw new Error(this.mensajeDeLogin(error.message));
@@ -82,14 +73,9 @@ export class Auth {
     return data;
   }
 
-  // Supabase responde lo mismo cuando el email no existe y cuando la contraseña es incorrecta
-  // (a propósito, para no revelar qué emails están registrados), así que el aviso también es el mismo.
   private mensajeDeLogin(mensaje: string): string {
     if (mensaje === 'Invalid login credentials') {
       return 'El email o la contraseña no son correctos. Revisá los datos e intentá de nuevo.';
-    }
-    if (mensaje === 'Email not confirmed') {
-      return 'Todavía no confirmaste tu email. Revisá tu casilla de correo.';
     }
     return mensaje;
   }
@@ -105,8 +91,7 @@ export class Auth {
         .insert({ id: data.user.id, email: data.user.email, ...profile });
       if (profileError) throw profileError;
     } finally {
-      // Si la confirmación de email está desactivada, signUp deja sesión.
-      // La cerramos para que el usuario tenga que loguearse a mano.
+      // La confirmacion por mail esta desactivada, supabase devuelve la sesion automaticamente asi que aca la saco
       if (data.session) await this.signOut();
     }
 
@@ -118,9 +103,7 @@ export class Auth {
     await this.aplicarSesion(null);
   }
 
-  // ---------------------------------------------------------------------
-  // Consultas (leen el estado en memoria)
-  // ---------------------------------------------------------------------
+  //para leer el estado de memoria
   async hasSession(): Promise<boolean> {
     await this.inicio;
     return this.haySesion();
