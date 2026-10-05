@@ -12,6 +12,7 @@ import {
   submit,
 } from '@angular/forms/signals';
 import { Auth } from '../../../services/auth';
+import { ConfirmarSalida, confirmarDescartar } from '../../../guards/salida-guard';
 import { SelectorFecha } from '../selector-fecha/selector-fecha';
 
 // Los menores pueden registrarse; la restricción de edad de cada película se controla al comprar
@@ -23,7 +24,7 @@ const EDAD_MINIMA_REGISTRO = 10;
   styleUrls: ['./register.css','../stylesCompartidos/forms.css'],
   templateUrl: './register.html',
 })
-export class Register {
+export class Register implements ConfirmarSalida {
   private auth = inject(Auth);
   private router = inject(Router);
 
@@ -95,6 +96,11 @@ export class Register {
     );
   });
 
+  // canDeactivate: si el formulario tiene cambios sin guardar, se pide confirmación antes de salir
+  puedeSalir(): boolean {
+    return confirmarDescartar(this.registerForm().dirty());
+  }
+
   async onSubmit(event: Event) {
     event.preventDefault();
     this.errorMsg.set('');
@@ -104,6 +110,7 @@ export class Register {
 
       try {
         await this.auth.signUp(email, password, profile);
+        this.registerForm().reset(); // ya se envió: salir no es perder cambios
         this.router.navigate(['/login']);
       } catch (e: any) {
         this.errorMsg.set(e?.message ?? 'No se pudo crear la cuenta');

@@ -12,6 +12,7 @@ import {
   submit,
 } from '@angular/forms/signals';
 import { Auth } from '../../../services/auth';
+import { ConfirmarSalida, confirmarDescartar } from '../../../guards/salida-guard';
 
 import { Rol, RUTA_POR_ROL } from '../../../modelos/user-model';
 
@@ -31,7 +32,7 @@ const rutaPorRol: Record<Rol, string> = {
   styleUrls: ['./login.css','../stylesCompartidos/forms.css'],
   templateUrl: './login.html',
 })
-export class Login {
+export class Login implements ConfirmarSalida {
   private auth = inject(Auth);
   private router = inject(Router);
 
@@ -54,6 +55,11 @@ private model = signal({
   })
 
 
+  // canDeactivate: si el formulario tiene cambios sin guardar, se pide confirmación antes de salir
+  puedeSalir(): boolean {
+    return confirmarDescartar(this.loginForm().dirty());
+  }
+
   async onSubmit(event: Event) {
     event.preventDefault();
     this.errorMsg.set('');
@@ -63,6 +69,7 @@ private model = signal({
       try {
         await this.auth.signIn(email, password);
         const rol = await this.auth.getCurrentRole().catch(() => null);
+        this.loginForm().reset(); // ya se envió: salir no es perder cambios
         this.router.navigate([RUTA_POR_ROL[rol ?? 'cliente']]);
       } catch (e: any) {
         this.errorMsg.set(e?.message ?? 'No se pudo iniciar sesión');

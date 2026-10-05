@@ -13,6 +13,7 @@ import {
 import { SupabaseService } from '../../../../services/supabase-service';
 import { PeliculaModel, PeliculaModelForm, Genero } from '../../../../modelos/pelicula-model';
 import{PeliculaService} from '../../../../services/peliculas-service'
+import { ConfirmarSalida, confirmarDescartar } from '../../../../guards/salida-guard';
 import { SelectorFecha } from '../../../compartido/selector-fecha/selector-fecha';
 
 
@@ -22,7 +23,7 @@ import { SelectorFecha } from '../../../compartido/selector-fecha/selector-fecha
   styleUrls: ['../../../compartido/stylesCompartidos/forms.css', './crear-modificar.css'],
   templateUrl: './crear-modificar.html',
 })
-export class CrearModificar implements OnInit {
+export class CrearModificar implements OnInit, ConfirmarSalida {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private peliculasService = inject(PeliculaService);
@@ -124,6 +125,11 @@ export class CrearModificar implements OnInit {
   }
 }
 
+  // canDeactivate: el formulario o la imagen elegida cuentan como cambios sin guardar
+  puedeSalir(): boolean {
+    return confirmarDescartar(this.peliculaForm().dirty() || this.archivoSeleccionado() !== null);
+  }
+
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -164,6 +170,8 @@ export class CrearModificar implements OnInit {
       }
       await this.peliculasService.setGeneros(peliculaId, this.generosSeleccionados()); // <- esta faltaba
 
+        this.peliculaForm().reset();
+        this.archivoSeleccionado.set(null);
         this.router.navigate(['/admin/peliculas']);
       } catch (e: any) {
         this.errorMsg.set(e?.message ?? 'No se pudo guardar la película');

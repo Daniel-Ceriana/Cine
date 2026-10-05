@@ -54,7 +54,7 @@ export const routes: Routes = [
       path: 'funciones',
       children: [
         { path: '', loadComponent: () => import('./componentes/admin/funciones/funciones').then(m => m.Funciones) },
-        { path: 'crear', loadComponent: () => import('./componentes/admin/funciones/crear-modificar/crear-modificar').then(m => m.CrearModificarFuncion) },
+        { path: 'crear', canDeactivate: [confirmarSalidaGuard], loadComponent: () => import('./componentes/admin/funciones/crear-modificar/crear-modificar').then(m => m.CrearModificarFuncion) },
         { path: ':id/butacas', loadComponent: () => import('./componentes/admin/funciones/butacas-funcion/butacas-funcion').then(m => m.ButacasFuncion) },
       ],
     },
@@ -63,30 +63,32 @@ export const routes: Routes = [
       path: 'salas',
       children: [
         { path: '', loadComponent: () => import('./componentes/admin/salas/salas').then(m => m.Salas) },
-        { path: 'crear', loadComponent: () => import('./componentes/admin/salas/crear-modificar/crear-modificar').then(m => m.CrearModificarSala) },
+        { path: 'crear', canDeactivate: [confirmarSalidaGuard], loadComponent: () => import('./componentes/admin/salas/crear-modificar/crear-modificar').then(m => m.CrearModificarSala) },
       ],
     },
     {
       path: 'peliculas',
       children: [
         { path: '', loadComponent: () => import('./componentes/admin/peliculas/peliculas').then(m => m.Peliculas) },
-        { path: 'crear', loadComponent: () => import('./componentes/admin/peliculas/crear-modificar/crear-modificar').then(m => m.CrearModificar) },
+        { path: 'crear', canDeactivate: [confirmarSalidaGuard], loadComponent: () => import('./componentes/admin/peliculas/crear-modificar/crear-modificar').then(m => m.CrearModificar) },
       ],
     },
     { path: 'productos', loadComponent: () => import('./componentes/admin/productos/productos').then(m => m.Productos) },
     { path: 'puntos', loadComponent: () => import('./componentes/admin/puntos/puntos').then(m => m.Puntos) },
-    { path: 'cupones', loadComponent: () => import('./componentes/admin/cupones/cupones').then(m => m.Cupones) },
+    { path: 'cupones', canDeactivate: [confirmarSalidaGuard], loadComponent: () => import('./componentes/admin/cupones/cupones').then(m => m.Cupones) },
   ],
 },
     
 {
   path: 'register',
   canMatch: [invitadoMatch],
+  canDeactivate: [confirmarSalidaGuard],
   loadComponent: () => import('./componentes/compartido/register/register').then(m => m.Register),
 },
 {
   path: 'login',
   canMatch: [invitadoMatch],
+  canDeactivate: [confirmarSalidaGuard],
   loadComponent: () => import('./componentes/compartido/login/login').then(m => m.Login),
 },
 {

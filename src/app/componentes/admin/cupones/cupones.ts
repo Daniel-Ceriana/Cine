@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
+import { ConfirmarSalida, confirmarDescartar } from '../../../guards/salida-guard';
 import { CuponService } from '../../../services/cupon-service';
 import { CuponModel } from '../../../modelos/cupon-model';
 
@@ -13,7 +14,7 @@ import { CuponModel } from '../../../modelos/cupon-model';
   styleUrl: './cupones.css',
   templateUrl: './cupones.html',
 })
-export class Cupones implements OnInit {
+export class Cupones implements OnInit, ConfirmarSalida {
   private cuponService = inject(CuponService);
 
   cupones = signal<CuponModel[]>([]);
@@ -129,7 +130,14 @@ export class Cupones implements OnInit {
     this.editandoId.set(null);
     this.intentoEnvio.set(false);
     this.model.set({ nombre: '', edad_min: '', edad_max: '', porcentaje: '', activo: true });
+    this.cuponForm().reset();
   }
+
+  // canDeactivate: si el formulario tiene cambios sin guardar, se pide confirmación antes de salir
+  puedeSalir(): boolean {
+    return confirmarDescartar(this.cuponForm().dirty());
+  }
+
 
   async guardarPorEdad(event: Event) {
     event.preventDefault();

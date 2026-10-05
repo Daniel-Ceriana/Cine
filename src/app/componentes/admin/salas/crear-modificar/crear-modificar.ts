@@ -9,6 +9,7 @@ import {
   validate,
   submit,
 } from '@angular/forms/signals';
+import { ConfirmarSalida, confirmarDescartar } from '../../../../guards/salida-guard';
 import { SalaService } from '../../../../services/sala-service';
 import { SalaModelForm, FormatoSala } from '../../../../modelos/sala-model';
 
@@ -18,7 +19,7 @@ import { SalaModelForm, FormatoSala } from '../../../../modelos/sala-model';
   styleUrls: ['../../../compartido/stylesCompartidos/forms.css'],
   templateUrl: './crear-modificar.html',
 })
-export class CrearModificarSala implements OnInit {
+export class CrearModificarSala implements OnInit, ConfirmarSalida {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private salaService = inject(SalaService);
@@ -72,6 +73,11 @@ export class CrearModificarSala implements OnInit {
     }
   }
 
+  // canDeactivate: si el formulario tiene cambios sin guardar, se pide confirmación antes de salir
+  puedeSalir(): boolean {
+    return confirmarDescartar(this.salaForm().dirty());
+  }
+
   async onSubmit(event: Event) {
     event.preventDefault();
     this.errorMsg.set('');
@@ -86,6 +92,7 @@ export class CrearModificarSala implements OnInit {
           await this.salaService.crear(this.model());
         }
 
+        this.salaForm().reset();
         this.router.navigate(['/admin/salas']);
       } catch (e: any) {
         // 23505 = unique: ya existe una sala con ese número

@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { ConfirmarSalida, confirmarDescartar } from '../../../../guards/salida-guard';
 import { FuncionService } from '../../../../services/funcion-service';
 import { PeliculaService } from '../../../../services/peliculas-service';
 import {
@@ -67,7 +68,7 @@ interface FuncionFormModel {
   styleUrl: './crear-modificar.css',
   templateUrl: './crear-modificar.html',
 })
-export class CrearModificarFuncion implements OnInit {
+export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private funcionService = inject(FuncionService);
@@ -243,6 +244,11 @@ export class CrearModificarFuncion implements OnInit {
     this.model.update((m) => ({ ...m, pelicula_id }));
   }
 
+  // canDeactivate: si el formulario tiene cambios sin guardar, se pide confirmación antes de salir
+  puedeSalir(): boolean {
+    return confirmarDescartar(this.funcionForm().dirty());
+  }
+
   async onSubmit(event: Event) {
     event.preventDefault();
     this.errorMsg.set('');
@@ -271,6 +277,7 @@ export class CrearModificarFuncion implements OnInit {
           await this.funcionService.crearVarias({ ...m, fechas, hora });
         }
 
+        this.funcionForm().reset();
         this.router.navigate(['/admin/funciones']);
       } catch (e: any) {
         this.errorMsg.set(e?.message ?? 'No se pudo guardar la función');
