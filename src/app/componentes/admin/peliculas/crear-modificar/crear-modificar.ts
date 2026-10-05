@@ -13,10 +13,11 @@ import {
 import { SupabaseService } from '../../../../services/supabase-service';
 import { PeliculaModel, PeliculaModelForm, Genero } from '../../../../modelos/pelicula-model';
 import{PeliculaService} from '../../../../services/peliculas-service'
+import { SelectorFecha } from '../../../compartido/selector-fecha/selector-fecha';
 
 
 @Component({
-  imports: [FormField, RouterLink],
+  imports: [FormField, RouterLink, SelectorFecha],
   selector: 'app-crear-modificar',
   styleUrls: ['../../../compartido/stylesCompartidos/forms.css', './crear-modificar.css'],
   templateUrl: './crear-modificar.html',

@@ -12,12 +12,13 @@ import {
   submit,
 } from '@angular/forms/signals';
 import { Auth } from '../../../services/auth';
+import { SelectorFecha } from '../selector-fecha/selector-fecha';
 
 // Los menores pueden registrarse; la restricción de edad de cada película se controla al comprar
 const EDAD_MINIMA_REGISTRO = 10;
 
 @Component({
-  imports: [FormField, RouterLink],
+  imports: [FormField, RouterLink, SelectorFecha],
   selector: 'app-register',
   styleUrls: ['./register.css','../stylesCompartidos/forms.css'],
   templateUrl: './register.html',

@@ -67,7 +67,7 @@
     <div class="item">
       <section>
         <label>Fecha de estreno</label>
-        <input type="date" [formField]="peliculaForm.fecha_estreno" />
+        <app-selector-fecha [formField]="peliculaForm.fecha_estreno" [aniosAtras]="30" [aniosAdelante]="2" />
       </section>
       @if (peliculaForm.fecha_estreno().touched() && peliculaForm.fecha_estreno().invalid()) {
         <small class="error">{{ peliculaForm.fecha_estreno().errors()[0].message }}</small>

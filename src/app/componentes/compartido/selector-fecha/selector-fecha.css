@@ -1,0 +1,15 @@
+/* Los selects toman su estilo de styles.css; acá solo el armado en tres columnas */
+:host {
+  display: block;
+}
+
+.selector-fecha {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1.3fr;
+  gap: var(--spacing-8);
+}
+
+.selector-fecha select {
+  width: 100%;
+  min-width: 0;
+}

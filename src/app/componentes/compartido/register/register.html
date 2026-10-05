@@ -35,7 +35,7 @@
   <label>
     Fecha de nacimiento
   </label>
-  <input type="date" [formField]="registerForm.fecha_nacimiento" />
+  <app-selector-fecha [formField]="registerForm.fecha_nacimiento" [aniosAtras]="100" [aniosAdelante]="0" />
 </section>
       @if (registerForm.fecha_nacimiento().touched() && registerForm.fecha_nacimiento().invalid()) {
       <small class="error">{{ registerForm.fecha_nacimiento().errors()[0].message }}</small>
