@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { textoResumenCancelacion } from '../../../../utilidades/resumen-cancelacion';
 import { ConfirmarSalida, confirmarDescartar } from '../../../../guards/salida-guard';
 import { FuncionService } from '../../../../services/funcion-service';
 import { PeliculaService } from '../../../../services/peliculas-service';
@@ -26,6 +27,7 @@ import {
   lunesDe,
   diaSemana,
 } from '../../../../utilidades/fechas-ar';
+import { PesosPipe } from '../../../../pipes/comunes/pesos.pipe';
 import { DuracionPipe } from '../../../../pipes/comunes/duracion.pipe';
 import { DiaArPipe, FechaCortaArPipe } from '../../../../pipes/comunes/fechas-ar.pipes';
 
@@ -48,8 +50,6 @@ interface FuncionFormModel {
   formato: FormatoSala;
   idioma: IdiomaFuncion;
   precio_base: number;
-  precio_preventa: number;
-  dias_preventa: number;
 }
 
 @Component({
@@ -63,6 +63,7 @@ interface FuncionFormModel {
     DuracionPipe,
     DiaArPipe,
     FechaCortaArPipe,
+    PesosPipe,
   ],
   selector: 'app-crear-modificar-funcion',
   styleUrl: './crear-modificar.css',
@@ -100,8 +101,6 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
     formato: '2D',
     idioma: 'castellano',
     precio_base: 0,
-    precio_preventa: 0,
-    dias_preventa: 0,
   });
 
   // Las validaciones están en "faltantes" (más abajo), que junta todo lo que impide guardar
@@ -177,12 +176,6 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
 
     if (!m.pelicula_id) faltan.push('Elegí una película');
     if (!(m.precio_base > 0)) faltan.push('Ingresá un precio base mayor a 0');
-    if (m.precio_preventa < 0) faltan.push('El precio de preventa no puede ser negativo');
-    if (m.dias_preventa < 0 || !Number.isInteger(m.dias_preventa)) {
-      faltan.push('Los días de preventa tienen que ser un número entero, 0 o mayor');
-    } else if (m.dias_preventa > 0 && !(m.precio_preventa > 0)) {
-      faltan.push('Si hay días de preventa, ingresá el precio de preventa');
-    }
 
     return [...faltan, ...this.erroresFechas()];
   });
@@ -203,8 +196,6 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
         formato: funcion.salas.formato,
         idioma: funcion.idioma,
         precio_base: funcion.precio_base,
-        precio_preventa: funcion.precio_preventa,
-        dias_preventa: funcion.dias_preventa,
       });
       this.diaUnico.set(fecha);
       this.hora.set(horaADate(hora));
@@ -249,6 +240,29 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
     return confirmarDescartar(this.funcionForm().dirty());
   }
 
+  // Las funciones de la serie que no están en las fechas nuevas se cancelan. Si alguna tenía compras,
+  // se le muestra al admin cuántas y cómo se compensan antes de seguir.
+  private async confirmarCancelaciones(fechas: string[]): Promise<boolean> {
+    const base = this.funcionBase();
+    if (!base?.serie_id) return true;
+
+    const serie = await this.funcionService.getSerieDesde(base.serie_id, base.inicio);
+    const aCancelar = serie.filter((s) => !fechas.includes(partesAr(s.inicio).fecha));
+    if (aCancelar.length === 0) return true;
+
+    const resumen = await this.funcionService.resumenCancelacion(aCancelar.map((s) => s.id));
+    const afectadas = resumen.compras_con_cuenta + resumen.compras_anonimas;
+    if (afectadas === 0) return true;
+
+    return confirm(
+      `Al sacar estos días se cancelan ${aCancelar.length} función(es) de la serie.
+
+${textoResumenCancelacion(resumen)}
+
+¿Querés continuar?`,
+    );
+  }
+
   async onSubmit(event: Event) {
     event.preventDefault();
     this.errorMsg.set('');
@@ -264,6 +278,9 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
         this.cargando.set(true);
         const hora = dateAHora(this.hora()!);
         const fechas = this.modoVarias() ? this.fechasGeneradas() : [this.diaUnico()];
+
+        // Sacar días de una serie cancela esas funciones: si tenían entradas vendidas, el admin lo confirma
+        if (this.esEdicion() && this.modoVarias() && !(await this.confirmarCancelaciones(fechas))) return;
 
         if (this.esEdicion()) {
           await this.funcionService.modificarVarias({

@@ -35,6 +35,29 @@ export class PeliculaService {
     return data as unknown as PeliculaConGeneros;
   }
 
+  // Las más vendidas de los últimos `dias` días (función SQL peliculas_mas_vendidas), de mayor a menor.
+  // Solo se devuelven las que siguen activas.
+  async getMasVendidas(dias = 30, limite = 3): Promise<PeliculaConGeneros[]> {
+    const { data: ranking, error } = await this.supabase.client.rpc('peliculas_mas_vendidas', {
+      p_dias: dias,
+      p_limite: limite,
+    });
+    if (error) throw error;
+
+    const ids = (ranking as { pelicula_id: string }[]).map((r) => r.pelicula_id);
+    if (ids.length === 0) return [];
+
+    const { data, error: errorPeliculas } = await this.supabase.client
+      .from(this.tabla)
+      .select('*, generos(id, nombre)')
+      .in('id', ids)
+      .eq('activa', true);
+    if (errorPeliculas) throw errorPeliculas;
+
+    const porId = new Map((data as unknown as PeliculaConGeneros[]).map((p) => [p.id, p]));
+    return ids.map((id) => porId.get(id)).filter((p): p is PeliculaConGeneros => !!p);
+  }
+
  async getAll(soloActivas = false): Promise<PeliculaConGeneros[]> {
   let query = this.supabase.client
     .from(this.tabla)

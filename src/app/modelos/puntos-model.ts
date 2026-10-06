@@ -10,7 +10,8 @@ export interface RecompensaModel {
   created_at: string;
 }
 
-export type TipoMovimientoPuntos = 'ganado' | 'canje';
+// devolucion: vuelven los puntos de un canje cancelado · ajuste: se quitan los puntos ganados en una compra cancelada
+export type TipoMovimientoPuntos = 'ganado' | 'canje' | 'devolucion' | 'ajuste';
 
 export interface MovimientoPuntos {
   id: string;

@@ -26,10 +26,19 @@
         type="button"
         role="tab"
         class="pestana"
+        [class.pestana--activa]="pestana() === 'compras'"
+        [attr.aria-selected]="pestana() === 'compras'"
+        (click)="pestana.set('compras')">
+        Mis compras
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="pestana"
         [class.pestana--activa]="pestana() === 'resumen'"
         [attr.aria-selected]="pestana() === 'resumen'"
         (click)="pestana.set('resumen')">
-        Mis puntos y datos
+        Puntos, crédito y datos
       </button>
       <button
         type="button"
@@ -48,8 +57,27 @@
     @if (errorMsg()) {
       <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
     }
+    @if (okMsg()) {
+      <p class="ok" role="status">{{ okMsg() }}</p>
+    }
     @if (cargando()) {
       <p>Cargando...</p>
+    }
+
+    @if (pestana() === 'compras') {
+      <section class="compras">
+        @if (!cargando() && compras().length === 0) {
+          <p class="vacio">Todavía no hiciste ninguna compra.</p>
+        }
+        @for (c of compras(); track c.id) {
+          <app-tarjeta-compra
+            [compra]="c"
+            [puedeCancelar]="true"
+            [horasCancelacion]="horasCancelacion()"
+            [cancelando]="cancelandoId() === c.id"
+            (cancelar)="cancelarCompra($event)" />
+        }
+      </section>
     }
 
     @if (pestana() === 'resumen') {
@@ -78,6 +106,31 @@
               <span class="chip" [class.chip--rojo]="m.tipo === 'canje'">{{ m.tipo | tipoMovimiento }}</span>
               <span class="lista__puntos texto-ticket" [class.lista__puntos--baja]="m.puntos < 0">
                 {{ m.puntos | puntos: 'signo' }}
+              </span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="bloque ticket">
+        <h2>Historial de crédito</h2>
+        <p class="vacio">
+          El crédito se acredita al cancelar una compra y se usa al pagar la próxima. No es lo mismo que los puntos.
+        </p>
+
+        @if (!cargando() && movimientosCredito().length === 0) {
+          <p class="vacio">Todavía no tenés movimientos de crédito.</p>
+        }
+
+        <ul class="lista">
+          @for (m of movimientosCredito(); track m.id) {
+            <li class="lista__item">
+              <div class="lista__info">
+                <p class="lista__titulo">{{ m.descripcion }}</p>
+                <p class="lista__meta">{{ m.created_at | diaAr }} · {{ m.created_at | horaAr }}</p>
+              </div>
+              <span class="lista__puntos texto-ticket" [class.lista__puntos--baja]="m.monto < 0">
+                {{ m.monto < 0 ? '-' : '+' }}{{ (m.monto < 0 ? -m.monto : m.monto) | pesos }}
               </span>
             </li>
           }

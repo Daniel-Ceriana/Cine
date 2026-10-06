@@ -1,0 +1,120 @@
+.compra {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: var(--spacing-12) var(--spacing-16);
+    padding: var(--spacing-16);
+}
+
+.compra::before,
+.compra::after {
+    display: none;
+}
+
+.compra--cancelada {
+    opacity: 0.75;
+}
+
+.compra__poster {
+    width: 96px;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border: 2px solid var(--crema-borde);
+    border-radius: var(--radio);
+}
+
+.compra__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    min-width: 0;
+}
+
+.compra__titulo {
+    font-size: var(--font-medium);
+}
+
+.compra__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+}
+
+.compra__meta {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+/* Acciones y detalle ocupan todo el ancho, debajo del póster */
+.compra__acciones,
+.compra__fila {
+    grid-column: 1 / -1;
+}
+
+.compra__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+}
+
+.btn--peligro {
+    background-color: var(--rojo);
+    border-color: var(--rojo);
+    color: #ffffff;
+}
+
+.btn--peligro:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.entrada {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-8);
+    padding: var(--spacing-12);
+    background-color: var(--crema-fondo);
+    border: 2px dashed var(--crema-borde);
+    border-radius: var(--radio);
+}
+
+.entrada__qr {
+    width: 200px;
+    height: 200px;
+    padding: var(--spacing-8);
+    background-color: #ffffff;
+    border: 2px solid var(--crema-borde);
+    border-radius: var(--radio);
+}
+
+.entrada__etiqueta {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.entrada__codigo {
+    font-size: var(--font-large);
+    letter-spacing: 0.15em;
+    color: var(--bordo);
+    overflow-wrap: anywhere;
+}
+
+.aviso--edad {
+    padding: var(--spacing-8) var(--spacing-12);
+    font-size: var(--font-xsmall);
+    background-color: #FBE3DF;
+    border: 2px solid var(--rojo);
+    border-radius: var(--radio);
+}
+
+@media (max-width: 480px) {
+    .compra {
+        grid-template-columns: 72px 1fr;
+    }
+
+    .compra__poster {
+        width: 72px;
+    }
+}

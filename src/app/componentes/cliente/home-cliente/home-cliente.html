@@ -1,2 +1,15 @@
 <h1 class="titulo-pagina">Cartelera</h1>
+
+@if (masVendidas().length > 0) {
+  <section class="mas-vendidas">
+    <h2 class="mas-vendidas__titulo">Las más vendidas</h2>
+    <p class="mas-vendidas__ayuda">Las películas con más entradas vendidas en los últimos {{ dias }} días.</p>
+    <div class="mas-vendidas__grilla">
+      @for (pelicula of masVendidas(); track pelicula.id) {
+        <app-item-pelicula [pelicula]="pelicula" [enPreventa]="enPreventa().has(pelicula.id)" />
+      }
+    </div>
+  </section>
+}
+
 <app-listado-peliculas></app-listado-peliculas>

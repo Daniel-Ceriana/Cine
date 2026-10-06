@@ -58,7 +58,7 @@
           }
 
           @if (seleccionadas().length === 0) {
-            <p class="resumen__vacio">Tocá las butacas que querés en el mapa (hasta {{ maxButacas }}).</p>
+            <p class="resumen__vacio">Tocá las butacas que querés en el mapa (hasta {{ maxButacas() }}).</p>
           } @else {
             <ul class="resumen__lista">
               @for (c of seleccionadas(); track c) {
@@ -95,6 +95,18 @@
               <p class="resumen__linea">Puntos que se canjean <span class="texto-ticket">{{ puntosUsados() }}</span></p>
             }
             <p class="resumen__total">Total <span class="texto-ticket">{{ total() | pesos }}</span></p>
+            @if (saldoCredito() > 0) {
+              <label class="canje canje--credito">
+                <input type="checkbox" [checked]="usarCredito()" (change)="usarCredito.set($any($event.target).checked)" />
+                Usar mi crédito ({{ saldoCredito() | pesos }})
+              </label>
+            }
+            @if (creditoAplicado() > 0) {
+              <p class="resumen__linea resumen__linea--descuento">
+                Crédito <span class="texto-ticket">- {{ creditoAplicado() | pesos }}</span>
+              </p>
+              <p class="resumen__total">A pagar <span class="texto-ticket">{{ aPagar() | pesos }}</span></p>
+            }
             @if (tieneSesion() && puntosGanados() > 0) {
               <p class="datos__ayuda">Con esta compra vas a sumar {{ puntosGanados() }} puntos.</p>
             }
@@ -169,6 +181,12 @@
           <p class="resumen__linea">Puntos que se canjean <span class="texto-ticket">{{ compra()!.puntos_usados }}</span></p>
         }
         <p class="resumen__total">Total <span class="texto-ticket">{{ compra()!.total | pesos }}</span></p>
+        @if (compra()!.credito_usado > 0) {
+          <p class="resumen__linea resumen__linea--descuento">
+            Crédito <span class="texto-ticket">- {{ compra()!.credito_usado | pesos }}</span>
+          </p>
+          <p class="resumen__total">A pagar <span class="texto-ticket">{{ aPagarCompra() | pesos }}</span></p>
+        }
         <p class="datos__ayuda">A nombre de {{ compra()!.nombre }} · {{ compra()!.email }}</p>
 
         @if (errorMsg()) {
@@ -177,13 +195,16 @@
 
         <div class="paso-pago__acciones">
           <button type="button" (click)="pagar()" [disabled]="procesando()">
-            {{ procesando() ? 'Procesando...' : 'Pagar ' + (compra()!.total | pesos) }}
+            {{ procesando() ? 'Procesando...' : aPagarCompra() > 0 ? 'Pagar ' + (aPagarCompra() | pesos) : 'Confirmar compra' }}
           </button>
           <button type="button" class="btn--secundario" (click)="cambiarButacas()" [disabled]="procesando()">
             Cambiar butacas
           </button>
         </div>
-        <p class="datos__ayuda">Pago simulado: no se realiza ningún cobro real.</p>
+        <p class="datos__ayuda">
+          @if (aPagarCompra() > 0) { Pago simulado: no se realiza ningún cobro real. }
+          @else { Tu crédito cubre toda la compra: no hay nada para pagar. }
+        </p>
       </section>
     }
 
@@ -192,7 +213,10 @@
       <section class="paso-pago ticket">
         <h2>¡Compra confirmada!</h2>
         <p>Butacas: <strong class="texto-ticket">{{ seleccionadas().join(', ') }}</strong></p>
-        <p>Total pagado: <strong class="texto-ticket">{{ compra()!.total | pesos }}</strong></p>
+        <p>Total de la compra: <strong class="texto-ticket">{{ compra()!.total | pesos }}</strong></p>
+        @if (compra()!.credito_usado > 0) {
+          <p>Pagado con crédito: <strong class="texto-ticket">{{ compra()!.credito_usado | pesos }}</strong></p>
+        }
         @if (compra()!.puntos_usados > 0) {
           <p>Puntos canjeados: <strong class="texto-ticket">{{ compra()!.puntos_usados }}</strong></p>
         }

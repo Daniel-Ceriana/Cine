@@ -1,0 +1,45 @@
+<main class="pagina mi-entrada">
+  <h1 class="titulo-pagina">Mi entrada</h1>
+
+  <section class="ticket bloque">
+    @if (tieneSesion()) {
+      <p class="aviso">
+        Tenés sesión iniciada: todas tus compras están en <a routerLink="/perfil">Mi perfil</a>.
+        Esta pantalla es para entradas compradas sin cuenta.
+      </p>
+    }
+
+    <p>
+      ¿Compraste sin iniciar sesión? Ingresá el código que figura en tu entrada y el email que usaste al comprar
+      para volver a ver tu QR y descargar el PDF.
+    </p>
+
+    <form class="datos" (submit)="buscar($event)" novalidate>
+      <label for="codigo">Código de la entrada</label>
+      <input id="codigo" type="text" [formField]="datosForm.codigo" placeholder="K7Q2-9XMD" autocomplete="off" />
+
+      <label for="email">Email de la compra</label>
+      <input id="email" type="email" [formField]="datosForm.email" autocomplete="email" />
+
+      @if (intentoEnvio() && faltantes().length > 0) {
+        <div class="faltantes" role="alert">
+          <p class="faltantes__titulo">Falta completar:</p>
+          <ul class="faltantes__lista">
+            @for (m of faltantes(); track m) {
+              <li>{{ m }}</li>
+            }
+          </ul>
+        </div>
+      }
+      @if (errorMsg()) {
+        <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+      }
+
+      <button type="submit" [disabled]="buscando()">{{ buscando() ? 'Buscando...' : 'Buscar mi entrada' }}</button>
+    </form>
+  </section>
+
+  @if (compra(); as c) {
+    <app-tarjeta-compra [compra]="c" [puedeCancelar]="false" />
+  }
+</main>

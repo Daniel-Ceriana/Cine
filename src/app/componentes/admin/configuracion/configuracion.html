@@ -1,0 +1,47 @@
+<main class="pagina configuracion">
+  <h1 class="titulo-pagina">Configuración</h1>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+  @if (errorMsg()) {
+    <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+  }
+  @if (okMsg()) {
+    <p class="ok" role="status">{{ okMsg() }}</p>
+  }
+
+  <section class="bloque ticket">
+    <h2>Reglas de la venta</h2>
+    <p class="bloque__ayuda">
+      Los cambios valen desde que se guardan. Las compras ya reservadas o pagadas no se modifican.
+    </p>
+
+    <ul class="lista">
+      @for (c of valores(); track c.clave) {
+        <li class="lista__item">
+          <div class="lista__info">
+            <p class="lista__nombre">{{ parametro(c.clave).nombre }}</p>
+            @if (c.descripcion) {
+              <p class="bloque__ayuda">{{ c.descripcion }}</p>
+            }
+          </div>
+
+          <label class="campo">
+            Valor ({{ parametro(c.clave).unidad }})
+            <input
+              type="text"
+              inputmode="decimal"
+              class="campo__numero"
+              [value]="ediciones()[c.clave]"
+              (input)="editar(c.clave, $any($event.target).value)" />
+          </label>
+
+          <button type="button" (click)="guardar(c)" [disabled]="guardandoClave() === c.clave">
+            {{ guardandoClave() === c.clave ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
+</main>

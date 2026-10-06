@@ -1,6 +1,10 @@
 import { Service, inject } from '@angular/core';
 import { SupabaseService } from './supabase-service';
-import { CompraModel, ReservarButacasParams } from '../modelos/compra-model';
+import { CompraDetalle, CompraModel, ReservarButacasParams } from '../modelos/compra-model';
+
+// Datos de la función y las butacas que se piden junto con la compra
+const SELECT_DETALLE =
+  '*, funciones(inicio, idioma, peliculas(nombre, imagen_url, restriccion_edad), salas(numero, formato)), compra_butacas(butaca_codigo)';
 
 @Service()
 export class CompraService {
@@ -16,6 +20,7 @@ export class CompraService {
       p_nombre: params.nombre ?? null,
       p_mayor_declarado: params.mayor_declarado ?? false,
       p_butacas_con_puntos: params.butacas_con_puntos ?? [],
+      p_usar_credito: params.usar_credito ?? false,
     });
 
     if (error) throw error;
@@ -48,5 +53,45 @@ export class CompraService {
 
     if (error) throw error;
     return Number(data.valor);
+  }
+
+  // Compras pagadas de la cuenta (incluye las canceladas), de la más nueva a la más vieja.
+  // Se filtra por pagada_at porque una reserva abandonada también queda "cancelada" sin haberse pagado.
+  async getMias(usuarioId: string): Promise<CompraDetalle[]> {
+    const { data, error } = await this.supabase.client
+      .from('compras')
+      .select(SELECT_DETALLE)
+      .eq('usuario_id', usuarioId)
+      .not('pagada_at', 'is', null)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data as unknown as CompraDetalle[];
+  }
+
+  // Quien compró sin cuenta recupera su entrada con código + email (función SQL buscar_entrada).
+  // Si no coinciden, el error es siempre el mismo.
+  async buscarEntrada(codigo: string, email: string): Promise<CompraDetalle> {
+    const { data: id, error } = await this.supabase.client.rpc('buscar_entrada', {
+      p_codigo: codigo,
+      p_email: email,
+    });
+    if (error) throw error;
+
+    const { data, error: errorLectura } = await this.supabase.client
+      .from('compras')
+      .select(SELECT_DETALLE)
+      .eq('id', id)
+      .single();
+
+    if (errorLectura) throw errorLectura;
+    return data as unknown as CompraDetalle;
+  }
+
+  // Cancela la compra (hasta N horas antes de la función): su total vuelve como crédito
+  async cancelar(compraId: string): Promise<CompraModel> {
+    const { data, error } = await this.supabase.client.rpc('cancelar_compra', { p_compra_id: compraId });
+    if (error) throw error;
+    return data as CompraModel;
   }
 }

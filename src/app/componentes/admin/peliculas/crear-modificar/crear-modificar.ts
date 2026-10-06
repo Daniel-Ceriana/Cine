@@ -47,6 +47,8 @@ export class CrearModificar implements OnInit, ConfirmarSalida {
     duracion_minutos: 0,
     restriccion_edad: '0',
     fecha_estreno: '',
+    precio_preventa: 0,
+    dias_preventa: 0,
     activa: true,
     destacada: false,
 
@@ -89,6 +91,20 @@ export class CrearModificar implements OnInit, ConfirmarSalida {
     // });
 
     required(p.fecha_estreno, { message: 'La fecha de estreno es obligatoria' });
+
+    // Preventa: 0 días = sin preventa. Si hay días, tiene que haber un precio.
+    validate(p.dias_preventa, ({ value }) =>
+      value() < 0 || !Number.isInteger(value())
+        ? { kind: 'dias', message: 'Tiene que ser un número entero, 0 o mayor' }
+        : null,
+    );
+    validate(p.precio_preventa, ({ value, valueOf }) => {
+      if (value() < 0) return { kind: 'min', message: 'No puede ser negativo' };
+      if (valueOf(p.dias_preventa) > 0 && !(value() > 0)) {
+        return { kind: 'precio', message: 'Si hay días de preventa, ingresá el precio' };
+      }
+      return null;
+    });
   });
 
  async ngOnInit() {
@@ -113,6 +129,8 @@ export class CrearModificar implements OnInit, ConfirmarSalida {
       duracion_minutos: pelicula.duracion_minutos,
       restriccion_edad: String(pelicula.restriccion_edad),
       fecha_estreno: pelicula.fecha_estreno,
+      precio_preventa: pelicula.precio_preventa,
+      dias_preventa: pelicula.dias_preventa,
       activa: pelicula.activa,
       destacada: pelicula.destacada,
     });

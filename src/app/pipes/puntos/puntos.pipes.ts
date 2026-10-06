@@ -15,6 +15,8 @@ export class PuntosPipe implements PipeTransform {
 const ETIQUETAS: Record<TipoMovimientoPuntos, string> = {
   ganado: 'Puntos ganados',
   canje: 'Canje',
+  devolucion: 'Devolución',
+  ajuste: 'Ajuste',
 };
 
 // 'ganado' -> 'Puntos ganados'   ·   'canje' -> 'Canje'

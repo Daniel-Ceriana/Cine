@@ -5,6 +5,7 @@ import { ConfirmarSalida } from '../../../guards/salida-guard';
 import { FuncionService } from '../../../services/funcion-service';
 import { ButacaService } from '../../../services/butaca-service';
 import { CompraService } from '../../../services/compra-service';
+import { ConfiguracionService } from '../../../services/configuracion-service';
 import { CuponService } from '../../../services/cupon-service';
 import { PuntosService } from '../../../services/puntos-service';
 import { Auth } from '../../../services/auth';
@@ -23,8 +24,6 @@ import { RestriccionEdadPipe } from '../../../pipes/pelicula/restriccion-edad.pi
 import { TipoButacaPipe } from '../../../pipes/butaca/butaca.pipes';
 import { TipoButaca } from '../../../modelos/sala-model';
 
-// Mismo valor que configuracion.max_butacas_por_compra; la base es la que lo hace cumplir
-const MAX_BUTACAS = 8;
 const REFRESCO_MS = 15_000;
 
 type Paso = 'elegir' | 'pagar' | 'listo';
@@ -52,6 +51,7 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
   private butacaService = inject(ButacaService);
   private compraService = inject(CompraService);
   private cuponService = inject(CuponService);
+  private configuracionService = inject(ConfiguracionService);
   private puntosService = inject(PuntosService);
   private auth = inject(Auth);
 
@@ -67,6 +67,7 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
   cuponMio = signal<CuponAplicable | null>(null); // el cupón que le corresponde hoy (solo con cuenta)
   costoEntradaPuntos = signal<number | null>(null); // puntos que cuesta canjear una entrada (null = no disponible)
   conPuntos = signal<string[]>([]); // butacas que se eligió pagar con puntos
+  usarCredito = signal(false); // pagar con el crédito de la cuenta todo lo que alcance
   // Perfil de quien tiene sesión (null = compra sin sesión). Lo guarda Auth en memoria, sin pedidos extra.
   perfil = this.auth.perfil;
   cargando = signal(false);
@@ -85,7 +86,8 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
   private model = signal({ nombre: '', email: '', mayor_declarado: false });
   datosForm = form(this.model);
 
-  readonly maxButacas = MAX_BUTACAS;
+  // configuracion.max_butacas_por_compra (la base es la que lo hace cumplir; acá es para avisar antes)
+  maxButacas = signal(8);
 
   tieneSesion = computed(() => this.perfil() !== null);
   restriccion = computed(() => this.funcion()?.peliculas.restriccion_edad ?? 0);
@@ -148,9 +150,22 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
   });
   total = computed(() => this.subtotal() - this.descuento());
 
-  // 1 punto por cada peso pagado (solo con cuenta)
-  puntosGanados = computed(() => (this.tieneSesion() ? Math.floor(this.total()) : 0));
-  puntosGanadosCompra = computed(() => Math.floor(this.compra()?.total ?? 0));
+  // Crédito de la cuenta (lo que dejó una cancelación): cubre hasta el total y el resto se paga normalmente
+  saldoCredito = computed(() => this.perfil()?.credito ?? 0);
+  creditoAplicado = computed(() => (this.usarCredito() ? Math.min(this.saldoCredito(), this.total()) : 0));
+  aPagar = computed(() => this.total() - this.creditoAplicado());
+
+  // 1 punto por cada peso pagado en dinero (el crédito no suma puntos). Solo con cuenta.
+  puntosGanados = computed(() => (this.tieneSesion() ? Math.floor(this.aPagar()) : 0));
+  puntosGanadosCompra = computed(() => {
+    const c = this.compra();
+    return c ? Math.floor(c.total - c.credito_usado) : 0;
+  });
+  // Lo que falta pagar con el medio de pago, ya con el crédito de la compra reservada
+  aPagarCompra = computed(() => {
+    const c = this.compra();
+    return c ? c.total - c.credito_usado : 0;
+  });
 
   hayVip = computed(() => this.seleccionadas().some((c) => this.tipoDe(c) === 'vip'));
 
@@ -177,12 +192,14 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
     this.funcionId = this.route.snapshot.paramMap.get('id') ?? '';
     this.cargando.set(true);
     try {
-      const [funcion, recargo] = await Promise.all([
+      const [funcion, recargo, maxButacas] = await Promise.all([
         this.funcionService.getById(this.funcionId),
         this.compraService.getRecargoVip(),
+        this.configuracionService.getValor('max_butacas_por_compra').catch(() => 8),
       ]);
       this.funcion.set(funcion);
       this.recargoVip.set(recargo);
+      this.maxButacas.set(maxButacas);
 
       // Con cuenta: cupón que le corresponde y cuánto cuesta canjear una entrada
       if (this.tieneSesion()) {
@@ -246,8 +263,8 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
       this.seleccionadas.update((s) => s.filter((c) => c !== codigo));
     } else if (this.ocupadas().has(codigo)) {
       this.avisoMsg.set(`La butaca ${codigo} no está disponible.`);
-    } else if (this.seleccionadas().length >= MAX_BUTACAS) {
-      this.avisoMsg.set(`Podés elegir hasta ${MAX_BUTACAS} butacas por compra.`);
+    } else if (this.seleccionadas().length >= this.maxButacas()) {
+      this.avisoMsg.set(`Podés elegir hasta ${this.maxButacas()} butacas por compra.`);
     } else {
       this.seleccionadas.update((s) => [...s, codigo]);
     }
@@ -279,6 +296,7 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
         nombre: this.tieneSesion() ? undefined : m.nombre.trim(),
         mayor_declarado: m.mayor_declarado,
         butacas_con_puntos: this.conPuntosValidas(),
+        usar_credito: this.usarCredito(),
       });
       this.compra.set(compra);
       this.paso.set('pagar');
@@ -356,6 +374,7 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
     if (limpiarSeleccion) {
       this.seleccionadas.set([]);
       this.conPuntos.set([]);
+      this.usarCredito.set(false);
     }
     this.paso.set('elegir');
     this.cargarOcupacion();

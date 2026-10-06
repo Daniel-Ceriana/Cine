@@ -1,4 +1,4 @@
-export type TipoNotificacion = 'compra' | 'canje' | 'sistema';
+export type TipoNotificacion = 'compra' | 'canje' | 'sistema' | 'cancelacion';
 
 // Aviso que se ve en "Mi perfil" (el sistema no envía mails)
 export interface NotificacionModel {

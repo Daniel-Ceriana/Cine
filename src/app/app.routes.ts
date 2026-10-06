@@ -23,6 +23,13 @@ export const routes: Routes = [
   canMatch: [sesionMatch],
   loadComponent: () => import('./componentes/cliente/perfil/perfil').then(m => m.Perfil),
 },
+// Quien compró sin cuenta recupera su entrada con código + email
+{
+  path: 'mi-entrada',
+  canMatch: [clienteMatch],
+  canDeactivate: [confirmarSalidaGuard],
+  loadComponent: () => import('./componentes/cliente/mi-entrada/mi-entrada').then(m => m.MiEntrada),
+},
 {
   path: 'funcion/:id/butacas',
   canMatch: [clienteMatch],
@@ -75,6 +82,7 @@ export const routes: Routes = [
     },
     { path: 'productos', loadComponent: () => import('./componentes/admin/productos/productos').then(m => m.Productos) },
     { path: 'puntos', loadComponent: () => import('./componentes/admin/puntos/puntos').then(m => m.Puntos) },
+    { path: 'configuracion', loadComponent: () => import('./componentes/admin/configuracion/configuracion').then(m => m.Configuracion) },
     { path: 'cupones', canDeactivate: [confirmarSalidaGuard], loadComponent: () => import('./componentes/admin/cupones/cupones').then(m => m.Cupones) },
   ],
 },

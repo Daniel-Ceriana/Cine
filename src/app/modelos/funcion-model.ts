@@ -11,8 +11,6 @@ export interface FuncionModel {
   fin_bloqueo: string; // lo calcula la base (fin de la película + 30 min, múltiplo de 5)
   idioma: IdiomaFuncion;
   precio_base: number;
-  precio_preventa: number;
-  dias_preventa: number;
   activa: boolean;
   created_at: string;
 }
@@ -25,6 +23,8 @@ export interface FuncionConRelaciones extends FuncionModel {
     imagen_url: string;
     fecha_estreno: string;
     restriccion_edad: number;
+    precio_preventa: number; // la preventa se configura por película
+    dias_preventa: number;
   };
   salas: { numero: number; nombre: string; formato: FormatoSala };
 }
@@ -36,8 +36,6 @@ interface FuncionParams {
   formato: FormatoSala; // sirve para elegir entre las salas de ese tipo
   idioma: IdiomaFuncion;
   precio_base: number;
-  precio_preventa: number;
-  dias_preventa: number;
 }
 
 // Lo que se manda al RPC crear_funciones (varias fechas, una sola hora)
@@ -52,4 +50,14 @@ export interface ModificarFuncionesParams extends FuncionParams {
   funcion_id: string;
   alcance: AlcanceModificar;
   fechas: string[]; // con alcance 'una' se usa solo la primera
+}
+
+// Qué pasa si se cancelan una o más funciones (lo calcula resumen_cancelacion en la base).
+// Cancelar devuelve el mismo resumen con lo que se compensó.
+export interface ResumenCancelacion {
+  compras_con_cuenta: number; // reciben el total como crédito y una notificación
+  credito_total: number;
+  compras_anonimas: number; // se cancelan, pero no hay cuenta donde avisar ni acreditar
+  total_anonimas: number;
+  anonimas: { nombre: string; email: string; codigo: string; total: number; pelicula: string; inicio: string }[];
 }

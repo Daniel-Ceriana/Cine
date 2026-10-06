@@ -3,12 +3,13 @@ import { SupabaseService } from './supabase-service';
 import { precioVigente } from '../utilidades/precio-funcion';
 import {
   FuncionConRelaciones,
+  ResumenCancelacion,
   CrearFuncionesParams,
   ModificarFuncionesParams,
 } from '../modelos/funcion-model';
 
 const SELECT_CON_RELACIONES =
-  '*, peliculas(nombre, duracion_minutos, imagen_url, fecha_estreno, restriccion_edad), salas(numero, nombre, formato)';
+  '*, peliculas(nombre, duracion_minutos, imagen_url, fecha_estreno, restriccion_edad, precio_preventa, dias_preventa), salas(numero, nombre, formato)';
 
 @Service()
 export class FuncionService {
@@ -51,14 +52,13 @@ export class FuncionService {
   }
 
   // Ids de las películas que hoy tienen alguna función en preventa. La base solo filtra lo grueso
-  // (activas, futuras, con preventa configurada); si hoy rige la preventa lo decide precioVigente,
+  // (activas y futuras); si la película tiene preventa y hoy rige la preventa lo decide precioVigente,
   // la misma regla que ve el cliente en el detalle y que aplica reservar_butacas.
   async getPeliculasEnPreventa(): Promise<Set<string>> {
     const { data, error } = await this.supabase.client
       .from(this.tabla)
       .select(SELECT_CON_RELACIONES)
       .eq('activa', true)
-      .gt('dias_preventa', 0)
       .gte('inicio', new Date().toISOString());
 
     if (error) throw error;
@@ -90,8 +90,6 @@ export class FuncionService {
       p_formato: params.formato,
       p_idioma: params.idioma,
       p_precio_base: params.precio_base,
-      p_precio_preventa: params.precio_preventa,
-      p_dias_preventa: params.dias_preventa,
     });
 
     if (error) throw error;
@@ -109,21 +107,24 @@ export class FuncionService {
       p_formato: params.formato,
       p_idioma: params.idioma,
       p_precio_base: params.precio_base,
-      p_precio_preventa: params.precio_preventa,
-      p_dias_preventa: params.dias_preventa,
     });
 
     if (error) throw error;
     return data as number;
   }
 
-  // Se cancela con activa = false (no se borra) para conservar el historial
-  async cancelar(id: string): Promise<void> {
-    const { error } = await this.supabase.client
-      .from(this.tabla)
-      .update({ activa: false })
-      .eq('id', id);
-
+  // Qué pasaría si se cancelan estas funciones: cuántas compras afecta y cuánto crédito se acredita
+  async resumenCancelacion(ids: string[]): Promise<ResumenCancelacion> {
+    const { data, error } = await this.supabase.client.rpc('resumen_cancelacion', { p_funcion_ids: ids });
     if (error) throw error;
+    return data as ResumenCancelacion;
+  }
+
+  // Cancela la función (no se borra: queda activa = false para conservar el historial).
+  // La base compensa a los compradores: crédito por el total y una notificación a quienes tienen cuenta.
+  async cancelar(id: string): Promise<ResumenCancelacion> {
+    const { data, error } = await this.supabase.client.rpc('cancelar_funcion', { p_funcion_id: id });
+    if (error) throw error;
+    return data as ResumenCancelacion;
   }
 }

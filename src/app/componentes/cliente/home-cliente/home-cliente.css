@@ -1,0 +1,32 @@
+/* Las 3 más vendidas, arriba del listado con buscador */
+.mas-vendidas {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    max-width: 1100px;
+    margin: 0 auto var(--spacing-24);
+    padding: 0 var(--spacing-16);
+}
+
+.mas-vendidas__titulo {
+    font-size: var(--font-large);
+    color: var(--bordo);
+}
+
+.mas-vendidas__ayuda {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.mas-vendidas__grilla {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 200px));
+    gap: var(--spacing-16);
+}
+
+@media (max-width: 640px) {
+    .mas-vendidas__grilla {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-12);
+    }
+}

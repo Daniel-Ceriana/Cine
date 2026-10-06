@@ -76,6 +76,28 @@
 
     <div class="item">
       <section>
+        <label>Días de preventa</label>
+        <input type="number" [formField]="peliculaForm.dias_preventa" />
+      </section>
+      <small class="ayuda">0 = sin preventa. Si no hay preventa, la venta abre el día del estreno.</small>
+      @if (peliculaForm.dias_preventa().touched() && peliculaForm.dias_preventa().invalid()) {
+        <small class="error">{{ peliculaForm.dias_preventa().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Precio de preventa ($)</label>
+        <input type="number" step="0.01" [formField]="peliculaForm.precio_preventa" />
+      </section>
+      <small class="ayuda">Vale para todas las funciones de la película, durante los días previos al estreno.</small>
+      @if (peliculaForm.precio_preventa().touched() && peliculaForm.precio_preventa().invalid()) {
+        <small class="error">{{ peliculaForm.precio_preventa().errors()[0].message }}</small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
         <label>
           <input type="checkbox" [formField]="peliculaForm.activa" />
           Activa

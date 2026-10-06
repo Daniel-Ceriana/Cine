@@ -3,7 +3,8 @@ import { Router, RouterLink } from '@angular/router';
 import { form, FormField } from '@angular/forms/signals';
 import { MenuCrearVer } from '../generico/menu-crear-ver/menu-crear-ver';
 import { FuncionService } from '../../../services/funcion-service';
-import { FuncionConRelaciones } from '../../../modelos/funcion-model';
+import { FuncionConRelaciones, ResumenCancelacion } from '../../../modelos/funcion-model';
+import { textoResumenCancelacion } from '../../../utilidades/resumen-cancelacion';
 import { partesAr, formatearDia, formatearHora } from '../../../utilidades/fechas-ar';
 import { PesosPipe } from '../../../pipes/comunes/pesos.pipe';
 import { DiaArPipe, HoraArPipe } from '../../../pipes/comunes/fechas-ar.pipes';
@@ -38,6 +39,8 @@ export class Funciones implements OnInit {
   funciones = signal<FuncionConRelaciones[]>([]);
   cargando = signal(false);
   errorMsg = signal('');
+  // Resultado de la última cancelación (para mostrar a quién hay que contactar por fuera)
+  ultimaCancelacion = signal<ResumenCancelacion | null>(null);
 
   // Película cuyo detalle (días y horarios) se está viendo; null = listado de películas
   peliculaId = signal<string | null>(null);
@@ -116,17 +119,22 @@ export class Funciones implements OnInit {
     this.router.navigate(['/admin/funciones/crear'], { queryParams: { id: f.id } });
   }
 
+  // Antes de cancelar se muestra cuántas compras afecta y cómo se compensa; recién ahí se confirma.
+  // La base hace todo junto: cancela la función y compensa a los compradores (crédito + notificación).
   async cancelar(f: FuncionConRelaciones) {
-    // TODO: cuando existan las entradas, avisar si la función ya tiene tickets vendidos
-    // y otorgar puntos equivalentes a los usuarios que las compraron.
-    if (!confirm(`¿Cancelar la función de "${f.peliculas.nombre}" del ${formatearDia(f.inicio)} a las ${formatearHora(f.inicio)}?`)) {
-      return;
-    }
-
     this.errorMsg.set('');
+    this.ultimaCancelacion.set(null);
+
     try {
-      await this.funcionService.cancelar(f.id);
+      const resumen = await this.funcionService.resumenCancelacion([f.id]);
+      const funcion = `"${f.peliculas.nombre}" del ${formatearDia(f.inicio)} a las ${formatearHora(f.inicio)}`;
+      if (!confirm(`¿Cancelar la función de ${funcion}?
+
+${textoResumenCancelacion(resumen)}`)) return;
+
+      const hecho = await this.funcionService.cancelar(f.id);
       this.funciones.update((lista) => lista.map((x) => (x.id === f.id ? { ...x, activa: false } : x)));
+      this.ultimaCancelacion.set(hecho);
     } catch (e: any) {
       this.errorMsg.set(e?.message ?? 'No se pudo cancelar la función');
     }

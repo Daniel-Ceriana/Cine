@@ -20,10 +20,11 @@ export function precioVigente(f: FuncionConRelaciones): VigenciaPrecio {
     return { estado: 'normal', precio: Number(f.precio_base), abreEl: null };
   }
 
-  if (f.dias_preventa > 0) {
-    const abreEl = sumarDias(estreno, -f.dias_preventa);
+  // la preventa se configura por película
+  if (f.peliculas.dias_preventa > 0) {
+    const abreEl = sumarDias(estreno, -f.peliculas.dias_preventa);
     return hoy >= abreEl
-      ? { estado: 'preventa', precio: Number(f.precio_preventa), abreEl }
+      ? { estado: 'preventa', precio: Number(f.peliculas.precio_preventa), abreEl }
       : { estado: 'no-abierta', precio: null, abreEl };
   }
 

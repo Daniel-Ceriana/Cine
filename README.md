@@ -51,7 +51,7 @@ tablas usa ese número.
 | RF-02 | El admin decide qué películas aparecen al entrar a la página (activa / destacada). | 1 | Hecho |
 | RF-03 | Cada película puede tener **varios géneros**. | 3 | Hecho |
 | RF-04 | El listado de películas tiene un buscador por nombre y por género. | 2, 3 | Hecho |
-| RF-05 | En la página principal se muestran primero las **3 películas más vendidas**. | 2 | Pendiente |
+| RF-05 | En la página principal se muestran primero las **3 películas más vendidas** (entradas vendidas en los últimos 30 días). | 2 | Hecho |
 | RF-06 | Las películas pueden tener restricción de edad: sin restricción, +13 o +18. | 6 | Hecho |
 | RF-07 | Sección "Próximamente" con las películas que se estrenan en las próximas semanas. | 9 | Pendiente |
 | RF-08 | El usuario puede activar una alerta para que le avisen cuando abra la venta de una película próxima. | 9 | Pendiente |
@@ -70,10 +70,10 @@ tablas usa ese número.
 | RF-23 | No puede haber una función antes de que pase **media hora** de que terminó la anterior en esa sala. | 1 | Hecho |
 | RF-24 | La asignación de sala es **automática** y bajo ningún término dos funciones coinciden en la misma sala al mismo tiempo. | 5 | Hecho |
 | RF-25 | El admin puede programar una película para varios días de la semana a la misma hora (ej.: lunes, martes y viernes a las 18 h). | 5 | Hecho |
-| RF-26 | Preventa: abrir la venta antes del estreno con un **precio especial**, que vuelve al normal al pasar la fecha. Configurable película por película. | 9 | Parcial |
+| RF-26 | Preventa: abrir la venta antes del estreno con un **precio especial**, que vuelve al normal al pasar la fecha. Configurable película por película. | 9 | Hecho |
 
-> RF-26: el precio y los días de preventa se configuran por función y la regla ya se aplica al vender.
-> Falta la opción de configurarlos una sola vez por película.
+> RF-26: el precio y los días de preventa se configuran **una sola vez por película** (formulario de película) y valen
+> para todas sus funciones. La regla se aplica al vender (`reservar_butacas`).
 
 ### 3.3 Butacas y compra de entradas
 
@@ -88,10 +88,7 @@ tablas usa ese número.
 | RF-36 | Menores de 13 o de 18 años no pueden comprar entradas de películas con esa restricción. Toda entrada de esas películas aclara que debe ir un adulto. | 6 | Hecho |
 | RF-37 | Pago de la compra. | 1 | Parcial |
 | RF-38 | Al confirmar la compra se genera un **PDF** con los datos de la entrada y un **código QR**. | 1 | Hecho |
-| RF-39 | El usuario puede cancelar hasta 2 horas antes de la función. No se devuelve dinero: se acredita **crédito** en su cuenta, usable junto con otros medios de pago. | 10 | Pendiente |
-
-> RF-62: la entrada ya funciona con un solo uso. El candy también, pero recién se podrá probar de punta a punta
-> cuando la compra incluya productos (RF-51).
+| RF-39 | El usuario puede cancelar hasta 2 horas antes de la función. No se devuelve dinero: se acredita **crédito** en su cuenta, usable junto con otros medios de pago. | 10 | Hecho |
 
 > RF-37: el pago está **simulado** (no hay cobro real). La compra queda pendiente hasta confirmarse.
 
@@ -106,18 +103,18 @@ tablas usa ese número.
 | RF-44 | El admin puede crear cupones que solo apliquen a usuarios de **más de 50 años**. | 4 | Hecho |
 | RF-45 | Puntos de fidelización: 1 punto por cada peso gastado (solo usuarios registrados). | 8 | Hecho |
 | RF-46 | Canje de puntos por entradas gratis o productos del candy. El admin configura cuántos puntos cuesta cada recompensa. | 8 | Parcial |
-| RF-47 | El perfil muestra los puntos acumulados, el historial de canjes y el crédito. Los puntos no se transfieren. | 8, 10 | Parcial |
+| RF-47 | El perfil muestra los puntos acumulados, el historial de canjes y el crédito. Los puntos no se transfieren. | 8, 10 | Hecho |
 
 > RF-46: se pueden canjear **entradas**; los productos del candy se suman cuando exista el candy (RF-50 a 52).
-> RF-47: están los puntos, el historial de canjes y las notificaciones; el **crédito** se muestra pero todavía no se
-> acredita (depende de la cancelación, RF-39).
+> RF-47: puntos, historial de canjes, **crédito con su historial** y notificaciones. El crédito se acredita al
+> cancelar una compra (RF-39).
 
 | ID | Requerimiento | Origen | Estado |
 |----|---------------|--------|--------|
 | RF-48 | Los avisos al usuario (por ejemplo "estrenos" o compras) se ven en **Mi perfil → Notificaciones**. El sistema **no envía mails**. | 9 (aclaración) | Parcial |
 
-> RF-48: hoy se avisa cuando se confirma una compra y cuando se hace un canje. Las alertas de estreno (RF-08) y el
-> aviso de función cancelada usarán el mismo mecanismo cuando se implementen.
+> RF-48: hoy se avisa cuando se confirma una compra, al hacer un canje, al cancelar una compra y cuando el cine cancela
+> una función. Las alertas de estreno (RF-08) usarán el mismo mecanismo cuando se implementen.
 
 ### 3.5 Candy bar
 
@@ -135,11 +132,16 @@ tablas usa ese número.
 | RF-61 | Se puede ingresar el código a mano (no hay lector de QR real: solo se genera el QR). | 5 | Hecho |
 | RF-62 | Una vez validada la entrada o entregada la comida, el QR **deja de funcionar** (la entrada y el candy se validan por separado). | 5 | Parcial |
 
+> RF-62: la entrada ya funciona con un solo uso. El candy también, pero recién se podrá probar de punta a punta
+> cuando la compra incluya productos (RF-51).
+
 ### 3.7 Administración, reportes y auditoría
 
 | ID | Requerimiento | Origen | Estado |
 |----|---------------|--------|--------|
 | RF-70 | Usuario admin que controla salas, funciones, distribución de butacas, productos, etc. | 5 | Parcial |
+| RF-77 | Pantalla de configuración del admin: recargo VIP, máximo de butacas por compra, minutos de reserva y horas de cancelación. | acordado | Hecho |
+| RF-78 | "Mi entrada": quien compró sin cuenta recupera su entrada (QR y PDF) con código + email. Con cuenta, "Mi perfil → Mis compras". | acordado | Hecho |
 | RF-71 | Gestión de empleados (usuarios que validan QR). | 5 | Hecho |
 | RF-72 | Reporte de facturación por día y de cantidad de entradas vendidas. | 7 | Pendiente |
 | RF-73 | Exportar el reporte de facturación a PDF y a Excel. | 10 | Pendiente |
@@ -148,7 +150,7 @@ tablas usa ese número.
 | RF-76 | Mapa del cine que indique la sala de la entrada comprada. | 4 | Fuera de alcance (el cliente aún no dio "luz verde") |
 
 > RF-70: el admin ya gestiona películas, salas y funciones. La distribución de butacas es la misma en todas las
-> salas y se modifica desde el código (decisión acordada). Faltan productos, cupones y empleados.
+> salas y se modifica desde el código (decisión acordada). Ya están cupones y empleados; falta productos.
 
 ---
 
@@ -161,8 +163,8 @@ tablas usa ese número.
 | RNF-03 | Estilo visual **único y producido**. | Hecho (falta aplicarlo a las pantallas nuevas) |
 | RNF-04 | Uso correcto de Angular, buenas prácticas y técnicas vistas en clase. | En curso |
 | RNF-05 | Integración con **Supabase**. | Hecho |
-| RNF-06 | Integración de **PWA**. | Pendiente |
-| RNF-07 | Aplicación **desplegada** con URL funcional. | Pendiente |
+| RNF-06 | Integración de **PWA**. | Hecho (instalación verificada) |
+| RNF-07 | Aplicación **desplegada** con URL funcional. | Parcial (Firebase Hosting configurado; falta confirmar URL y URLs permitidas en Supabase Auth) |
 | RNF-08 | Código en GitHub. | Hecho |
 | RNF-09 | README con arquitectura y decisiones técnicas. | Parcial (ver `docs/DECISIONES_TECNICAS.md`) |
 | RNF-10 | Interfaz usable en celular (el cliente compra desde el teléfono). | Parcial |
@@ -199,8 +201,8 @@ Filas R–T   1  2  3  4  |  6 … 25                        | 27 28 29 30   VIP
 6. Al modificar, se elige entre cambiar **solo esa función** o **esa y las siguientes de su serie** (las creadas juntas).
 
 **Precios**
-7. La preventa rige desde `fecha de estreno − días de preventa` hasta el estreno. Antes de eso no se vende; desde el
-   estreno, precio normal.
+7. La preventa se configura **por película** (`precio_preventa` y `dias_preventa`) y rige desde
+   `fecha de estreno − días de preventa` hasta el estreno. Antes de eso no se vende; desde el estreno, precio normal.
 8. Las butacas VIP suman un **recargo global** configurable por el admin. Las accesibles cuestan lo mismo que las comunes.
 9. El precio se guarda tal como se cobró en cada entrada: cambios posteriores no alteran compras anteriores.
 
@@ -246,7 +248,7 @@ Filas R–T   1  2  3  4  |  6 … 25                        | 27 28 29 30   VIP
 Trabajo Práctico 1 — Programación IV (2026 C2) · Sistema de venta de entradas para un cine
 
 Este documento explica **cómo está armada la aplicación y por qué se tomó cada decisión**. Refleja el estado actual
-del proyecto; lo que todavía no está hecho figura en la sección 10 y en `docs/REQUERIMIENTOS.md`.
+del proyecto; lo que todavía no está hecho figura en la sección 10 y en las tablas de requerimientos de este archivo.
 
 ---
 
@@ -300,8 +302,8 @@ listas desplegables del formulario de funciones).
 src/app/
 ├── componentes/
 │   ├── admin/        pantallas del administrador (películas, salas, funciones, butacas de una función…)
-│   ├── cliente/      pantallas del público (inicio, detalle de película, selección de butacas y pago)
-│   └── compartido/   piezas reutilizables (nav, login, registro, listado y tarjeta de película, mapa de butacas)
+│   ├── cliente/      pantallas del público (inicio, detalle, selección de butacas y pago, perfil, Mi entrada)
+│   └── compartido/   piezas reutilizables (nav, login, registro, listado y tarjeta de película, mapa de butacas, tarjeta de compra)
 ├── modelos/          interfaces TypeScript de las tablas y la plantilla de butacas
 ├── services/         acceso a Supabase (un servicio por tema)
 ├── guards/           control de acceso por sesión y rol (canMatch) y confirmación al salir (canDeactivate)
@@ -337,10 +339,13 @@ src/app/
 |------|--------|----------|
 | `/home` | Visitante y cliente | Cartelera con buscador |
 | `/peliculas/:id` | Visitante y cliente | Detalle de película y sus funciones |
-| `/funcion/:id/butacas` | Visitante y cliente | Elegir butacas, reservar y pagar |
+| `/funcion/:id/butacas` | Visitante y cliente | Elegir butacas, reservar y pagar (con crédito, cupón y puntos) |
+| `/mi-entrada` | Visitante y cliente | Recuperar una entrada comprada sin cuenta, con código + email |
+| `/perfil` | Con sesión | Mis compras (con cancelación), puntos, crédito, datos y notificaciones |
+| `/entradas`, `/candy` | Empleados (y admin) | Validar entradas y entregar candy ingresando el código |
 | `/login`, `/register` | Sin sesión | Acceso y registro |
 | `/no-autorizado` | Cualquiera | Aviso de "sin permiso" (sesión iniciada con un rol que no alcanza) |
-| `/admin/...` | Solo admin | Películas, salas, funciones, butacas por función |
+| `/admin/...` | Solo admin | Películas, salas, funciones (con butacas por función), empleados, cupones, puntos y configuración |
 
 ### 3.4 Fechas y horas
 
@@ -510,6 +515,8 @@ Los scripts están en `supabase/` y se ejecutan **en orden** desde el editor SQL
 | `004_compras_butacas.sql` | Butacas, configuración, compras, reservas, tiempo real |
 | `005_codigos_validacion.sql` | Código corto de la compra, validación de entrada y candy (un uso por sección) |
 | `006_cupones_puntos_notificaciones.sql` | Cupones, puntos, canje, notificaciones; reemplaza `reservar_butacas` y `confirmar_pago` |
+| `007_mis_compras_credito.sql` | Crédito (historial y uso al pagar), `cancelar_compra`, `buscar_entrada`, `peliculas_mas_vendidas`; reemplaza `reservar_butacas` y `confirmar_pago` |
+| `008_funcion_cancelada_preventa.sql` | Preventa por película, `compensar_compra`, `cancelar_funcion`, `resumen_cancelacion`, regla de funciones vendidas; reemplaza `colocar_funcion`, `crear_funciones`, `modificar_funciones`, `reservar_butacas` y `cancelar_compra` |
 
 ---
 
@@ -531,22 +538,28 @@ configuracion (recargo VIP, máximo de butacas, minutos de reserva)
 | Tabla | Descripción |
 |-------|-------------|
 | `profiles` | Datos de cada usuario registrado y su rol (cliente, admin, empleados) |
-| `peliculas` | Datos propios de la película: nombre, sinopsis, imagen, duración, estreno, restricción de edad |
+| `peliculas` | Nombre, sinopsis, imagen, duración, estreno, restricción de edad y **preventa** (`precio_preventa`, `dias_preventa`) |
 | `generos`, `pelicula_generos` | Relación muchos a muchos entre películas y géneros |
 | `salas` | Número, nombre, **formato** (2D–5D) y si está activa |
-| `funciones` | Película + sala + inicio + idioma + precios + serie. Guarda también `fin_bloqueo` |
+| `funciones` | Película + sala + inicio + idioma + precio base + serie. Guarda también `fin_bloqueo` |
 | `butacas` | 518 filas fijas con código, fila, bloque, número y tipo (normal/accesible/vip) |
-| `compras` | Una por función: comprador, estado, vencimiento de la reserva, total, `qr_token` |
+| `compras` | Una por función: comprador, estado, vencimiento de la reserva, subtotal, descuento, total, `codigo`, puntos y crédito usados, y si se canceló (`cancelada_at`, `cancelada_motivo`) |
 | `compra_butacas` | Una por butaca comprada: precio cobrado y estado (reservada/vendida/liberada) |
-| `configuracion` | Valores que el admin puede modificar |
+| `cupones`, `recompensas` | Descuentos (primera compra, rango de edad) y cuántos puntos cuesta canjear cada cosa |
+| `puntos_movimientos` | Historial de puntos: ganados, canjes, devoluciones y ajustes |
+| `credito_movimientos` | Historial del crédito: se acredita al cancelar y se usa al pagar (el saldo está en `profiles.credito`) |
+| `notificaciones` | Avisos que se ven en Mi perfil (compra, canje, cancelación) |
+| `configuracion` | Valores que el admin modifica: recargo VIP, máximo de butacas, minutos de reserva y horas de cancelación |
 
 ---
 
 ## 6. Decisiones de negocio y cómo se implementaron
 
-### 6.1 Precios y preventa van en la función, no en la película
-El precio depende de *cuándo y dónde* se proyecta, no solo de la película. Por eso `precio_base`,
-`precio_preventa` y `dias_preventa` se movieron de `peliculas` a `funciones`.
+### 6.1 El precio base va en la función; la preventa, en la película
+El precio normal depende de *cuándo y dónde* se proyecta, por eso `precio_base` vive en `funciones`. La preventa, en
+cambio, es una decisión sobre la película (el cliente la pidió "película por película"): `precio_preventa` y
+`dias_preventa` están en `peliculas` y valen para todas sus funciones. Una migración copió a cada película los valores
+de su función más reciente.
 
 ### 6.2 El formato (2D/3D/4D/5D) pertenece a la sala
 Una sala física es 3D o no lo es; una misma sala no puede proyectar 2D y 3D. Guardarlo en la función permitía
@@ -723,11 +736,49 @@ operación que mueva puntos de una cuenta a otra.
 **Notificaciones dentro de la aplicación (el sistema no envía mails).** Cuando hay algo que avisar, se crea una fila
 en `notificaciones` y el usuario la ve en la pestaña "Notificaciones" de **Mi perfil**, con un contador de no leídas.
 Hoy se generan al **confirmar la compra** (con el código de la entrada) y al **realizar un canje**. Las alertas de
-estreno y el aviso de función cancelada usarán este mismo mecanismo cuando se implementen. Se crean dentro de las
+estreno usarán este mismo mecanismo cuando se implementen. También se crean al cancelar una compra y al cancelar una
+función. Se crean dentro de las
 mismas funciones SQL que confirman el pago, así que no puede quedar una compra confirmada sin su aviso.
 
 **Mi perfil.** Muestra los datos de la cuenta, el saldo de puntos y de crédito, el historial y las notificaciones. El
 saldo se vuelve a leer al entrar, para que refleje la última compra.
+
+### 6.18 Mis compras, cancelación y crédito
+
+- **Mis compras** (Mi perfil): las compras pagadas de la cuenta, con QR, código y PDF. Una reserva abandonada también
+  queda `cancelada`, por eso se listan solo las que tienen `pagada_at`.
+- **Mi entrada** (`/mi-entrada`, pública): quien compró sin cuenta no tiene sesión, así que recupera su entrada con
+  **código + email**. La función `buscar_entrada` responde siempre el mismo error si no coinciden, para no revelar qué
+  códigos existen. Desde ahí **no se cancela**: el crédito se acredita en una cuenta y el anónimo no tiene.
+- **Cancelar** (`cancelar_compra`, atómica): solo el dueño, compra pagada, entrada sin usar y hasta
+  `configuracion.horas_cancelacion` (2) horas antes de la función. Libera las butacas (se ven libres en tiempo real),
+  marca la compra `cancelada`, **acredita crédito por el total** y crea una notificación. Se cancela la compra entera.
+- **Puntos al cancelar:** se quitan los ganados en esa compra (sin dejar el saldo en negativo, movimiento `ajuste`) y se
+  devuelven los canjeados (`devolucion`). El cupón de primera compra vuelve a estar disponible porque `cupon_aplicable`
+  solo mira compras `pagada`.
+- **Crédito ≠ puntos:** el saldo es `profiles.credito` y su historial `credito_movimientos`. Al comprar, la casilla
+  "Usar mi crédito" lo aplica hasta cubrir el total (`compras.credito_usado`); el resto se paga con el medio de pago
+  (si el crédito cubre todo, se confirma sin pagar). Se descuenta recién al confirmar, con el perfil bloqueado.
+  Los puntos ganados se calculan sobre el **dinero** pagado, no sobre el crédito, para no generar puntos reciclándolo.
+- **Más vendidas:** `peliculas_mas_vendidas(30, 3)` cuenta butacas `vendida` de compras pagadas de los últimos 30 días;
+  las canceladas no suman.
+
+### 6.19 Función cancelada, funciones con entradas vendidas y preventa
+
+- **Cancelar una función** (`cancelar_funcion`, atómica) solo se puede si todavía no empezó. Para cada compra pagada
+  usa `compensar_compra` (la misma que `cancelar_compra`): libera las butacas, la marca `cancelada` con motivo
+  `cine`, acredita el total como crédito, ajusta los puntos (quita los ganados y devuelve los canjeados) y crea una
+  notificación "Función cancelada". También libera a quien estaba en el paso de pago.
+- **Compradores sin cuenta:** la compra se cancela y las butacas se liberan, pero no hay dónde acreditar ni avisar. El
+  admin ve la lista (nombre, email, código y total) para contactarlos por fuera.
+- **Aviso al admin antes de cancelar:** `resumen_cancelacion` calcula cuántas compras afecta y cuánto crédito se
+  acredita; Angular lo muestra en el `confirm()`. Quitar días de una serie en `modificar_funciones` pasa por la misma
+  lógica (`desactivar_funcion`) y pide la misma confirmación.
+- **Una función con entradas vendidas no se puede mover ni cambiar** (día, hora, película, formato o idioma): hay que
+  cancelarla y crear otra. Solo se puede cambiar el precio base. Lo hace cumplir `validar_cambio_con_ventas`.
+- **Quién canceló:** `compras.cancelada_motivo` es `cliente` o `cine`, y "Mis compras" lo muestra distinto.
+- **Preventa por película:** ver 6.1. El cálculo del precio vigente sigue duplicado (Angular y SQL), ahora leyendo de la
+  película en los dos lados.
 
 ---
 
@@ -784,10 +835,11 @@ que se está viendo.
 
 ## 10. Limitaciones y decisiones abiertas
 
-**Pendiente de implementar** (detalle en `docs/REQUERIMIENTOS.md`): candy bar, cupones, puntos, crédito y cancelación, reseñas, "Próximamente", "Mis películas", reportes y
-exportaciones, log de actividad, PWA y despliegue.
+**Pendiente de implementar** (detalle en las tablas de la sección 3): candy bar y combos, crédito y cancelación,
+reseñas, "Próximamente", "Mis películas", top 3 más vendidas, reportes y exportaciones, gráficos y log de actividad.
+La PWA y el despliegue están armados y falta verificarlos.
 
-**PWA y despliegue (en curso)**
+**PWA y despliegue (armados, falta verificar)**
 - Hosting en **Firebase Hosting**. `firebase.json` publica `dist/tp1/browser` (la salida de `ng build`, no la carpeta
   `public/`, que son los assets de Angular) y redirige toda ruta a `index.html` para que funcione el router de la SPA.
 - PWA con **`@angular/pwa`**: service worker de Angular (`ngsw-config.json`), solo activo en el build de producción.
@@ -799,20 +851,8 @@ exportaciones, log de actividad, PWA y despliegue.
 **Limitaciones conocidas**
 - El plano de butacas está duplicado en `sala-plantilla.ts` y en el SQL de la tabla `butacas`.
 - La regla de precio vigente está en Angular y en SQL (ver 6.14).
-- El máximo de 8 butacas figura en la configuración y como constante en Angular (la base es la que lo hace cumplir).
 - El cliente solo llega a la selección de butacas desde el detalle de la película.
-- Al cancelar una función, todavía no se avisa si tenía entradas vendidas (queda un `TODO` en el código y en el SQL).
 - No hay pruebas automáticas propias todavía.
 
 **Decisiones a revisar antes de la entrega**
-- Si la preventa debe configurarse una vez por película y no por función (hoy es por función).
-- Cómo se notificarán las alertas de "Próximamente" (correo, notificación push de la PWA o ambas).
-
-
-
-
-
-
-
-
-
+- Las alertas de "Próximamente" se verán en Mi perfil → Notificaciones (el sistema no envía mails, ver RF-48); falta definir qué evento las dispara.

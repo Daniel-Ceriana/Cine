@@ -39,12 +39,19 @@ testem.log
 /typings
 __screenshots__/
 
+
+
+
+
 # System files
 .DS_Store
 Thumbs.db
+#despues se puede subir
 docs
 # Claude / agentes
 .claude/
 .agents/
 skills-lock.json
 CLAUDE.md
+
+supabase

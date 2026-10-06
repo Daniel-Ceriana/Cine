@@ -1,0 +1,73 @@
+@let c = compra();
+
+<article class="compra ticket" [class.compra--cancelada]="c.estado === 'cancelada'">
+  <img class="compra__poster" [src]="c.funciones.peliculas.imagen_url" [alt]="c.funciones.peliculas.nombre" />
+
+  <div class="compra__info">
+    <h3 class="compra__titulo">{{ c.funciones.peliculas.nombre }}</h3>
+    <p class="texto-ticket">{{ c.funciones.inicio | diaAr }} · {{ c.funciones.inicio | horaAr }} · Sala {{ c.funciones.salas.numero }}</p>
+    <div class="compra__chips">
+      <span class="chip">{{ c.funciones.salas.formato | formatoSala }}</span>
+      <span class="chip">{{ c.funciones.idioma | idiomaFuncion }}</span>
+      <span class="chip" [class.chip--rojo]="c.estado === 'cancelada'">{{ c.estado | estadoCompra }}</span>
+      @if (c.estado === 'pagada' && c.entrada_validada_at) {
+        <span class="chip">Entrada usada</span>
+      }
+    </div>
+    <p>Butacas: <strong class="texto-ticket">{{ butacas().join(', ') }}</strong></p>
+    <p>
+      Total: <strong class="texto-ticket">{{ c.total | pesos }}</strong>
+      @if (c.credito_usado > 0) {
+        <span class="compra__meta">(pagaste {{ c.credito_usado | pesos }} con crédito)</span>
+      }
+    </p>
+    @if (c.estado === 'cancelada' && c.cancelada_motivo === 'cine') {
+      <p class="compra__meta">El cine canceló esta función. Su total se acreditó como crédito en la cuenta.</p>
+    } @else if (c.estado === 'cancelada' && c.cancelada_at) {
+      <p class="compra__meta">La cancelaste vos. Su total se acreditó como crédito en la cuenta.</p>
+    }
+  </div>
+
+  @if (c.estado === 'pagada') {
+    <div class="compra__acciones">
+      <button type="button" class="btn--secundario" (click)="alternarEntrada()" [attr.aria-expanded]="verEntrada()">
+        {{ verEntrada() ? 'Ocultar entrada' : 'Ver entrada' }}
+      </button>
+      <button type="button" class="btn--secundario" (click)="descargarPdf()" [disabled]="descargando()">
+        {{ descargando() ? 'Generando PDF...' : 'Descargar PDF' }}
+      </button>
+      @if (puedeCancelar()) {
+        <button type="button" class="btn--peligro" (click)="pedirCancelacion()" [disabled]="motivoNoCancelable() !== null || cancelando()">
+          {{ cancelando() ? 'Cancelando...' : 'Cancelar compra' }}
+        </button>
+      }
+    </div>
+
+    @if (puedeCancelar() && motivoNoCancelable(); as motivo) {
+      <p class="compra__meta compra__fila">{{ motivo }}</p>
+    } @else if (puedeCancelar()) {
+      <p class="compra__meta compra__fila">
+        Podés cancelar hasta el {{ limiteCancelacion().toISOString() | diaAr }} a las {{ limiteCancelacion().toISOString() | horaAr }}.
+        No se devuelve dinero: se acredita crédito en tu cuenta.
+      </p>
+    }
+
+    @if (errorMsg()) {
+      <p class="error compra__fila" role="alert">{{ errorMsg() }}</p>
+    }
+
+    @if (verEntrada()) {
+      <div class="entrada compra__fila">
+        @if (qrUrl()) {
+          <img class="entrada__qr" [src]="qrUrl()" alt="Código QR de la entrada" />
+        }
+        <p class="entrada__etiqueta">Código de la entrada</p>
+        <p class="entrada__codigo texto-ticket">{{ c.codigo }}</p>
+        <p class="compra__meta">Presentá el QR o el código en la puerta de la sala. Sirve una sola vez.</p>
+        @if (restriccion() > 0) {
+          <p class="aviso aviso--edad">Para esta película (+{{ restriccion() }}) debe asistir un adulto.</p>
+        }
+      </div>
+    }
+  }
+</article>

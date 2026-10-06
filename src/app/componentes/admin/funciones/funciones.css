@@ -180,3 +180,24 @@
 .funcion__acciones::after {
     bottom: -11px;
 }
+
+/* Resultado de la última cancelación */
+.cancelacion {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+    padding: var(--spacing-20);
+}
+
+.cancelacion::before,
+.cancelacion::after {
+    display: none;
+}
+
+.cancelacion__lista {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    font-size: var(--font-xsmall);
+    overflow-wrap: anywhere;
+}

@@ -20,6 +20,35 @@
     <p class="error">{{ errorMsg() }}</p>
   }
 
+  @if (ultimaCancelacion(); as r) {
+    <section class="cancelacion ticket" role="status">
+      <h2>Función cancelada</h2>
+      @if (r.compras_con_cuenta + r.compras_anonimas === 0) {
+        <p>No había compras: no hubo que compensar a nadie.</p>
+      }
+      @if (r.compras_con_cuenta > 0) {
+        <p>
+          {{ r.compras_con_cuenta }} compra(s) con cuenta: se acreditaron {{ r.credito_total | pesos }} de crédito y se
+          les avisó en su perfil.
+        </p>
+      }
+      @if (r.compras_anonimas > 0) {
+        <p>
+          {{ r.compras_anonimas }} compra(s) sin cuenta ({{ r.total_anonimas | pesos }}): se cancelaron, pero hay que
+          avisarles por fuera.
+        </p>
+        <ul class="cancelacion__lista">
+          @for (a of r.anonimas; track a.codigo) {
+            <li>
+              <strong>{{ a.nombre }}</strong> · {{ a.email }} · código {{ a.codigo }} · {{ a.total | pesos }}
+            </li>
+          }
+        </ul>
+      }
+      <button type="button" class="btn--secundario" (click)="ultimaCancelacion.set(null)">Cerrar</button>
+    </section>
+  }
+
   @if (peliculaElegida(); as pelicula) {
     <!-- Detalle: días y horarios de la película elegida -->
     <button type="button" class="btn--secundario funciones__volver" (click)="peliculaId.set(null)">← Volver a las películas</button>
@@ -42,8 +71,8 @@
                   }
                 </div>
                 <p class="funcion__meta texto-ticket">Sala {{ f.salas.numero }} · {{ f.precio_base | pesos }}</p>
-                @if (f.dias_preventa > 0) {
-                  <p class="funcion__meta texto-ticket">Preventa {{ f.precio_preventa | pesos }} ({{ f.dias_preventa }} días)</p>
+                @if (f.peliculas.dias_preventa > 0) {
+                  <p class="funcion__meta texto-ticket">Preventa {{ f.peliculas.precio_preventa | pesos }} ({{ f.peliculas.dias_preventa }} días)</p>
                 }
               </div>
 

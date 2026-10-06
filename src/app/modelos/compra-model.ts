@@ -1,3 +1,6 @@
+import { FormatoSala } from './sala-model';
+import { IdiomaFuncion } from './funcion-model';
+
 export type EstadoCompra = 'pendiente' | 'pagada' | 'cancelada' | 'vencida';
 export type EstadoCompraButaca = 'reservada' | 'vendida' | 'liberada';
 
@@ -16,6 +19,9 @@ export interface CompraModel {
   cupon_nombre: string | null; // cupón aplicado (snapshot del momento de la compra)
   cupon_porcentaje: number | null;
   puntos_usados: number; // puntos canjeados en esta compra
+  credito_usado: number; // parte del total que se pagó con crédito
+  cancelada_at: string | null; // si se canceló después de pagar, su total volvió como crédito
+  cancelada_motivo: 'cliente' | 'cine' | null; // quién la canceló: el cliente o el cine (función cancelada)
   codigo: string; // 'K7Q2-9XMD': es lo que lleva el QR y lo que el empleado puede escribir a mano
   pagada_at: string | null;
   entrada_validada_at: string | null; // la entrada se usa una sola vez
@@ -48,6 +54,18 @@ export interface ReservarButacasParams {
   nombre?: string;
   mayor_declarado?: boolean;
   butacas_con_puntos?: string[]; // butacas que se pagan canjeando puntos
+  usar_credito?: boolean; // paga con el crédito de la cuenta todo lo que alcance
+}
+
+// Compra con los datos de la función y las butacas (para "Mis compras" y "Mi entrada")
+export interface CompraDetalle extends CompraModel {
+  funciones: {
+    inicio: string;
+    idioma: IdiomaFuncion;
+    peliculas: { nombre: string; imagen_url: string; restriccion_edad: number };
+    salas: { numero: number; formato: FormatoSala };
+  };
+  compra_butacas: { butaca_codigo: string }[];
 }
 
 export type ButacaEstadoVista = 'libre' | 'seleccionada' | 'reservada' | 'vendida';

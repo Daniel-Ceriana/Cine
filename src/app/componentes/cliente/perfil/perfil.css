@@ -216,3 +216,19 @@
         margin-bottom: var(--spacing-8);
     }
 }
+
+/* ---- Mis compras ---- */
+.compras {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+}
+
+.ok {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: #EAF3E6;
+    border: 2px solid #6FA267;
+    border-radius: var(--radio);
+    font-size: var(--font-xsmall);
+    font-weight: 600;
+}
