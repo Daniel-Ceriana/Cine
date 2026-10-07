@@ -1,0 +1,147 @@
+.reportes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+}
+
+.reportes__intro {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.reportes__periodo {
+    font-size: var(--font-medium);
+}
+
+/* ---- Período ---- */
+.periodo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+    padding: var(--spacing-20);
+}
+
+.periodo::before,
+.periodo::after {
+    display: none;
+}
+
+.periodo__campos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-20);
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.periodo__acciones,
+.exportar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-12);
+}
+
+.faltantes {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: #FBE3DF;
+    border: 2px solid var(--error);
+    border-radius: var(--radio);
+}
+
+.faltantes__titulo {
+    font-size: var(--font-xsmall);
+    font-weight: 700;
+    color: var(--error);
+}
+
+.faltantes__lista {
+    margin: var(--spacing-8) 0 0 var(--spacing-20);
+    list-style: disc;
+    font-size: var(--font-xsmall);
+}
+
+/* ---- Resumen ---- */
+.resumen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: var(--spacing-12);
+}
+
+.dato {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: var(--spacing-16);
+    text-align: center;
+}
+
+.dato::before,
+.dato::after {
+    display: none;
+}
+
+.dato__valor {
+    font-size: var(--font-medium);
+    color: var(--bordo);
+}
+
+.dato__nombre {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+/* ---- Tabla ---- */
+.tabla-contenedor {
+    overflow-x: auto;
+    border: 2px solid var(--crema-borde);
+    border-radius: var(--radio);
+    background-color: var(--crema-superficie);
+}
+
+.tabla-contenedor:focus-visible {
+    outline: 3px solid var(--rojo);
+    outline-offset: 2px;
+}
+
+.tabla {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+    font-size: var(--font-xsmall);
+}
+
+.tabla th,
+.tabla td {
+    padding: var(--spacing-8) var(--spacing-12);
+    border-bottom: 1px dashed var(--crema-borde);
+    white-space: nowrap;
+}
+
+.tabla thead th {
+    background-color: var(--bordo);
+    color: var(--crema-superficie);
+    font-weight: 700;
+    text-align: left;
+    white-space: normal;
+}
+
+.tabla .num {
+    text-align: right;
+}
+
+.tabla tbody th {
+    text-align: left;
+    font-weight: 600;
+}
+
+.tabla tfoot th,
+.tabla tfoot td {
+    background-color: var(--mostaza-suave);
+    font-weight: 700;
+    border-bottom: none;
+}

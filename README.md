@@ -145,8 +145,8 @@ tablas usa ese número.
 | RF-77 | Pantalla de configuración del admin: recargo VIP, máximo de butacas por compra, minutos de reserva, horas de cancelación y máximo de unidades de cada producto del candy. | acordado | Hecho |
 | RF-78 | "Mi entrada": quien compró sin cuenta recupera su entrada (QR y PDF) con código + email. Con cuenta, "Mi perfil → Mis compras". | acordado | Hecho |
 | RF-71 | Gestión de empleados (usuarios que validan QR). | 5 | Hecho |
-| RF-72 | Reporte de facturación por día y de cantidad de entradas vendidas. | 7 | Pendiente |
-| RF-73 | Exportar el reporte de facturación a PDF y a Excel. | 10 | Pendiente |
+| RF-72 | Reporte de facturación por día y de cantidad de entradas vendidas. | 7 | Hecho |
+| RF-73 | Exportar el reporte de facturación a PDF y a Excel. | 10 | Hecho |
 | RF-74 | Gráfico de películas más vistas por semana y por mes, y producto del candy más vendido. | 10 | Pendiente |
 | RF-75 | Log de actividad: quién creó una función, quién modificó un precio, quién validó un QR, con fecha y hora. | 10 | Pendiente |
 | RF-76 | Mapa del cine que indique la sala de la entrada comprada. | 4 | Fuera de alcance (el cliente aún no dio "luz verde") |
@@ -293,7 +293,8 @@ pedir datos y avisar al usuario. Así, aunque alguien saltee la interfaz, las re
 | CSS propio con variables | Estilo general | Identidad visual propia (ver sección 7) |
 | Google Fonts | Bungee, Special Elite, Inter | Tipografías de la identidad visual |
 | `qrcode` | Generar el código QR de cada compra | Genera la imagen del QR en el navegador; es pequeña y no depende de Angular |
-| `jsPDF` | Generar el PDF de la entrada | Arma el PDF en el navegador, sin servidor; se reutilizará para exportar reportes |
+| `jsPDF` | Generar el PDF de la entrada y el del reporte de facturación | Arma el PDF en el navegador, sin servidor |
+| `write-excel-file` | Exportar el reporte de facturación a Excel (`.xlsx`) | Pequeña (unos 20 kB comprimida), licencia MIT, reutiliza `fflate` (que ya trae jsPDF) y se carga solo al exportar. Se descartaron SheetJS (más pesada y con la versión de npm sin actualizar) y ExcelJS (unas 45 veces más pesada) |
 
 Decisión: **no** se usó una librería de componentes para toda la interfaz. Se eligió CSS propio para lograr un
 estilo único, y Material queda limitado a los controles donde aporta más (selector de hora, botones de opción,
@@ -531,6 +532,7 @@ Los scripts están en `supabase/` y se ejecutan **en orden** desde el editor SQL
 | `013_combos.sql` | `combos`, `combo_items`, `compra_combos`, `guardar_combo`, `validar_combos` (reemplaza las tablas de combos viejas, si había); reemplaza `reservar_butacas` (guarda `compras.precio_entrada`), `guardar_candy`, `definir_candy_compra` y `evaluar_codigo`; 3 combos de ejemplo |
 | `014_resenias.sql` | `resenias` (reemplaza una tabla vieja, si había), vista `peliculas_puntuacion`, `puede_resenar`, `guardar_resenia`, `eliminar_resenia`, `mis_peliculas` |
 | `015_proximamente.sql` | `alertas_estreno` (reemplaza una tabla vieja, si había), `notificaciones.pelicula_id` y tipo `estreno`, `pelicula_con_venta_abierta`, `activar_alerta`, `quitar_alerta`, `revisar_alertas` |
+| `016_reporte_facturacion.sql` | `reporte_facturacion(desde, hasta)`: una fila por día con movimiento, solo para el admin (no agrega tablas) |
 
 ---
 
@@ -940,6 +942,29 @@ saldo se vuelve a leer al entrar, para que refleje la última compra.
 - **Filtros de idioma y formato.** Vuelven al buscador: las opciones salen de las funciones futuras activas
   (`getOfertaPorPelicula`), no están fijas, y cada película se filtra por los idiomas y formatos de sus funciones con
   el pipe `filtrar`.
+
+### 6.26 Reporte de facturación y exportación
+
+- **Pantalla** `/admin/reportes`: período (Desde y Hasta, con atajos "Últimos 7 días", "Últimos 30 días" y "Este mes"),
+  resumen del período, tabla por día con fila de totales y botones para exportar. **No hay rango máximo.**
+- **Una sola función SQL** (`reporte_facturacion`), solo para el admin, que devuelve una fila por día **con
+  movimiento** (los días sin ventas ni cancelaciones no aparecen), en hora argentina.
+- **Cuándo cuenta una compra.** Como **venta**, el día en que se pagó (`pagada_at`). Una reserva que nunca se pagó no
+  cuenta. Una compra pagada y después cancelada (por el cliente o por el cine) cuenta como **cancelación** el día en
+  que se canceló (`cancelada_at`), por su total original, que se devolvió como crédito. **Neto = ventas − cancelado.**
+- **Crédito.** El crédito usado como medio de pago no es dinero nuevo: se muestra **aparte** y
+  *Cobrado en dinero = ventas totales − crédito usado*. Las entradas canjeadas con puntos cuentan como vendidas pero se
+  informan en su propia columna.
+- **Candy.** Entradas y candy van en columnas separadas, con la parte del candy que guarda cada compra
+  (`candy_subtotal − candy_descuento`); el valor de las entradas de los combos cuenta como entradas.
+- **Un solo lugar para las columnas.** `utilidades/reporte.ts` define las columnas, los totales y los formatos, y los
+  usan la tabla, el PDF y el Excel, así los tres dicen siempre lo mismo.
+- **PDF** (`jsPDF`, hoja A4 horizontal): título, período, tabla con el encabezado repetido en cada hoja y fila de
+  totales. Montos en formato argentino (12.500,50).
+- **Excel** (`write-excel-file`, versión `universal`): un `.xlsx` real con encabezados en negrita, fechas y montos como
+  números con formato (Excel los muestra según el idioma de la computadora) y fila de totales. Se usa la versión
+  `universal`, que devuelve un `Blob`, en lugar de la de navegador (que usa Web Workers), y el archivo se baja con la
+  misma función que el PDF. Las dos librerías se cargan con importación dinámica al tocar el botón.
 
 ---
 

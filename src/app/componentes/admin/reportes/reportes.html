@@ -1,0 +1,119 @@
+<main class="pagina reportes">
+  <h1 class="titulo-pagina">Reporte de facturación</h1>
+
+  <p class="reportes__intro">
+    Cada compra cuenta el día en que se pagó. Las canceladas (por el cliente o por el cine) se restan el día en que se
+    cancelaron. El crédito usado como medio de pago no es dinero nuevo, por eso se muestra aparte.
+  </p>
+
+  <!-- Período -->
+  <form class="periodo ticket" (submit)="verReporte($event)" novalidate>
+    <div class="periodo__campos">
+      <div class="campo">
+        <label>Desde</label>
+        <app-selector-fecha [formField]="rangoForm.desde" [aniosAtras]="10" [aniosAdelante]="0" />
+      </div>
+      <div class="campo">
+        <label>Hasta</label>
+        <app-selector-fecha [formField]="rangoForm.hasta" [aniosAtras]="10" [aniosAdelante]="0" />
+      </div>
+    </div>
+
+    @if (intentoEnvio() && faltantes().length > 0) {
+      <div class="faltantes" role="alert">
+        <p class="faltantes__titulo">Falta completar:</p>
+        <ul class="faltantes__lista">
+          @for (m of faltantes(); track m) {
+            <li>{{ m }}</li>
+          }
+        </ul>
+      </div>
+    }
+
+    <div class="periodo__acciones">
+      <button type="submit" [disabled]="cargando()">{{ cargando() ? 'Buscando...' : 'Ver reporte' }}</button>
+      <button type="button" class="btn--secundario" (click)="ultimosDias(7)" [disabled]="cargando()">Últimos 7 días</button>
+      <button type="button" class="btn--secundario" (click)="ultimosDias(30)" [disabled]="cargando()">Últimos 30 días</button>
+      <button type="button" class="btn--secundario" (click)="esteMes()" [disabled]="cargando()">Este mes</button>
+    </div>
+  </form>
+
+  @if (errorMsg()) {
+    <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+  }
+
+  @if (periodo(); as p) {
+    <h2 class="reportes__periodo">
+      {{ p.desde === p.hasta ? fechaCompleta(p.desde) : fechaCompleta(p.desde) + ' al ' + fechaCompleta(p.hasta) }}
+    </h2>
+
+    <!-- Resumen del período -->
+    <section class="resumen">
+      <div class="dato ticket">
+        <span class="dato__valor texto-ticket">{{ totales().ventas_total | pesos }}</span>
+        <span class="dato__nombre">Ventas totales</span>
+      </div>
+      <div class="dato ticket">
+        <span class="dato__valor texto-ticket">{{ totales().cobrado_dinero | pesos }}</span>
+        <span class="dato__nombre">Cobrado en dinero</span>
+      </div>
+      <div class="dato ticket">
+        <span class="dato__valor texto-ticket">{{ totales().entradas }}</span>
+        <span class="dato__nombre">Entradas vendidas</span>
+      </div>
+      <div class="dato ticket">
+        <span class="dato__valor texto-ticket">{{ totales().cancelado | pesos }}</span>
+        <span class="dato__nombre">Cancelado</span>
+      </div>
+      <div class="dato ticket">
+        <span class="dato__valor texto-ticket">{{ totales().neto | pesos }}</span>
+        <span class="dato__nombre">Neto</span>
+      </div>
+    </section>
+
+    <div class="exportar">
+      <button type="button" (click)="exportarPdf()" [disabled]="exportando() !== null || cargando()">
+        {{ exportando() === 'pdf' ? 'Generando PDF...' : 'Exportar a PDF' }}
+      </button>
+      <button type="button" class="btn--secundario" (click)="exportarExcel()" [disabled]="exportando() !== null || cargando()">
+        {{ exportando() === 'excel' ? 'Generando Excel...' : 'Exportar a Excel' }}
+      </button>
+    </div>
+
+    <!-- Tabla por día (en tablet se desliza hacia el costado) -->
+    @if (!cargando() && filas().length === 0) {
+      <p class="vacio">No hubo ventas ni cancelaciones en este período.</p>
+    } @else {
+      <div class="tabla-contenedor" tabindex="0" role="region" aria-label="Facturación por día">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th scope="col">Día</th>
+              @for (c of columnas; track c.clave) {
+                <th scope="col" class="num">{{ c.titulo }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (f of filas(); track f.dia) {
+              <tr>
+                <th scope="row">{{ fechaCompleta(f.dia) }}</th>
+                @for (c of columnas; track c.clave) {
+                  <td class="num texto-ticket">{{ valor(f, c.clave, c.tipo) }}</td>
+                }
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row">Total</th>
+              @for (c of columnas; track c.clave) {
+                <td class="num texto-ticket">{{ valor(totales(), c.clave, c.tipo) }}</td>
+              }
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    }
+  }
+</main>
