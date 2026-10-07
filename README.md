@@ -148,7 +148,7 @@ tablas usa ese número.
 | RF-72 | Reporte de facturación por día y de cantidad de entradas vendidas. | 7 | Hecho |
 | RF-73 | Exportar el reporte de facturación a PDF y a Excel. | 10 | Hecho |
 | RF-74 | Gráfico de películas más vistas por semana y por mes, y producto del candy más vendido. | 10 | Hecho |
-| RF-75 | Log de actividad: quién creó una función, quién modificó un precio, quién validó un QR, con fecha y hora. | 10 | Pendiente |
+| RF-75 | Log de actividad: quién creó una función, quién modificó un precio, quién validó un QR, con fecha y hora. | 10 | Hecho |
 | RF-76 | Mapa del cine que indique la sala de la entrada comprada. | 4 | Fuera de alcance (el cliente aún no dio "luz verde") |
 
 > RF-70: el admin ya gestiona películas, salas y funciones. La distribución de butacas es la misma en todas las
@@ -535,6 +535,7 @@ Los scripts están en `supabase/` y se ejecutan **en orden** desde el editor SQL
 | `015_proximamente.sql` | `alertas_estreno` (reemplaza una tabla vieja, si había), `notificaciones.pelicula_id` y tipo `estreno`, `pelicula_con_venta_abierta`, `activar_alerta`, `quitar_alerta`, `revisar_alertas` |
 | `016_reporte_facturacion.sql` | `reporte_facturacion(desde, hasta)`: una fila por día con movimiento, solo para el admin (no agrega tablas) |
 | `017_graficos.sql` | `ranking_peliculas`, `ranking_productos` y `ranking_combos`: los más vendidos de un período, solo para el admin (no agrega tablas) |
+| `018_log_actividad.sql` | `log_actividad` y la vista `log_usuarios`, los triggers que escriben el log (películas, salas, productos, categorías, combos, productos de combos, cupones, recompensas, configuración, funciones, roles y validaciones) y `guardar_combo` (ahora solo toca los productos que cambian) |
 
 ---
 
@@ -566,6 +567,7 @@ configuracion (recargo VIP, máximo de butacas, minutos de reserva)
 | `compra_items` | Productos del candy de cada compra: nombre y precio del momento, cantidad y, si se canjearon, puntos por unidad; los que vienen en un combo llevan su nombre (`combo_nombre`) y precio 0 |
 | `combos`, `combo_items` | Combos del candy (precio fijo, cantidad de entradas, imagen obligatoria, orden, activo, destacado) y los productos que incluye cada uno |
 | `compra_combos` | Combos de cada compra: nombre, cantidad, entradas y precio del momento |
+| `log_actividad` | Quién (nombre y rol al momento), qué acción, sobre qué, cuándo y el detalle del antes y el después. Lo escriben triggers |
 | `alertas_estreno` | Una por persona y por película próxima: si ya se avisó (`avisada`) y cuándo |
 | `resenias` | Una por persona y por película: estrellas (1 a 5), comentario opcional (hasta 300 caracteres) y fechas |
 | `cupones`, `recompensas` | Descuentos (primera compra, rango de edad) y cuántos puntos cuesta canjear cada cosa |
@@ -989,6 +991,37 @@ saldo se vuelve a leer al entrar, para que refleje la última compra.
   teclado y las flechas tienen etiqueta. Si un período no tiene ventas, se dice "Sin ventas en este período".
 - **Consultas que se pisan.** Si se cambia de período mientras se está cargando, solo vale la última consulta.
 
+### 6.28 Log de actividad
+
+- **Qué se registra.** Solo lo que hacen el **admin y los empleados**; las acciones del cliente (compras, cancelaciones,
+  reseñas, su perfil) no entran.
+  - Admin: crear, modificar, eliminar, activar y desactivar películas, salas, productos, categorías, combos (y los
+    productos de cada combo), cupones, costos de canje de puntos y configuración; crear, modificar y cancelar
+    funciones; cambiar el rol de una cuenta (asignar o quitar empleados).
+  - Empleados: cada entrada validada y cada entrega de candy, con el código de la compra.
+- **Triggers en la base.** La base escribe el log sola, así no se puede saltear desde la aplicación ni hay que acordarse
+  de registrarlo en cada pantalla. Un trigger genérico (`log_registrar_cambio`) sirve a ocho tablas: compara la fila
+  vieja con la nueva (`log_diferencias`) y guarda solo los campos que cambiaron, con su **antes y después**. Hay uno
+  propio para funciones, otro para los productos de un combo, otro para los roles y otro para las validaciones.
+- **Una acción, un renglón.** Crear una serie de funciones es un solo clic del admin, pero la base la escribe función
+  por función. `log_agrupar` las junta en **un renglón por transacción y por película** ("Creó 8 funciones de ...") con
+  la lista adentro; la columna `lote` guarda el número de transacción (`txid_current()`) y un índice único parcial
+  garantiza que haya una sola fila por lote. Lo mismo para los productos de un combo. Para que esto registre solo lo
+  que cambió, `guardar_combo` ya no borra y vuelve a crear todos los productos: borra los que se sacaron y agrega o
+  actualiza los demás.
+- **Quién queda registrado.** El usuario de la sesión (`auth.uid()`), con su nombre y rol **guardados al momento**,
+  así el log se entiende aunque después cambien. Sin sesión (un script en el editor SQL) o con una cuenta de cliente
+  no se registra nada. **Excepción:** un cambio de rol se registra siempre, para que se vea si alguien se lo cambia sin
+  ser admin. Las validaciones se registran a nombre del empleado que las hizo.
+- **Pantalla** `/admin/log`: filtros por usuario (solo los que tienen actividad, vista `log_usuarios`), acción,
+  elemento y rango de fechas (por defecto, la última semana); 50 renglones por vez con "Cargar más"; cada renglón se
+  despliega y muestra el detalle (campo / antes / después, los datos, la lista de funciones o los cambios de productos),
+  con nombres y valores legibles (pesos, Sí/No, fechas en hora argentina, roles).
+- **Retención.** Se conserva todo; no hay borrado automático (no hay tareas programadas).
+- **Limitación conocida.** Como el resto del sistema, la tabla no tiene RLS: la pantalla es solo para el admin, pero
+  los datos se podrían leer con la clave pública. Se corrige en la sesión S15 (activar RLS), donde además las
+  funciones de los triggers tendrán que ejecutarse con permisos propios.
+
 ---
 
 ## 7. Tiempo real
@@ -1037,6 +1070,8 @@ que se está viendo.
   Las reglas de negocio críticas sí se validan en la base (secciones 6.3 a 6.11).
   En un sistema real se activaría RLS con políticas por rol, y las operaciones sensibles solo se permitirían
   mediante las funciones SQL.
+  **Está programado activarla en todas las tablas al terminar el resto de la hoja de ruta** (sesión S15 de
+  `docs/HOJA_DE_RUTA.md`): hasta entonces hay que tomarla como una limitación conocida.
 - La clave pública de Supabase está en `src/environments/environment.ts`. Es una clave pensada para navegadores,
   pero por lo anterior conviene no publicar el proyecto de Supabase con datos reales.
 
@@ -1044,7 +1079,7 @@ que se está viendo.
 
 ## 10. Limitaciones y decisiones abiertas
 
-**Pendiente de implementar** (detalle en las tablas de la sección 3): "Próximamente" y alertas, reportes y exportaciones, gráficos y log de actividad.
+**Pendiente de implementar** (detalle en las tablas de la sección 3): ajustes finales de estilo y accesibilidad, verificación de la PWA y cierre de la entrega.
 La PWA y el despliegue están armados y falta verificarlos.
 
 **PWA y despliegue (armados, falta verificar)**

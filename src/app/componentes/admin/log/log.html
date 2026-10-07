@@ -1,0 +1,183 @@
+<main class="pagina log">
+  <h1 class="titulo-pagina">Log de actividad</h1>
+
+  <p class="log__intro">
+    Qué hicieron el administrador y los empleados, y cuándo. Lo escribe la base de datos sola. Las acciones de los clientes
+    no se registran. Una serie de funciones creada de una vez aparece en un solo renglón.
+  </p>
+
+  <!-- Filtros -->
+  <form class="filtros ticket" (submit)="buscar($event)" novalidate>
+    <div class="filtros__fila">
+      <div class="campo">
+        <label for="usuario">Usuario</label>
+        <select id="usuario" [formField]="filtrosForm.usuarioId">
+          <option value="">Todos</option>
+          @for (u of usuarios(); track u.usuario_id) {
+            <option [value]="u.usuario_id">{{ u.usuario_nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="accion">Acción</label>
+        <select id="accion" [formField]="filtrosForm.accion">
+          <option value="">Todas</option>
+          @for (a of acciones; track a.valor) {
+            <option [value]="a.valor">{{ a.nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="entidad">Sobre qué</label>
+        <select id="entidad" [formField]="filtrosForm.entidad">
+          <option value="">Todo</option>
+          @for (e of entidades; track e.valor) {
+            <option [value]="e.valor">{{ e.nombre }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="filtros__fila">
+      <div class="campo">
+        <label>Desde</label>
+        <app-selector-fecha [formField]="filtrosForm.desde" [aniosAtras]="10" [aniosAdelante]="0" />
+      </div>
+      <div class="campo">
+        <label>Hasta</label>
+        <app-selector-fecha [formField]="filtrosForm.hasta" [aniosAtras]="10" [aniosAdelante]="0" />
+      </div>
+    </div>
+
+    @if (intentoEnvio() && faltantes().length > 0) {
+      <div class="faltantes" role="alert">
+        <p class="faltantes__titulo">Falta completar:</p>
+        <ul class="faltantes__lista">
+          @for (m of faltantes(); track m) {
+            <li>{{ m }}</li>
+          }
+        </ul>
+      </div>
+    }
+
+    <div class="filtros__acciones">
+      <button type="submit" [disabled]="cargando()">{{ cargando() ? 'Buscando...' : 'Buscar' }}</button>
+      <button type="button" class="btn--secundario" (click)="limpiar()" [disabled]="cargando()">Última semana</button>
+    </div>
+  </form>
+
+  @if (errorMsg()) {
+    <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+  }
+
+  @if (!cargando() && registros().length === 0 && !errorMsg()) {
+    <p class="vacio">No hay actividad para estos filtros.</p>
+  }
+
+  <!-- Lista: del renglón más nuevo al más viejo -->
+  <ul class="lista">
+    @for (r of registros(); track r.id) {
+      <li class="renglon ticket">
+        <div class="renglon__cabecera">
+          <div class="renglon__cuando texto-ticket">
+            <span>{{ r.created_at | diaAr }}</span>
+            <span>{{ r.created_at | horaAr }} hs</span>
+          </div>
+
+          <div class="renglon__texto">
+            <p class="renglon__descripcion">{{ r.descripcion }}</p>
+            <p class="renglon__usuario">
+              {{ r.usuario_nombre }} · {{ r.usuario_rol | rolUsuario }}
+            </p>
+            <div class="renglon__chips">
+              <span class="chip" [class.chip--rojo]="r.accion === 'eliminar' || r.accion === 'cancelar' || r.accion === 'desactivar'">
+                {{ r.accion | accionLog }}
+              </span>
+              <span class="chip">{{ r.entidad | entidadLog }}</span>
+            </div>
+          </div>
+
+          @if (tieneDetalle(r.detalle)) {
+            <button
+              type="button"
+              class="btn--secundario renglon__ver"
+              [attr.aria-expanded]="estaAbierto(r.id)"
+              (click)="alternar(r.id)">
+              {{ estaAbierto(r.id) ? 'Ocultar detalle' : 'Ver detalle' }}
+            </button>
+          }
+        </div>
+
+        @if (estaAbierto(r.id) && r.detalle; as d) {
+          <div class="detalle">
+            <!-- Modificaciones: qué cambió, con el antes y el después -->
+            @if (d.cambios) {
+              <table class="detalle__tabla">
+                <thead>
+                  <tr><th scope="col">Campo</th><th scope="col">Antes</th><th scope="col">Después</th></tr>
+                </thead>
+                <tbody>
+                  @for (f of filasCambios(d.cambios); track f.campo) {
+                    <tr>
+                      <th scope="row">{{ f.campo }}</th>
+                      <td>{{ f.antes }}</td>
+                      <td>{{ f.despues }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+
+            <!-- Altas, bajas y validaciones: los datos -->
+            @if (d.datos) {
+              <table class="detalle__tabla">
+                <thead>
+                  <tr><th scope="col">Campo</th><th scope="col">Valor</th></tr>
+                </thead>
+                <tbody>
+                  @for (f of filasDatos(d.datos); track f.campo) {
+                    <tr>
+                      <th scope="row">{{ f.campo }}</th>
+                      <td>{{ f.valor }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+
+            <!-- Funciones que se hicieron juntas -->
+            @if (d.funciones) {
+              <ul class="detalle__lista">
+                @for (f of filasFunciones(d.funciones); track $index) {
+                  <li>
+                    <strong class="texto-ticket">{{ f.cuando }}</strong>
+                    @for (linea of f.lineas; track linea) {
+                      <span> · {{ linea }}</span>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+
+            <!-- Productos de un combo -->
+            @if (d.productos) {
+              <ul class="detalle__lista">
+                @for (p of d.productos; track $index) {
+                  <li>{{ textoProducto(p) }}</li>
+                }
+              </ul>
+            }
+          </div>
+        }
+      </li>
+    }
+  </ul>
+
+  @if (hayMas()) {
+    <button type="button" class="btn--secundario mas" (click)="cargarMas()" [disabled]="cargandoMas()">
+      {{ cargandoMas() ? 'Cargando...' : 'Cargar más' }}
+    </button>
+  }
+</main>

@@ -28,6 +28,7 @@ const RUTAS_ADMIN: NavRoute[] = [
   { url: '/admin/puntos', nombre: 'Puntos' },
   { url: '/admin/reportes', nombre: 'Reportes' },
   { url: '/admin/graficos', nombre: 'Gráficos' },
+  { url: '/admin/log', nombre: 'Log' },
   { url: '/admin/configuracion', nombre: 'Configuración' },
   { url: '/logout', nombre: 'Salir' },
 ];
