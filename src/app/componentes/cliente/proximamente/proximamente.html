@@ -1,14 +1,18 @@
 @if (proximas().length > 0) {
   <section class="proximamente">
-    <h2 class="proximamente__titulo">Próximamente</h2>
+    <h2 class="seccion-titulo">Próximamente</h2>
     <p class="proximamente__ayuda">Estrenos que todavía no están a la venta. Pedí el aviso y te contamos cuando abra.</p>
 
     <div class="proximamente__grilla">
       @for (pelicula of proximas(); track pelicula.id) {
-        <div class="proxima">
+        <article class="proxima">
           <app-item-pelicula [pelicula]="pelicula" [proxima]="true" />
-          <app-boton-alerta [peliculaId]="pelicula.id" />
-        </div>
+
+          <!-- talón de la entrada: el aviso de estreno -->
+          <div class="proxima__talon">
+            <app-boton-alerta class="boton-ancho" [peliculaId]="pelicula.id" />
+          </div>
+        </article>
       }
     </div>
   </section>

@@ -943,6 +943,12 @@ saldo se vuelve a leer al entrar, para que refleje la última compra.
   pendientes de esa cuenta cuya venta ya abrió (`pelicula_con_venta_abierta`), crea la notificación de tipo `estreno`
   (con un enlace a la película) y marca la alerta como avisada. Cada alerta avisa **una sola vez**, aunque se revise
   desde dos pantallas a la vez (`update ... where not avisada`).
+- **Aspecto de las dos secciones de la cartelera.** "Las más vendidas" es un **podio**: la primera al centro y más
+  grande, la segunda a su izquierda y la tercera a su derecha, cada una con un disco mostaza con su puesto (en el celular, la
+  primera arriba y las otras dos debajo). Los lugares se reordenan solo con CSS, así el orden de lectura y del teclado
+  sigue siendo 1, 2, 3. "Próximamente" muestra cada película como una **entrada**: un cartel "ESTRENO" con el día y el mes
+  sobre el póster y el botón "Avisarme" adentro de la tarjeta, en un talón separado por una línea de puntos. Los dos
+  títulos usan la clase global `seccion-titulo` (marquesina de foquitos).
 - **Filtros de idioma y formato.** Vuelven al buscador: las opciones salen de las funciones futuras activas
   (`getOfertaPorPelicula`), no están fijas, y cada película se filtra por los idiomas y formatos de sus funciones con
   el pipe `filtrar`.

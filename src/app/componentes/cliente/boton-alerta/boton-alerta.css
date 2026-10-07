@@ -5,6 +5,15 @@
     gap: var(--spacing-8);
 }
 
+/* en la tarjeta de "Próximamente" el botón ocupa todo el talón */
+:host(.boton-ancho) {
+    align-items: stretch;
+}
+
+:host(.boton-ancho) button {
+    width: 100%;
+}
+
 .alerta__ayuda {
     font-size: var(--font-xsmall);
     color: var(--tinta-suave);

@@ -2,11 +2,15 @@
 
 @if (masVendidas().length > 0) {
   <section class="mas-vendidas">
-    <h2 class="mas-vendidas__titulo">Las más vendidas</h2>
+    <h2 class="seccion-titulo">Las más vendidas</h2>
     <p class="mas-vendidas__ayuda">Las películas con más entradas vendidas en los últimos {{ dias }} días.</p>
-    <div class="mas-vendidas__grilla">
-      @for (pelicula of masVendidas(); track pelicula.id) {
-        <app-item-pelicula [pelicula]="pelicula" [enPreventa]="enPreventa().has(pelicula.id)" />
+
+    <!-- Podio: la primera al centro y más grande, la segunda a su izquierda y la tercera a su derecha -->
+    <div class="podio">
+      @for (pelicula of masVendidas(); track pelicula.id; let i = $index) {
+        <div class="podio__lugar">
+          <app-item-pelicula [pelicula]="pelicula" [posicion]="i + 1" [enPreventa]="enPreventa().has(pelicula.id)" />
+        </div>
       }
     </div>
   </section>

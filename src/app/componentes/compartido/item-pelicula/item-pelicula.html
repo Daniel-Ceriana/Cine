@@ -7,19 +7,33 @@
     @if (enPreventa()) {
       <span class="pelicula__preventa chip chip--preventa">Preventa</span>
     }
+    @if (posicion(); as lugar) {
+      <span class="pelicula__posicion">
+        <span aria-hidden="true">{{ lugar }}</span>
+        <span class="solo-lectores">Puesto {{ lugar }}</span>
+      </span>
+    }
+    @if (proxima()) {
+      <span class="pelicula__estreno">
+        <span class="pelicula__estreno-etiqueta">Estreno</span>
+        <span class="pelicula__estreno-dia">{{ estreno().dia }}</span>
+        <span class="pelicula__estreno-mes">{{ estreno().mes }}</span>
+      </span>
+    }
   </div>
 
   <div class="pelicula__info">
     <h3 class="pelicula__nombre">{{ pelicula().nombre }}</h3>
     <p class="pelicula__meta texto-ticket">{{ pelicula().duracion_minutos | duracion }}</p>
-    @if (proxima()) {
-      <p class="pelicula__puntuacion">Estreno: {{ pelicula().fecha_estreno | fechaCortaAr }}</p>
-    } @else if (puntuacion(); as p) {
-      <p class="pelicula__puntuacion" [attr.aria-label]="'Puntuación ' + (p.promedio | puntuacion) + ' de 5, ' + p.cantidad + ' reseñas'">
-        <span class="pelicula__estrella" aria-hidden="true">★</span> {{ p.promedio | puntuacion }} <span class="pelicula__cantidad">({{ p.cantidad }})</span>
-      </p>
-    } @else {
-      <p class="pelicula__puntuacion pelicula__puntuacion--vacia">Sin reseñas</p>
+    <!-- en "Próximamente" no hay puntuación: el día de estreno ya se ve sobre el póster -->
+    @if (!proxima()) {
+      @if (puntuacion(); as p) {
+        <p class="pelicula__puntuacion" [attr.aria-label]="'Puntuación ' + (p.promedio | puntuacion) + ' de 5, ' + p.cantidad + ' reseñas'">
+          <span class="pelicula__estrella" aria-hidden="true">★</span> {{ p.promedio | puntuacion }} <span class="pelicula__cantidad">({{ p.cantidad }})</span>
+        </p>
+      } @else {
+        <p class="pelicula__puntuacion pelicula__puntuacion--vacia">Sin reseñas</p>
+      }
     }
   </div>
 
