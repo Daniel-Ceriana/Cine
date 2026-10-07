@@ -1,0 +1,7 @@
+.sin-conexion__texto {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: var(--rojo-oscuro);
+    color: var(--crema-superficie);
+    font-size: var(--font-xsmall);
+    text-align: center;
+}

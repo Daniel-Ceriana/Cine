@@ -1,0 +1,13 @@
+<div role="status">
+  @if (hayVersionNueva()) {
+    <div class="version">
+      <p class="version__texto">Hay una versión nueva de Picture House.</p>
+      <div class="version__acciones">
+        <button type="button" (click)="actualizar()" [disabled]="actualizando()">
+          {{ actualizando() ? 'Actualizando...' : 'Actualizar' }}
+        </button>
+        <button type="button" class="btn--secundario" (click)="despues()" [disabled]="actualizando()">Después</button>
+      </div>
+    </div>
+  }
+</div>

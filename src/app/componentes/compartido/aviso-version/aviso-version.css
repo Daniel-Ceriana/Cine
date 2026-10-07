@@ -1,0 +1,30 @@
+/* Barra fija abajo, por encima del contenido */
+.version {
+    position: fixed;
+    right: var(--spacing-16);
+    bottom: var(--spacing-16);
+    left: var(--spacing-16);
+    z-index: 900;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-12);
+    max-width: 640px;
+    margin: 0 auto;
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: var(--bordo);
+    border: 2px solid var(--mostaza);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    color: var(--crema-superficie);
+}
+
+.version__texto {
+    font-weight: 600;
+}
+
+.version__acciones {
+    display: flex;
+    gap: var(--spacing-8);
+}

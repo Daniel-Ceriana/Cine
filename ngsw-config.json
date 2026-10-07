@@ -26,5 +26,32 @@
         ]
       }
     }
+  ],
+  "dataGroups": [
+    {
+      "name": "tipografias",
+      "urls": [
+        "https://fonts.googleapis.com/**",
+        "https://fonts.gstatic.com/**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 20,
+        "maxAge": "365d",
+        "cacheOpaqueResponses": true
+      }
+    },
+    {
+      "name": "imagenes-supabase",
+      "urls": [
+        "https://phcnwjjvbdlzeqjbacha.supabase.co/storage/v1/object/public/**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 60,
+        "maxAge": "7d",
+        "cacheOpaqueResponses": true
+      }
+    }
   ]
 }

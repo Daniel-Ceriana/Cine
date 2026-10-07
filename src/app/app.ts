@@ -1,9 +1,11 @@
 import { Component, ElementRef, signal, viewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Nav } from './componentes/compartido/nav/nav';
+import { AvisoConexion } from './componentes/compartido/aviso-conexion/aviso-conexion';
+import { AvisoVersion } from './componentes/compartido/aviso-version/aviso-version';
 
 @Component({
-  imports: [RouterOutlet, Nav],
+  imports: [RouterOutlet, Nav, AvisoConexion, AvisoVersion],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',

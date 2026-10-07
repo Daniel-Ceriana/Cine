@@ -114,7 +114,7 @@ tablas usa ese número.
 
 | ID | Requerimiento | Origen | Estado |
 |----|---------------|--------|--------|
-| RF-48 | Los avisos al usuario (por ejemplo "estrenos" o compras) se ven en **Mi perfil → Notificaciones**. El sistema **no envía mails**. | 9 (aclaración) | Parcial |
+| RF-48 | Los avisos al usuario (por ejemplo "estrenos" o compras) se ven en **Mi perfil → Notificaciones**. El sistema **no envía mails**. | 9 (aclaración) | Hecho |
 
 > RF-48: hoy se avisa cuando se confirma una compra, al hacer un canje, al cancelar una compra y cuando el cine cancela
 > una función. Las alertas de estreno (RF-08) usan el mismo mecanismo.
@@ -141,7 +141,7 @@ tablas usa ese número.
 
 | ID | Requerimiento | Origen | Estado |
 |----|---------------|--------|--------|
-| RF-70 | Usuario admin que controla salas, funciones, distribución de butacas, productos, etc. | 5 | Parcial |
+| RF-70 | Usuario admin que controla salas, funciones, distribución de butacas, productos, etc. | 5 | Hecho |
 | RF-77 | Pantalla de configuración del admin: recargo VIP, máximo de butacas por compra, minutos de reserva, horas de cancelación y máximo de unidades de cada producto del candy. | acordado | Hecho |
 | RF-78 | "Mi entrada": quien compró sin cuenta recupera su entrada (QR y PDF) con código + email. Con cuenta, "Mi perfil → Mis compras". | acordado | Hecho |
 | RF-71 | Gestión de empleados (usuarios que validan QR). | 5 | Hecho |
@@ -151,8 +151,9 @@ tablas usa ese número.
 | RF-75 | Log de actividad: quién creó una función, quién modificó un precio, quién validó un QR, con fecha y hora. | 10 | Hecho |
 | RF-76 | Mapa del cine que indique la sala de la entrada comprada. | 4 | Fuera de alcance (el cliente aún no dio "luz verde") |
 
-> RF-70: el admin ya gestiona películas, salas y funciones. La distribución de butacas es la misma en todas las
-> salas y se modifica desde el código (decisión acordada). Ya están cupones, empleados y productos con sus categorías.
+> RF-70: el admin gestiona películas, salas, funciones, productos y categorías, combos, cupones, puntos, empleados,
+> configuración, reportes, gráficos y el log. La distribución de butacas es la misma en todas las salas y se modifica
+> desde el código (decisión acordada).
 
 ---
 
@@ -162,14 +163,15 @@ tablas usa ese número.
 |----|---------------|--------|
 | RNF-01 | Interfaces fáciles de navegar y entender, tanto para clientes como para empleados. | Parcial |
 | RNF-02 | Nada de selectores de fecha y hora engorrosos ni demasiado scroll. | Parcial |
-| RNF-03 | Estilo visual **único y producido**. | Hecho (falta aplicarlo a las pantallas nuevas) |
+| RNF-03 | Estilo visual **único y producido**. | Hecho |
 | RNF-04 | Uso correcto de Angular, buenas prácticas y técnicas vistas en clase. | En curso |
 | RNF-05 | Integración con **Supabase**. | Hecho |
-| RNF-06 | Integración de **PWA**. | Hecho (instalación verificada) |
+| RNF-06 | Integración de **PWA**. | Hecho (íconos propios, aviso de versión nueva y de sin conexión; falta correr Lighthouse sobre la URL publicada) |
 | RNF-07 | Aplicación **desplegada** con URL funcional. | Parcial (Firebase Hosting configurado; falta confirmar URL y URLs permitidas en Supabase Auth) |
 | RNF-08 | Código en GitHub. | Hecho |
-| RNF-09 | README con arquitectura y decisiones técnicas. | Parcial (ver `docs/DECISIONES_TECNICAS.md`) |
-| RNF-10 | Interfaz usable en celular (el cliente compra desde el teléfono). | Parcial |
+| RNF-09 | README con arquitectura y decisiones técnicas. | Hecho (falta la sección "cómo correr el proyecto") |
+| RNF-10 | Interfaz usable en celular (el cliente compra desde el teléfono). | Parcial (hecha mobile-first y con botones táctiles de 44 px; falta probarla en dispositivos reales) |
+| RNF-11 | **Accesibilidad**: teclado, foco visible, lectores de pantalla, contraste, movimiento reducido (ver 6.29). | Hecho |
 
 ---
 
@@ -234,7 +236,7 @@ Filas R–T   1  2  3  4  |  6 … 25                        | 27 28 29 30   VIP
 18. Los puntos cubren el precio de la entrada (el costo lo define el admin); el recargo VIP se paga en dinero.
     Los puntos no se transfieren entre usuarios.
 
-**Cancelación (a implementar)**
+**Cancelación**
 19. Cancelación hasta 2 horas antes, con crédito. Si se cancela una función que ya tiene entradas vendidas, se avisa
     al admin y los compradores reciben puntos equivalentes.
 
@@ -244,6 +246,12 @@ Filas R–T   1  2  3  4  |  6 … 25                        | 27 28 29 30   VIP
 
 - Mapa general del cine (RF-76): el cliente todavía no lo aprobó.
 - Pasarela de pago real: se usa un pago simulado.
+- Envío de mails: los avisos se ven en Mi perfil → Notificaciones.
+- Lector de QR con la cámara: el empleado ingresa el código a mano.
+- Una página 404: las direcciones que no existen redirigen a la cartelera (decisión acordada).
+- Pruebas automáticas propias (los `.spec.ts` son los de la plantilla de Angular).
+- Limpieza automática de reservas vencidas con `pg_cron`: se liberan al consultar (`liberar_reservas_vencidas`).
+- **RLS** (seguridad por filas): está programada como última sesión de la hoja de ruta (ver sección 9).
 
 --------------------------------------------------
 --------------------------------------------------
@@ -271,7 +279,7 @@ Es una aplicación web de una sola página (SPA) hecha con **Angular**, que usa 
 │  Componentes              │        │  Auth ............ usuarios y sesión       │
 │     │                     │  HTTPS │  PostgreSQL ...... tablas, restricciones,  │
 │  Servicios  ──────────────┼───────▶│                    triggers y funciones SQL│
-│     │                     │        │  Storage ......... pósters de películas    │
+│     │                     │        │  Storage ......... imágenes del cine       │
 │  SupabaseService (cliente)│◀───────┼─ Realtime ........ cambios de butacas      │
 └───────────────────────────┘  WSS   └────────────────────────────────────────────┘
 ```
@@ -310,15 +318,24 @@ listas desplegables del formulario de funciones).
 ```
 src/app/
 ├── componentes/
-│   ├── admin/        pantallas del administrador (películas, salas, funciones, butacas de una función…)
-│   ├── cliente/      pantallas del público (inicio, detalle, selección de butacas y pago, perfil, Mi entrada)
-│   └── compartido/   piezas reutilizables (nav, login, registro, listado y tarjeta de película, mapa de butacas, tarjeta de compra)
+│   ├── admin/        pantallas del administrador: inicio por temas, películas, salas, funciones (y sus butacas), productos y
+│   │                 categorías, combos, cupones, puntos, empleados, reportes, gráficos, log y configuración
+│   ├── cliente/      pantallas del público: inicio (más vendidas y próximamente), detalle con reseñas, compra con candy,
+│   │                 perfil (compras, Mis películas, puntos y notificaciones), Mi entrada
+│   ├── empleado/     validación de entradas y entrega de candy por código
+│   └── compartido/   piezas reutilizables: nav, avisos de conexión y de versión, login, registro, tarjeta de película,
+│                     estrellas, gráfico de barras, selector de fecha, mapa de butacas, tarjeta de compra
 ├── modelos/          interfaces TypeScript de las tablas y la plantilla de butacas
 ├── services/         acceso a Supabase (un servicio por tema)
 ├── guards/           control de acceso por sesión y rol (canMatch) y confirmación al salir (canDeactivate)
 ├── pipes/            formatos de datos que vienen de la base (por modelo) y el filtro genérico de listas
-├── utilidades/       funciones puras: fechas en hora argentina, precio vigente de una función
+├── utilidades/       funciones puras: fechas en hora argentina, precio vigente, períodos, reporte (tabla, PDF y Excel),
+│                     detalle del log, "próxima" y subida de imágenes
 └── interfaces/       tipos auxiliares (rutas del menú)
+
+public/               archivos estáticos: íconos de la PWA, manifiesto, ilustraciones de productos y combos de ejemplo
+scripts/              herramientas de un solo uso (generar-iconos.cjs: los íconos de la PWA)
+supabase/             scripts SQL numerados (001 a 018), que se ejecutan en orden
 ```
 
 ### 3.2 Prácticas aplicadas
@@ -384,6 +401,11 @@ la lógica en la plantilla (`restriccion_edad === 0 ? 'ATP' : '+' + ...`). Ahora
 | `pipes/funcion` | `idiomaFuncion` | `'castellano'` → `Castellano` |
 | `pipes/butaca` | `tipoButaca`, `estadoButaca` | `'vip'` → `VIP` · `'reservada'` → `En proceso` |
 | `pipes/compra` | `estadoCompra` | `'pendiente'` → `Pendiente de pago` |
+| `pipes/producto` | `estadoProducto`, `estadoCategoria` | `true` → `Activo` · `Activa` |
+| `pipes/puntos` | `puntos`, `tipoMovimiento` | `1500` → `1.500` · `'canje'` → `Canje` |
+| `pipes/pelicula` | `puntuacion` | `4.3` → `4,3` |
+| `pipes/usuario` | `rolUsuario` | `'empleado_candy'` → `Empleado de candy` |
+| `pipes/log` | `accionLog`, `entidadLog` | `'crear'` → `Creó` · `'combo_productos'` → `Productos de un combo` |
 
 **Decisiones:**
 - **Un pipe por dato de dominio, agrupado por modelo**, y no uno por modelo con un parámetro. Cada pipe hace una sola
@@ -427,7 +449,7 @@ se cumple la ruta ni siquiera se considera. Se usa en todas las rutas con contro
 | `clienteMatch` | `/home`, `/peliculas/:id`, `/funcion/:id/butacas` | Pasan visitantes y clientes. El personal con panel propio va a su panel. |
 | `rolMatch` | `/admin/**` (con `data.roles`) | Sin sesión o con otro rol → `/no-autorizado`. La pantalla se adapta: sin sesión invita a iniciar sesión; con sesión explica que la cuenta no tiene acceso. |
 | `invitadoMatch` | `/login`, `/register` | Con sesión, redirige al inicio que le corresponde. |
-| `confirmarSalidaGuard` (`canDeactivate`) | `/funcion/:id/butacas` | Pide confirmación si se sale con butacas reservadas sin pagar. |
+| `confirmarSalidaGuard` (`canDeactivate`) | `/funcion/:id/butacas`, `/peliculas/:id`, `/login`, `/register` y todos los formularios del admin | Pide confirmación si se sale con butacas reservadas sin pagar, con una reseña sin guardar o con cambios sin guardar en un formulario. |
 
 **Redirección con `UrlTree` en lugar de `false`.** Con `false`, en un `canMatch` Angular sigue buscando otra ruta y
 termina en la ruta comodín (`**`), que lleva al inicio sin explicar nada. Devolviendo un `UrlTree`, el usuario va
@@ -445,9 +467,10 @@ Dos detalles que conviene saber:
   redirigir. Además ahora **lanza el error** de credenciales inválidas (antes se ignoraba y la pantalla de login
   navegaba igual).
 
-**Roles sin panel todavía.** Los empleados (candy y entradas) aún no tienen pantallas. Para que no queden en un
-bucle de redirecciones (`/home` → `/candy` → ruta inexistente → `/home`), `clienteMatch` solo redirige a los roles
-listados en `ROLES_CON_PANEL` (hoy solo el admin). Cuando existan sus paneles se agregan a esa lista.
+**Roles con panel.** El admin y los dos empleados (de entradas y de candy) tienen su propia pantalla de inicio
+(`RUTA_POR_ROL`). Para que no queden en un bucle de redirecciones (`/home` → su panel → ruta inexistente → `/home`),
+`clienteMatch` solo redirige a los roles listados en `ROLES_CON_PANEL`, que hoy son los tres. Si algún día se suma un rol
+nuevo, se agrega a esa lista cuando tenga su panel.
 
 **Por qué, con un solo archivo de rutas, `canMatch` rinde poco frente a `canActivate` en bytes.**
 Es importante tener claro qué se gana y qué no:
@@ -513,6 +536,12 @@ críticas son **funciones SQL (RPC)** que se ejecutan de forma **atómica**: o s
 | `confirmar_pago` | Pasa la compra a pagada y las butacas a vendidas, si la reserva sigue vigente. |
 | `liberar_compra` | Libera las butacas si el comprador abandona. |
 | `liberar_reservas_vencidas` | Libera las reservas cuyo tiempo se cumplió. |
+| `definir_candy_compra`, `validar_candy`, `validar_combos`, `guardar_candy` | Agregan productos y combos a una reserva vigente y recalculan subtotal, cupón, puntos, crédito y total (ver 6.22 y 6.23). |
+| `cancelar_compra`, `compensar_compra`, `cancelar_funcion` | Cancelan una compra (crédito por el total, puntos ajustados) y compensan a todos los compradores si el cine cancela una función. |
+| `evaluar_codigo`, `validar_codigo`, `buscar_entrada` | Validación por código en el cine (un uso por sección) y recuperación de una entrada sin cuenta. |
+| `guardar_combo`, `guardar_resenia`, `activar_alerta`, `revisar_alertas` | Combos con sus productos, reseñas (solo de quien vio la película) y alertas de estreno. |
+| `reporte_facturacion`, `ranking_peliculas`, `ranking_productos`, `ranking_combos` | Reporte de facturación por día y rankings de los gráficos (solo admin). |
+| `log_registrar_*` (triggers) | Escriben el log de actividad en cada cambio del admin y en cada validación de un empleado (ver 6.28). |
 
 ### 4.2 Migraciones
 
@@ -1087,8 +1116,11 @@ que se está viendo.
 - **Mismo estilo para cliente y admin**; el admin es más sobrio y prioriza legibilidad.
 - **Mobile-first en el cliente:** la cuadrícula de películas se adapta al ancho, los bloques de formulario se apilan
   y el mapa de butacas se desplaza horizontalmente en pantallas chicas.
-- **Accesibilidad básica:** botones reales (no `div`) para las butacas y las tarjetas, `aria-label` y `aria-pressed`
-  en las butacas, foco visible y mensajes de error con `role="alert"`.
+- **Accesibilidad:** ver la sección 6.29 (un solo `<main>`, "Saltar al contenido", mapa de butacas con flechas, foco
+  visible, movimiento reducido, botones de 44 px, errores ligados a su campo y contraste medido).
+- **Piezas propias de las pantallas nuevas:** el podio de las más vendidas, la tarjeta "entrada con talón" de
+  Próximamente, las estrellas de puntuación, los gráficos de barras y los íconos de la PWA (una entrada de cine mostaza
+  con una estrella sobre fondo bordó).
 
 ---
 
@@ -1111,10 +1143,9 @@ que se está viendo.
 
 ## 10. Limitaciones y decisiones abiertas
 
-**Pendiente de implementar** (detalle en las tablas de la sección 3): verificación de la PWA y cierre de la entrega.
-La PWA y el despliegue están armados y falta verificarlos.
+**Pendiente de implementar** (detalle en las tablas de la sección 3): confirmar el despliegue y cerrar la entrega.
 
-**PWA y despliegue (armados, falta verificar)**
+**PWA y despliegue**
 - Hosting en **Firebase Hosting**. `firebase.json` publica `dist/tp1/browser` (la salida de `ng build`, no la carpeta
   `public/`, que son los assets de Angular) y redirige toda ruta a `index.html` para que funcione el router de la SPA.
 - PWA con **`@angular/pwa`**: service worker de Angular (`ngsw-config.json`), solo activo en el build de producción.
@@ -1122,12 +1153,48 @@ La PWA y el despliegue están armados y falta verificarlos.
 - `ngsw-worker.js`, `ngsw.json` e `index.html` se sirven con `Cache-Control: no-cache` para que cada deploy llegue a
   los usuarios. Si el navegador los guardara, se quedaría con la versión anterior de la app.
 - `@angular/service-worker` tiene que tener la misma versión que `@angular/core`, porque pide una versión exacta.
+- **Íconos propios.** Los íconos y el favicon son de la identidad del cine (fondo bordó y una entrada mostaza con una
+  estrella), no el logo de Angular. Se generan con `node scripts/generar-iconos.cjs`, que dibuja las formas y escribe los
+  PNG con `pngjs` (que ya estaba en `node_modules` por otra librería; es una herramienta de un solo uso, no forma parte de
+  la app). Hay íconos normales, dos **maskable** (con la figura dentro del 80 % central, para que Android los recorte sin
+  cortar el dibujo) y uno para iOS.
+- **Manifiesto.** Los íconos normales y los maskable están **separados** (cada uno con su `purpose`), con `id`, `categories`
+  y tres accesos directos: Cartelera, Mi perfil y Mi entrada. `index.html` suma el ícono y las metas de iOS (Safari no
+  usa el manifiesto para eso).
+- **Qué se guarda sin conexión.** El service worker guarda el esqueleto de la app, las **tipografías** de Google Fonts
+  (un año) y los **pósters e imágenes** de Supabase Storage ya vistos (hasta 60 y una semana). **Nunca** guarda las
+  llamadas a la base (butacas, compras, perfil): sin internet no se ve la cartelera ni se compra, pero tampoco puede
+  aparecer una butaca desactualizada como libre.
+- **Aviso de sin conexión.** Una barra fija arriba ("Sin conexión: no se puede ver la cartelera ni comprar...") que aparece
+  y desaparece sola con los eventos `online` y `offline` del navegador.
+- **Aviso de versión nueva.** El service worker baja la versión nueva en segundo plano, pero la app abierta sigue con la
+  vieja hasta recargar. Una barra abajo avisa "Hay una versión nueva" con los botones **Actualizar** (activa la versión y
+  recarga) y **Después**, así no se interrumpe una compra en curso. Se busca una versión nueva cada 15 minutos y cada vez
+  que la persona vuelve a la app. Solo corre en producción.
+- **Caché de Firebase.** Los archivos con código en el nombre (`chunk-*`, `main-*`, `styles-*`, `polyfills-*`) se sirven
+  con caché de un año y `immutable`: el código cambia en cada versión, así que no hay riesgo de quedar viejos.
+- **Cómo verificar con Lighthouse.** `ng build`, servir `dist/tp1/browser` (en `localhost` o, mejor, en la URL de Firebase)
+  y en Chrome: DevTools → Lighthouse → categoría "Progressive Web App". También sirve DevTools → Application → Manifest
+  y Service Workers, y Network → Offline para probar la barra de sin conexión.
 
 **Limitaciones conocidas**
 - El plano de butacas está duplicado en `sala-plantilla.ts` y en el SQL de la tabla `butacas`.
 - La regla de precio vigente está en Angular y en SQL (ver 6.14).
 - El cliente solo llega a la selección de butacas desde el detalle de la película.
 - No hay pruebas automáticas propias todavía.
+- **Sin RLS** hasta la sesión S15 (ver sección 9).
+- **El build muestra dos avisos** que se decidió dejar por ahora: el paquete inicial pesa unos 590 kB (el aviso es a
+  partir de 500 kB; casi todo es Angular y Supabase, y unos 63 kB son de Angular Material, que se descarga en todas
+  las pantallas porque sus proveedores de fechas están en `app.config.ts` aunque solo los use el formulario de
+  funciones) y `perfil.css` pasa por unos 120 bytes el límite de 4 kB por componente.
+- Sin conexión, la barra avisa pero cada pantalla muestra su propio error ("Failed to fetch"); los botones de reservar y
+  pagar no se desactivan solos.
+- El log no distingue a qué categoría cambió un producto en los renglones anteriores a la última versión del script 018
+  (los nuevos sí guardan el nombre).
+- Las butacas ocupadas o reservadas se pueden enfocar y "elegir" con el teclado (igual que con el clic): muestran el
+  aviso de que no están disponibles.
 
 **Decisiones a revisar antes de la entrega**
-- Las alertas de "Próximamente" se verán en Mi perfil → Notificaciones (el sistema no envía mails, ver RF-48); falta definir qué evento las dispara.
+- Correr Lighthouse sobre la URL publicada y confirmar las URLs permitidas en Supabase Auth.
+- Decidir si las carpetas `supabase/` y `docs/` se suben al repositorio (hoy están en `.gitignore`).
+- Activar RLS en todas las tablas (sesión S15) y volver a probar cada rol.
