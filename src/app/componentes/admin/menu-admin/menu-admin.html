@@ -1,29 +1,16 @@
 <div class="contenedor-admin">
     <h1 class="admin__title">Administración</h1>
-    <ul class="admin__menu">
-        <li class="admin__item">
-            <a class="admin__link" routerLink="/admin/funciones" routerLinkActive="admin__link--active">Funciones</a>
-        </li>
-        <li class="admin__item">
-            <a class="admin__link" routerLink="/admin/empleados" routerLinkActive="admin__link--active">Empleados</a>
-        </li>
-        <li class="admin__item">
-            <a class="admin__link" routerLink="/admin/salas" routerLinkActive="admin__link--active">Salas</a>
-        </li>
-        <li class="admin__item">
-            <a class="admin__link" routerLink="/admin/peliculas" routerLinkActive="admin__link--active">Películas</a>
-        </li>
-        <li class="admin__item">
-            <a class="admin__link" routerLink="/admin/productos" routerLinkActive="admin__link--active">Productos</a>
-        </li>
-        <li class="admin__item">
-            <a class="admin__link" routerLink="/admin/cupones" routerLinkActive="admin__link--active">Cupones</a>
-        </li>
-        <li class="admin__item">
-            <a class="admin__link" routerLink="/admin/puntos" routerLinkActive="admin__link--active">Puntos</a>
-        </li>
-        <li class="admin__item">
-            <a class="admin__link" routerLink="/admin/configuracion" routerLinkActive="admin__link--active">Configuración</a>
-        </li>
-    </ul>
+
+    @for (grupo of grupos; track grupo.titulo) {
+        <section class="admin__grupo">
+            <h2 class="admin__grupo-titulo">{{ grupo.titulo }}</h2>
+            <ul class="admin__menu">
+                @for (enlace of grupo.enlaces; track enlace.url) {
+                    <li class="admin__item">
+                        <a class="admin__link" [routerLink]="enlace.url" routerLinkActive="admin__link--active">{{ enlace.nombre }}</a>
+                    </li>
+                }
+            </ul>
+        </section>
+    }
 </div>

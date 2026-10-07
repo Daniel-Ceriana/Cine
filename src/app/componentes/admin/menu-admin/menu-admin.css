@@ -1,0 +1,10 @@
+/* Cada tema del inicio del admin (Cartelera, Candy...) tiene su título y sus mosaicos */
+.admin__grupo {
+    margin-bottom: var(--spacing-24);
+}
+
+.admin__grupo-titulo {
+    margin-bottom: var(--spacing-12);
+    font-size: var(--font-medium);
+    color: var(--bordo);
+}

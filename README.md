@@ -356,6 +356,8 @@ src/app/
 | `/no-autorizado` | Cualquiera | Aviso de "sin permiso" (sesión iniciada con un rol que no alcanza) |
 | `/admin/...` | Solo admin | Películas, salas, funciones (con butacas por función), empleados, cupones, puntos, configuración y productos con sus categorías |
 
+> El menú superior del admin tiene solo las secciones principales (Home, Funciones, Películas, Productos y Reportes). **Todas** están en su Home (`/admin/homeadmin`), agrupadas por tema: Cartelera, Candy, Clientes, Ventas y control, y Sistema. En ese Home, la configuración se llama "Opciones" porque "Configuración" no entra en el mosaico.
+
 ### 3.4 Fechas y horas
 
 - Toda la lógica de horarios está en **hora argentina fija (UTC−3)**, sin importar la zona del dispositivo. Argentina

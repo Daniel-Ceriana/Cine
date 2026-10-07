@@ -16,20 +16,13 @@ const RUTAS_CLIENTE: NavRoute[] = [
   { url: '/logout', nombre: 'Salir' },
 ];
 
+// El menú del admin tiene solo las secciones principales; el resto está en su Home (componentes/admin/menu-admin)
 const RUTAS_ADMIN: NavRoute[] = [
   { url: RUTA_POR_ROL.admin, nombre: 'Home' },
   { url: '/admin/funciones', nombre: 'Funciones' },
-  { url: '/admin/peliculas', nombre: 'Peliculas' },
-  { url: '/admin/salas', nombre: 'Salas' },
-  { url: '/admin/empleados', nombre: 'Empleados' },
+  { url: '/admin/peliculas', nombre: 'Películas' },
   { url: '/admin/productos', nombre: 'Productos' },
-  { url: '/admin/combos', nombre: 'Combos' },
-  { url: '/admin/cupones', nombre: 'Cupones' },
-  { url: '/admin/puntos', nombre: 'Puntos' },
   { url: '/admin/reportes', nombre: 'Reportes' },
-  { url: '/admin/graficos', nombre: 'Gráficos' },
-  { url: '/admin/log', nombre: 'Log' },
-  { url: '/admin/configuracion', nombre: 'Configuración' },
   { url: '/logout', nombre: 'Salir' },
 ];
 
