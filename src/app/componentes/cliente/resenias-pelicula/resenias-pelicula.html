@@ -1,0 +1,93 @@
+<section class="resenias">
+  <h2>Reseñas</h2>
+
+  <!-- Promedio -->
+  @if (puntuacion(); as p) {
+    <div class="promedio">
+      <span class="promedio__valor texto-ticket">{{ p.promedio | puntuacion }}</span>
+      <div>
+        <app-estrellas [valor]="p.promedio" />
+        <p class="promedio__cantidad">{{ p.cantidad }} {{ p.cantidad === 1 ? 'reseña' : 'reseñas' }}</p>
+      </div>
+    </div>
+  } @else if (!cargando()) {
+    <p class="resenias__vacio">Todavía nadie reseñó esta película.</p>
+  }
+
+  @if (cargando()) {
+    <p>Cargando reseñas...</p>
+  }
+  @if (errorMsg()) {
+    <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+  }
+  @if (okMsg()) {
+    <p class="ok" role="status">{{ okMsg() }}</p>
+  }
+
+  <!-- Mi reseña -->
+  @if (!tieneSesion()) {
+    <p class="resenias__aviso">
+      <a routerLink="/login">Iniciá sesión</a> para dejar tu reseña después de ver la película.
+    </p>
+  } @else if (!puedeResenar() && !cargando()) {
+    <p class="resenias__aviso">Vas a poder dejar tu reseña después de ver la película.</p>
+  } @else if (puedeResenar()) {
+    <form class="mia ticket" (submit)="guardar($event)" novalidate>
+      <h3>{{ miResenia() ? 'Tu reseña' : 'Dejá tu reseña' }}</h3>
+
+      <app-estrellas [valor]="estrellas()" [editable]="true" (elegida)="estrellas.set($event)" />
+
+      <label for="comentario">Comentario <small>(opcional)</small></label>
+      <textarea id="comentario" rows="3" [formField]="reseniaForm.comentario" placeholder="¿Qué te pareció?"></textarea>
+      <p class="mia__contador" [class.mia__contador--exceso]="reseniaForm.comentario().value().length > maxComentario">
+        {{ reseniaForm.comentario().value().length }} / {{ maxComentario }}
+      </p>
+
+      @if (intentoEnvio() && faltantes().length > 0) {
+        <div class="faltantes" role="alert">
+          <p class="faltantes__titulo">Falta completar:</p>
+          <ul class="faltantes__lista">
+            @for (m of faltantes(); track m) {
+              <li>{{ m }}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      <div class="mia__acciones">
+        <button type="submit" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando...' : miResenia() ? 'Modificar reseña' : 'Publicar reseña' }}
+        </button>
+        @if (miResenia()) {
+          <button type="button" class="btn--secundario" (click)="eliminar()" [disabled]="guardando()">
+            Eliminar mi reseña
+          </button>
+        }
+      </div>
+    </form>
+  }
+
+  <!-- Reseñas de los demás -->
+  @if (otras().length > 0) {
+    <ul class="lista">
+      @for (r of visibles(); track r.id) {
+        <li class="resenia ticket">
+          <div class="resenia__cabecera">
+            <strong>{{ autor(r) }}</strong>
+            <app-estrellas [valor]="r.estrellas" />
+            <span class="resenia__fecha">{{ r.created_at | diaAr }}</span>
+          </div>
+          @if (r.comentario) {
+            <p class="resenia__comentario">{{ r.comentario }}</p>
+          }
+        </li>
+      }
+    </ul>
+
+    @if (!verTodas() && otras().length > visibles().length) {
+      <button type="button" class="btn--secundario" (click)="verTodas.set(true)">
+        Ver las {{ otras().length - visibles().length }} reseñas restantes
+      </button>
+    }
+  }
+</section>

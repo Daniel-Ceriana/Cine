@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img"><rect width="200" height="200" fill="#F3D98B"/><title>Alfajor</title>
+<ellipse cx="100" cy="132" rx="62" ry="22" fill="#6B3A2E" stroke="#2A1B15" stroke-width="3"/>
+<rect x="38" y="104" width="124" height="24" fill="#B0702F"/>
+<ellipse cx="100" cy="104" rx="62" ry="22" fill="#6B3A2E" stroke="#2A1B15" stroke-width="3"/>
+<ellipse cx="100" cy="96" rx="62" ry="22" fill="#3A1519" stroke="#2A1B15" stroke-width="3"/>
+<path d="M62 94 Q100 108 138 94" stroke="#FFF8E8" stroke-width="4" fill="none"/>
+</svg>

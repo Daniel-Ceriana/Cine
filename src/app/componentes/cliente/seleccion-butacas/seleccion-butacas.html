@@ -29,20 +29,40 @@
       </div>
     }
 
-    @if (paso() === 'elegir') {
-      <!-- ============ PASO 1: elegir butacas ============ -->
+    @if (paso() === 'elegir' || paso() === 'candy') {
+      <!-- ============ PASO 1: elegir butacas · PASO 2 (opcional): sumar candy ============ -->
       @if (avisoMsg()) {
         <p class="aviso aviso--info" role="status">{{ avisoMsg() }}</p>
       }
       @if (errorMsg()) {
         <p class="error">{{ errorMsg() }}</p>
       }
+      @if (paso() === 'candy') {
+        <p class="cuenta texto-ticket" [class.cuenta--urgente]="segundosRestantes() < 60">
+          Tus butacas están reservadas por <strong>{{ tiempo() }}</strong>
+        </p>
+      }
 
       <section class="contenido">
-        <app-mapa-butacas
-          [ocupacion]="ocupacion()"
-          [seleccionadas]="seleccionadas()"
-          (butacaClick)="onButacaClick($event)" />
+        @if (paso() === 'elegir') {
+          <app-mapa-butacas
+            [ocupacion]="ocupacion()"
+            [seleccionadas]="seleccionadas()"
+            (butacaClick)="onButacaClick($event)" />
+        } @else {
+          <app-candy
+            [catalogo]="catalogo()"
+            [carrito]="carrito()"
+            [maxUnidades]="maxUnidadesCandy()"
+            [puedeCanjear]="tieneSesion()"
+            [puntosDisponibles]="puntosDisponibles()"
+            [combos]="combos()"
+            [carritoCombos]="carritoCombos()"
+            [butacasLibres]="butacasLibres()"
+            [precioEntrada]="precioBase() ?? 0"
+            (cambio)="actualizarCarrito($event)"
+            (cambioCombo)="actualizarCarritoCombos($event)" />
+        }
 
         <aside class="resumen ticket">
           <h2 class="resumen__titulo">Tu compra</h2>
@@ -71,7 +91,7 @@
                       <input
                         type="checkbox"
                         [checked]="conPuntosValidas().includes(c)"
-                        [disabled]="!conPuntosValidas().includes(c) && !alcanzanPuntos()"
+                        [disabled]="paso() === 'candy' || (!conPuntosValidas().includes(c) && !puedeCanjearOtra())"
                         (change)="alternarPuntos(c)" />
                       Pagar la entrada con {{ costoEntradaPuntos() }} puntos
                     </label>
@@ -79,6 +99,33 @@
                 </li>
               }
             </ul>
+            @if (carritoCombos().length > 0) {
+              <h3 class="resumen__subtitulo">Combos</h3>
+              <ul class="resumen__lista">
+                @for (i of carritoCombos(); track i.combo.id) {
+                  <li>
+                    <span class="texto-ticket">{{ i.cantidad }} ×</span>
+                    <span>{{ i.combo.nombre }}</span>
+                    <span class="texto-ticket">{{ i.cantidad * i.combo.precio | pesos }}</span>
+                  </li>
+                }
+              </ul>
+              <p class="resumen__linea resumen__linea--descuento">
+                Entradas incluidas en los combos <span class="texto-ticket">- {{ valorCubierto() | pesos }}</span>
+              </p>
+            }
+            @if (carrito().length > 0) {
+              <h3 class="resumen__subtitulo">Candy</h3>
+              <ul class="resumen__lista">
+                @for (i of carrito(); track i.producto.id) {
+                  <li>
+                    <span class="texto-ticket">{{ i.cantidad }} ×</span>
+                    <span>{{ i.producto.nombre }}@if (i.conPuntos > 0) { ({{ i.conPuntos }} con puntos) }</span>
+                    <span class="texto-ticket">{{ ((i.cantidad - i.conPuntos) * i.producto.precio) | pesos }}</span>
+                  </li>
+                }
+              </ul>
+            }
             @if (hayVip()) {
               <p class="aviso aviso--vip">
                 Elegiste butacas <strong>VIP</strong>: tienen un recargo de {{ recargoVip() | pesos }} cada una.
@@ -113,7 +160,7 @@
           }
 
           <!-- Sin sesión iniciada: hay que pedir los datos para enviar la entrada -->
-          @if (!tieneSesion()) {
+          @if (!tieneSesion() && paso() === 'elegir') {
             <div class="datos">
               <p class="datos__titulo">Comprás sin iniciar sesión</p>
               <label for="nombre">Nombre</label>
@@ -133,7 +180,7 @@
             </div>
           }
 
-          @if (intentoEnvio() && faltantes().length > 0) {
+          @if (intentoEnvio() && faltantes().length > 0 && paso() === 'elegir') {
             <div class="faltantes" role="alert">
               <p class="faltantes__titulo">Falta completar:</p>
               <ul class="faltantes__lista">
@@ -144,9 +191,18 @@
             </div>
           }
 
-          <button type="button" (click)="continuar()" [disabled]="procesando()">
-            {{ procesando() ? 'Reservando...' : 'Continuar' }}
-          </button>
+          @if (paso() === 'elegir') {
+            <button type="button" (click)="continuar()" [disabled]="procesando()">
+              {{ procesando() ? 'Reservando...' : 'Continuar' }}
+            </button>
+          } @else {
+            <button type="button" (click)="confirmarCandy()" [disabled]="procesando()">
+              {{ procesando() ? 'Guardando...' : hayAlgoElegido() ? 'Continuar al resumen' : 'Seguir sin candy' }}
+            </button>
+            <button type="button" class="btn--secundario" (click)="cambiarButacas()" [disabled]="procesando()">
+              Cambiar butacas
+            </button>
+          }
         </aside>
       </section>
     }
@@ -170,6 +226,33 @@
             </li>
           }
         </ul>
+        @if (carritoCombos().length > 0) {
+          <h3 class="resumen__subtitulo">Combos</h3>
+          <ul class="resumen__lista">
+            @for (i of carritoCombos(); track i.combo.id) {
+              <li>
+                <span class="texto-ticket">{{ i.cantidad }} ×</span>
+                <span>{{ i.combo.nombre }}</span>
+                <span class="texto-ticket">{{ i.cantidad * i.combo.precio | pesos }}</span>
+              </li>
+            }
+          </ul>
+          <p class="resumen__linea resumen__linea--descuento">
+            Entradas incluidas en los combos <span class="texto-ticket">- {{ valorCubierto() | pesos }}</span>
+          </p>
+        }
+        @if (carrito().length > 0) {
+          <h3 class="resumen__subtitulo">Candy</h3>
+          <ul class="resumen__lista">
+            @for (i of carrito(); track i.producto.id) {
+              <li>
+                <span class="texto-ticket">{{ i.cantidad }} ×</span>
+                <span>{{ i.producto.nombre }}@if (i.conPuntos > 0) { ({{ i.conPuntos }} con puntos) }</span>
+                <span class="texto-ticket">{{ ((i.cantidad - i.conPuntos) * i.producto.precio) | pesos }}</span>
+              </li>
+            }
+          </ul>
+        }
         @if (compra()!.descuento > 0) {
           <p class="resumen__linea">Subtotal <span class="texto-ticket">{{ compra()!.subtotal | pesos }}</span></p>
           <p class="resumen__linea resumen__linea--descuento">
@@ -197,6 +280,11 @@
           <button type="button" (click)="pagar()" [disabled]="procesando()">
             {{ procesando() ? 'Procesando...' : aPagarCompra() > 0 ? 'Pagar ' + (aPagarCompra() | pesos) : 'Confirmar compra' }}
           </button>
+          @if (hayCandyEnVenta()) {
+            <button type="button" class="btn--secundario" (click)="editarCandy()" [disabled]="procesando()">
+              Cambiar candy
+            </button>
+          }
           <button type="button" class="btn--secundario" (click)="cambiarButacas()" [disabled]="procesando()">
             Cambiar butacas
           </button>
@@ -213,6 +301,9 @@
       <section class="paso-pago ticket">
         <h2>¡Compra confirmada!</h2>
         <p>Butacas: <strong class="texto-ticket">{{ seleccionadas().join(', ') }}</strong></p>
+        @if (hayAlgoElegido()) {
+          <p>Candy: <strong class="texto-ticket">{{ textoCandy() }}</strong></p>
+        }
         <p>Total de la compra: <strong class="texto-ticket">{{ compra()!.total | pesos }}</strong></p>
         @if (compra()!.credito_usado > 0) {
           <p>Pagado con crédito: <strong class="texto-ticket">{{ compra()!.credito_usado | pesos }}</strong></p>

@@ -35,6 +35,15 @@
         type="button"
         role="tab"
         class="pestana"
+        [class.pestana--activa]="pestana() === 'peliculas'"
+        [attr.aria-selected]="pestana() === 'peliculas'"
+        (click)="pestana.set('peliculas')">
+        Mis películas
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="pestana"
         [class.pestana--activa]="pestana() === 'resumen'"
         [attr.aria-selected]="pestana() === 'resumen'"
         (click)="pestana.set('resumen')">
@@ -76,6 +85,59 @@
             [horasCancelacion]="horasCancelacion()"
             [cancelando]="cancelandoId() === c.id"
             (cancelar)="cancelarCompra($event)" />
+        }
+      </section>
+    }
+
+    @if (pestana() === 'peliculas') {
+      <section class="peliculas">
+        <p class="peliculas__intro">
+          Las películas que ya viste y las reseñas que dejaste.
+          @if (sinReseniar() > 0) {
+            Te {{ sinReseniar() === 1 ? 'falta' : 'faltan' }} reseñar {{ sinReseniar() }}.
+          }
+        </p>
+
+        <div class="filtros" role="group" aria-label="Filtrar películas">
+          <button type="button" class="chip filtro" [class.filtro--activo]="filtroPeliculas() === 'todas'" [attr.aria-pressed]="filtroPeliculas() === 'todas'" (click)="filtroPeliculas.set('todas')">Todas</button>
+          <button type="button" class="chip filtro" [class.filtro--activo]="filtroPeliculas() === 'con'" [attr.aria-pressed]="filtroPeliculas() === 'con'" (click)="filtroPeliculas.set('con')">Con reseña</button>
+          <button type="button" class="chip filtro" [class.filtro--activo]="filtroPeliculas() === 'sin'" [attr.aria-pressed]="filtroPeliculas() === 'sin'" (click)="filtroPeliculas.set('sin')">Sin reseñar</button>
+        </div>
+
+        @if (!cargando() && misPeliculas().length === 0) {
+          <p class="vacio">Todavía no viste ninguna película. Cuando asistas a una función, aparece acá.</p>
+        } @else if (!cargando() && peliculasVisibles().length === 0) {
+          <p class="vacio">No hay películas para este filtro.</p>
+        }
+
+        @for (m of peliculasVisibles(); track m.pelicula_id) {
+          <article class="vista ticket">
+            <img class="vista__poster" [src]="m.imagen_url" [alt]="m.nombre" />
+
+            <div class="vista__info">
+              <h3 class="vista__titulo">{{ m.nombre }}</h3>
+              <p class="vista__meta texto-ticket">La viste el {{ m.ultima_funcion | diaAr }}</p>
+
+              @if (m.estrellas !== null) {
+                <app-estrellas [valor]="m.estrellas" />
+                @if (m.comentario) {
+                  <p class="vista__comentario">{{ m.comentario }}</p>
+                }
+                <p class="vista__meta">Reseñada el {{ m.resenia_fecha! | diaAr }}</p>
+              } @else {
+                <p class="vista__meta">Todavía no la reseñaste.</p>
+              }
+
+              <div class="vista__acciones">
+                <a class="btn" [routerLink]="['/peliculas', m.pelicula_id]">
+                  {{ m.estrellas !== null ? 'Ver o editar mi reseña' : 'Dejar mi reseña' }}
+                </a>
+                @if (m.estrellas !== null) {
+                  <button type="button" class="btn--secundario" (click)="eliminarResenia(m)">Eliminar reseña</button>
+                }
+              </div>
+            </div>
+          </article>
         }
       </section>
     }

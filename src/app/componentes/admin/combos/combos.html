@@ -1,0 +1,69 @@
+<app-menu-crear-ver
+    [modificar]="false"
+    titulo="Combos"
+    ruta="/admin/combos"
+    etiquetaCrear="Crear combo"
+    etiquetaVer="Ver combos"></app-menu-crear-ver>
+
+<main class="pagina">
+  <div class="barra">
+    <input
+      type="text"
+      class="barra__buscar"
+      placeholder="Buscar combo por nombre"
+      aria-label="Buscar combo por nombre"
+      [value]="busqueda()"
+      (input)="busqueda.set($any($event.target).value)" />
+  </div>
+
+  @if (cargando()) {
+    <p>Cargando combos...</p>
+  }
+  @if (errorMsg()) {
+    <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+  }
+  @if (!cargando() && combos().length === 0) {
+    <p>Todavía no hay combos creados.</p>
+  }
+
+  <section class="combos__lista">
+    @for (c of combos() | filtrar: busqueda() : ['nombre']; track c.id) {
+      <article class="combo ticket" [class.combo--inactivo]="!c.activo">
+        <img class="combo__imagen" [src]="c.imagen_url" [alt]="c.nombre" />
+
+        <div class="combo__info">
+          <h3 class="combo__nombre">{{ c.nombre }}</h3>
+          @if (c.descripcion) {
+            <p class="combo__descripcion">{{ c.descripcion }}</p>
+          }
+          <p class="combo__incluye">
+            Incluye: {{ entradas(c) }}
+            @for (i of c.combo_items; track i.producto_id) {
+              + {{ i.cantidad }} × {{ i.productos.nombre }}
+            }
+          </p>
+          <p class="combo__precio texto-ticket">{{ c.precio | pesos }}</p>
+          <div class="combo__chips">
+            <span class="chip" [class.chip--rojo]="!c.activo">{{ c.activo | estadoProducto }}</span>
+            @if (c.destacado) {
+              <span class="chip chip--preventa">Destacado</span>
+            }
+          </div>
+          @if (c.activo && tieneProductosInactivos(c)) {
+            <p class="combo__aviso" role="note">
+              El cliente no lo ve: alguno de sus productos (o su categoría) está inactivo.
+            </p>
+          }
+        </div>
+
+        <div class="combo__acciones">
+          <button type="button" (click)="onClickModificar(c)">Modificar</button>
+          <button type="button" class="btn--secundario" (click)="alternarActivo(c)">
+            {{ c.activo ? 'Desactivar' : 'Activar' }}
+          </button>
+          <button type="button" class="btn--secundario" (click)="eliminar(c)">Eliminar</button>
+        </div>
+      </article>
+    }
+  </section>
+</main>

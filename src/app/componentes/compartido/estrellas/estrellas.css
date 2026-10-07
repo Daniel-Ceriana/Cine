@@ -1,0 +1,57 @@
+:host {
+    display: inline-block;
+}
+
+/* ---- Para mostrar: las estrellas llenas se recortan con el ancho (relleno parcial) ---- */
+.estrellas {
+    position: relative;
+    display: inline-block;
+    font-size: 1.1rem;
+    line-height: 1;
+    letter-spacing: 2px;
+    white-space: nowrap;
+}
+
+.estrellas__fondo {
+    color: var(--crema-borde);
+}
+
+.estrellas__llenas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    color: var(--mostaza);
+}
+
+/* ---- Para elegir: cinco botones ---- */
+.estrellas--editable {
+    display: inline-flex;
+    gap: 2px;
+}
+
+.estrellas__boton {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: var(--crema-borde);
+    font-size: 1.8rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.estrellas__boton--llena {
+    color: var(--mostaza);
+}
+
+.estrellas__boton:hover {
+    color: var(--mostaza);
+}
+
+.estrellas__boton:focus-visible {
+    outline: 3px solid var(--rojo);
+    outline-offset: 2px;
+}

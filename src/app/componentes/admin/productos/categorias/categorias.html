@@ -1,0 +1,85 @@
+<main class="pagina categorias">
+  <h1 class="titulo-pagina">Categorías del candy</h1>
+
+  <p class="categorias__intro">
+    Las categorías agrupan los productos (pochoclos, bebidas, golosinas...). Se muestran en el orden indicado, de menor a
+    mayor. Si desactivás una categoría, el cliente deja de ver todos sus productos.
+  </p>
+
+  <a class="categorias__volver" routerLink="/admin/productos">&larr; Volver a productos</a>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+  @if (errorMsg()) {
+    <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+  }
+  @if (okMsg()) {
+    <p class="ok" role="status">{{ okMsg() }}</p>
+  }
+
+  <section class="bloque ticket">
+    <h2>Categorías</h2>
+
+    @if (categorias().length === 0 && !cargando()) {
+      <p class="bloque__ayuda">Todavía no hay categorías. Creá la primera abajo.</p>
+    }
+
+    <ul class="lista">
+      @for (c of categorias(); track c.id) {
+        <li class="lista__item" [class.lista__item--inactivo]="!c.activa">
+          <div class="lista__info">
+            <p class="lista__nombre">{{ c.nombre }}</p>
+            <p class="lista__meta">Orden {{ c.orden }}</p>
+          </div>
+          <span class="chip" [class.chip--rojo]="!c.activa">{{ c.activa | estadoCategoria }}</span>
+          <button type="button" (click)="editar(c)">Modificar</button>
+          <button type="button" class="btn--secundario" (click)="alternarActiva(c)" [disabled]="guardando()">
+            {{ c.activa ? 'Desactivar' : 'Activar' }}
+          </button>
+          <button type="button" class="btn--secundario" (click)="eliminar(c)" [disabled]="guardando()">Eliminar</button>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="bloque ticket">
+    <h2>{{ editandoId() ? 'Modificar categoría' : 'Nueva categoría' }}</h2>
+
+    <form class="formulario" (submit)="guardarCategoria($event)" novalidate>
+      <div class="campos-fila">
+        <div class="campo campo--ancho">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" [formField]="categoriaForm.nombre" placeholder="Ej.: Pochoclos" />
+        </div>
+        <div class="campo">
+          <label for="orden">Orden</label>
+          <input id="orden" type="text" inputmode="numeric" [formField]="categoriaForm.orden" />
+        </div>
+      </div>
+
+      <label class="check">
+        <input type="checkbox" [formField]="categoriaForm.activa" />
+        Activa
+      </label>
+
+      @if (intentoEnvio() && faltantes().length > 0) {
+        <div class="faltantes" role="alert">
+          <p class="faltantes__titulo">Falta completar:</p>
+          <ul class="faltantes__lista">
+            @for (m of faltantes(); track m) {
+              <li>{{ m }}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      <div class="acciones">
+        <button type="submit" [disabled]="guardando()">{{ editandoId() ? 'Guardar cambios' : 'Crear categoría' }}</button>
+        @if (editandoId()) {
+          <button type="button" class="btn--secundario" (click)="cancelarEdicion()">Cancelar</button>
+        }
+      </div>
+    </form>
+  </section>
+</main>

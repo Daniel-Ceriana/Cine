@@ -50,6 +50,7 @@ interface FuncionFormModel {
   formato: FormatoSala;
   idioma: IdiomaFuncion;
   precio_base: number;
+  con_preventa: boolean;
 }
 
 @Component({
@@ -101,6 +102,7 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
     formato: '2D',
     idioma: 'castellano',
     precio_base: 0,
+    con_preventa: false,
   });
 
   // Las validaciones están en "faltantes" (más abajo), que junta todo lo que impide guardar
@@ -115,13 +117,19 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
     return f ? partesAr(f.inicio).fecha : hoyAr();
   });
 
+  // Primer día en que puede haber funciones: hoy (o la función que se modifica) y nunca antes del estreno
+  private fechaMinima = computed(() => {
+    const estreno = this.peliculaElegida()?.fecha_estreno;
+    return estreno && estreno > this.fechaBase() ? estreno : this.fechaBase();
+  });
+
   // Fechas concretas: en cada una de las N semanas, los días de la semana elegidos.
-  // Nunca se generan fechas pasadas (ni anteriores a la función que se modifica).
+  // Nunca se generan fechas pasadas, anteriores al estreno ni anteriores a la función que se modifica.
   fechasGeneradas = computed<string[]>(() => {
     const dias = this.diasElegidos();
     if (dias.length === 0) return [];
 
-    const minima = this.fechaBase();
+    const minima = this.fechaMinima();
     let lunes = lunesDe(minima);
     if (!this.esEdicion() && this.inicioSemana() === 'proxima') lunes = sumarDias(lunes, 7);
 
@@ -139,8 +147,8 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
 
   // Lista de días para elegir al modificar una sola función (evita abrir un calendario)
   opcionesDia = computed<string[]>(() => {
-    const hoy = hoyAr();
-    const dias = Array.from({ length: DIAS_A_ELEGIR_UNA_FUNCION }, (_, i) => sumarDias(hoy, i));
+    const desde = this.fechaMinima();
+    const dias = Array.from({ length: DIAS_A_ELEGIR_UNA_FUNCION }, (_, i) => sumarDias(desde, i));
     const actual = this.fechaBase();
     return dias.includes(actual) ? dias : [actual, ...dias];
   });
@@ -149,6 +157,12 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
     this.peliculas().find((p) => p.id === this.model().pelicula_id) ?? null,
   );
 
+  // La preventa se configura en la película (días y precio); acá solo se marca qué funciones la tienen
+  peliculaTienePreventa = computed(() => {
+    const p = this.peliculaElegida();
+    return !!p && p.dias_preventa > 0 && p.precio_preventa > 0;
+  });
+
   // Errores de los controles de Material (no pasan por el form de señales)
   erroresFechas = computed<string[]>(() => {
     const errores: string[] = [];
@@ -156,7 +170,7 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
     if (this.modoVarias()) {
       if (this.diasElegidos().length === 0) errores.push('Elegí al menos un día de la semana');
       else if (this.fechasGeneradas().length === 0) {
-        errores.push('Con esos días y semanas no queda ninguna fecha futura');
+        errores.push('Con esos días y semanas no queda ninguna fecha válida (desde hoy y desde el estreno)');
       }
     } else if (!this.diaUnico()) {
       errores.push('Elegí el día de la función');
@@ -176,6 +190,9 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
 
     if (!m.pelicula_id) faltan.push('Elegí una película');
     if (!(m.precio_base > 0)) faltan.push('Ingresá un precio base mayor a 0');
+    if (m.con_preventa && !this.peliculaTienePreventa()) {
+      faltan.push('La película no tiene preventa configurada: cargala en la película o desmarcá "Con preventa"');
+    }
 
     return [...faltan, ...this.erroresFechas()];
   });
@@ -196,6 +213,7 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
         formato: funcion.salas.formato,
         idioma: funcion.idioma,
         precio_base: funcion.precio_base,
+        con_preventa: funcion.con_preventa,
       });
       this.diaUnico.set(fecha);
       this.hora.set(horaADate(hora));
@@ -232,7 +250,10 @@ export class CrearModificarFuncion implements OnInit, ConfirmarSalida {
   }
 
   setPelicula(pelicula_id: string) {
-    this.model.update((m) => ({ ...m, pelicula_id }));
+    // si la película nueva no tiene preventa, la marca no puede quedar puesta
+    const nueva = this.peliculas().find((p) => p.id === pelicula_id);
+    const tienePreventa = !!nueva && nueva.dias_preventa > 0 && nueva.precio_preventa > 0;
+    this.model.update((m) => ({ ...m, pelicula_id, con_preventa: m.con_preventa && tienePreventa }));
   }
 
   // canDeactivate: si el formulario tiene cambios sin guardar, se pide confirmación antes de salir

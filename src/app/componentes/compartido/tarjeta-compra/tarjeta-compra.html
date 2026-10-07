@@ -13,8 +13,19 @@
       @if (c.estado === 'pagada' && c.entrada_validada_at) {
         <span class="chip">Entrada usada</span>
       }
+      @if (c.estado === 'pagada' && c.candy_entregado_at) {
+        <span class="chip">Candy entregado</span>
+      }
     </div>
     <p>Butacas: <strong class="texto-ticket">{{ butacas().join(', ') }}</strong></p>
+    @if (productos().length > 0) {
+      <p>
+        Candy:
+        @for (p of productos(); track p.nombre; let ultimo = $last) {
+          <strong class="texto-ticket">{{ p.cantidad }} × {{ p.nombre }}</strong>@if (!ultimo) {, }
+        }
+      </p>
+    }
     <p>
       Total: <strong class="texto-ticket">{{ c.total | pesos }}</strong>
       @if (c.credito_usado > 0) {
@@ -63,7 +74,12 @@
         }
         <p class="entrada__etiqueta">Código de la entrada</p>
         <p class="entrada__codigo texto-ticket">{{ c.codigo }}</p>
-        <p class="compra__meta">Presentá el QR o el código en la puerta de la sala. Sirve una sola vez.</p>
+        <p class="compra__meta">
+          Presentá el QR o el código en la puerta de la sala. Sirve una sola vez.
+          @if (productos().length > 0) {
+            Con el mismo código retirás tu candy (también una sola vez).
+          }
+        </p>
         @if (restriccion() > 0) {
           <p class="aviso aviso--edad">Para esta película (+{{ restriccion() }}) debe asistir un adulto.</p>
         }

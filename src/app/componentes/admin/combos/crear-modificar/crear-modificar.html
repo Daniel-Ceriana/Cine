@@ -1,0 +1,151 @@
+<h1 class="titulo-pagina">{{ esEdicion() ? 'Modificar combo' : 'Crear combo' }}</h1>
+
+<div class="contenedor-form">
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  <form (submit)="onSubmit($event)" novalidate>
+
+    <div class="item">
+      <section>
+        <label for="nombre">Nombre</label>
+        <input id="nombre" type="text" [formField]="comboForm.nombre" placeholder="Ej.: Combo Pareja" />
+      </section>
+    </div>
+
+    <div class="item">
+      <section>
+        <label for="descripcion">Descripción <small>(opcional)</small></label>
+        <textarea id="descripcion" rows="3" [formField]="comboForm.descripcion"></textarea>
+      </section>
+    </div>
+
+    <div class="item">
+      <section>
+        <label for="entradas">Entradas que incluye</label>
+        <input id="entradas" type="text" inputmode="numeric" [formField]="comboForm.cantidad_entradas" />
+      </section>
+      <small class="ayuda">
+        Cada combo cubre esa cantidad de butacas de la compra (cualquier tipo; el recargo VIP se paga aparte).
+      </small>
+    </div>
+
+    <div class="item">
+      <section>
+        <label>Productos que incluye</label>
+        <ul class="renglones">
+          @for (r of renglones(); track $index) {
+            <li class="renglon">
+              <select
+                class="renglon__producto"
+                [attr.aria-label]="'Producto del renglón ' + ($index + 1)"
+                (change)="cambiarRenglon($index, { producto_id: $any($event.target).value })">
+                <option value="" [selected]="!r.producto_id">Elegí un producto</option>
+                @for (p of productos(); track p.id) {
+                  <option [value]="p.id" [selected]="p.id === r.producto_id">
+                    {{ p.nombre }}{{ p.activo ? '' : ' (inactivo)' }}
+                  </option>
+                }
+              </select>
+              <input
+                class="renglon__cantidad"
+                type="text"
+                inputmode="numeric"
+                [attr.aria-label]="'Cantidad del renglón ' + ($index + 1)"
+                [value]="r.cantidad"
+                (input)="cambiarRenglon($index, { cantidad: $any($event.target).value })" />
+              <button type="button" class="btn--secundario" (click)="quitarRenglon($index)" [attr.aria-label]="'Quitar el renglón ' + ($index + 1)">
+                Quitar
+              </button>
+            </li>
+          }
+        </ul>
+        <button type="button" class="btn--secundario" (click)="agregarRenglon()">Agregar producto</button>
+      </section>
+    </div>
+
+    <div class="item">
+      <section>
+        <label for="precio">Precio del combo ($)</label>
+        <input id="precio" type="text" inputmode="decimal" [formField]="comboForm.precio" placeholder="14000" />
+      </section>
+      @if (valorSuelto() > 0) {
+        <small class="ayuda">
+          Valor de lo que incluye por separado: <strong>{{ valorSuelto() | pesos }}</strong>
+          (productos {{ valorProductos() | pesos }}
+          @if (precioEntradaReferencia() !== null) {
+            + entradas {{ valorEntradas() | pesos }}, con la función futura más barata como referencia
+          } @else {
+            ; todavía no hay funciones cargadas, así que no se cuentan las entradas
+          })
+        </small>
+      }
+      @if (precioMayorAlValor()) {
+        <p class="advertencia" role="note">
+          <strong>Atención:</strong> el precio del combo es mayor que el valor de lo que incluye. Se puede guardar
+          igual, pero el cliente no va a ver el cartel "Ahorrás".
+        </p>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label for="orden">Orden</label>
+        <input id="orden" type="text" inputmode="numeric" [formField]="comboForm.orden" />
+      </section>
+      <small class="ayuda">Se muestra primero el número más bajo (los destacados siempre van antes).</small>
+    </div>
+
+    <div class="item">
+      <section>
+        <label for="imagen">Imagen <small>(obligatoria)</small></label>
+        <input id="imagen" type="file" accept="image/*" (change)="onFileSelected($event)" />
+      </section>
+      @if (previewUrl()) {
+        <img class="preview-imagen" [src]="previewUrl()" alt="Vista previa de la imagen del combo" />
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>
+          <input type="checkbox" [formField]="comboForm.activo" />
+          Activo
+        </label>
+      </section>
+      <small class="ayuda">Un combo inactivo (o con algún producto inactivo) no se muestra al cliente.</small>
+    </div>
+
+    <div class="item">
+      <section>
+        <label>
+          <input type="checkbox" [formField]="comboForm.destacado" />
+          Destacado
+        </label>
+      </section>
+      <small class="ayuda">Los combos destacados se muestran primero en la compra.</small>
+    </div>
+
+    @if (intentoEnvio() && faltantes().length > 0) {
+      <div class="faltantes" role="alert">
+        <p class="faltantes__titulo">Falta completar:</p>
+        <ul class="faltantes__lista">
+          @for (m of faltantes(); track m) {
+            <li>{{ m }}</li>
+          }
+        </ul>
+      </div>
+    }
+
+    @if (errorMsg()) {
+      <p class="error" role="alert">{{ errorMsg() }}</p>
+    }
+
+    <div class="item">
+      <button type="submit" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando...' : (esEdicion() ? 'Modificar' : 'Crear') }}
+      </button>
+    </div>
+  </form>
+</div>

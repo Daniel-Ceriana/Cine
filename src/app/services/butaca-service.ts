@@ -11,7 +11,7 @@ export class ButacaService {
   async getOcupacion(funcionId: string): Promise<OcupacionButaca[]> {
     const { data, error } = await this.supabase.client
       .from('compra_butacas')
-      .select('*, compras(nombre, email, estado, total, usuario_id, pagada_at, created_at)')
+      .select('*, compras(nombre, email, estado, total, candy_subtotal, candy_descuento, usuario_id, pagada_at, created_at)')
       .eq('funcion_id', funcionId)
       .in('estado', ['reservada', 'vendida']);
 

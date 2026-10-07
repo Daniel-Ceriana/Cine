@@ -1,0 +1,120 @@
+.resenias {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+}
+
+.resenias__vacio,
+.resenias__aviso {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+/* ---- Promedio ---- */
+.promedio {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-16);
+}
+
+.promedio__valor {
+    font-size: 2.2rem;
+    color: var(--bordo);
+}
+
+.promedio__cantidad {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.ok {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: #EAF3E6;
+    border: 2px solid #6FA267;
+    border-radius: var(--radio);
+    font-size: var(--font-xsmall);
+    font-weight: 600;
+}
+
+/* ---- Mi reseña ---- */
+.mia {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    padding: var(--spacing-20);
+}
+
+.mia::before,
+.mia::after {
+    display: none;
+}
+
+.mia__contador {
+    align-self: flex-end;
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.mia__contador--exceso {
+    color: var(--error);
+    font-weight: 700;
+}
+
+.mia__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-12);
+}
+
+.faltantes {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: #FBE3DF;
+    border: 2px solid var(--error);
+    border-radius: var(--radio);
+}
+
+.faltantes__titulo {
+    font-size: var(--font-xsmall);
+    font-weight: 700;
+    color: var(--error);
+}
+
+.faltantes__lista {
+    margin: var(--spacing-8) 0 0 var(--spacing-20);
+    list-style: disc;
+    font-size: var(--font-xsmall);
+}
+
+/* ---- Reseñas de los demás ---- */
+.lista {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+}
+
+.resenia {
+    padding: var(--spacing-16) var(--spacing-20);
+}
+
+.resenia::before,
+.resenia::after {
+    display: none;
+}
+
+.resenia__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-12);
+}
+
+.resenia__fecha {
+    margin-left: auto;
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.resenia__comentario {
+    margin-top: var(--spacing-8);
+    overflow-wrap: anywhere;
+}

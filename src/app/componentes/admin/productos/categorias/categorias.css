@@ -1,0 +1,133 @@
+.categorias {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-20);
+    max-width: 820px;
+}
+
+.categorias__intro {
+    text-align: center;
+    color: var(--tinta-suave);
+}
+
+.categorias__volver {
+    align-self: flex-start;
+    font-weight: 600;
+}
+
+.bloque {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+    padding: var(--spacing-20);
+}
+
+.bloque::before,
+.bloque::after {
+    display: none;
+}
+
+.bloque__ayuda {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-8);
+    cursor: pointer;
+}
+
+.ok {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: #EAF3E6;
+    border: 2px solid #6FA267;
+    border-radius: var(--radio);
+    font-size: var(--font-xsmall);
+    font-weight: 600;
+}
+
+/* ---- Lista de categorías ---- */
+.lista {
+    display: flex;
+    flex-direction: column;
+}
+
+.lista__item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-12);
+    padding: var(--spacing-12) 0;
+    border-bottom: 1px dashed var(--crema-borde);
+}
+
+.lista__item--inactivo {
+    opacity: .6;
+}
+
+.lista__info {
+    flex: 1;
+    min-width: 180px;
+}
+
+.lista__nombre {
+    font-weight: 700;
+}
+
+.lista__meta {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+/* ---- Formulario ---- */
+.formulario {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 120px;
+}
+
+.campo--ancho {
+    flex: 3;
+    min-width: 200px;
+}
+
+.campos-fila {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-16);
+}
+
+.acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-12);
+}
+
+.faltantes {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: #FBE3DF;
+    border: 2px solid var(--error);
+    border-radius: var(--radio);
+}
+
+.faltantes__titulo {
+    font-size: var(--font-xsmall);
+    font-weight: 700;
+    color: var(--error);
+}
+
+.faltantes__lista {
+    margin: var(--spacing-8) 0 0 var(--spacing-20);
+    list-style: disc;
+    font-size: var(--font-xsmall);
+}

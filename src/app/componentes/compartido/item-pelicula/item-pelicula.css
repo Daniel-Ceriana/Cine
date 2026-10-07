@@ -67,3 +67,22 @@
 .pelicula__acciones button {
     width: 100%;
 }
+
+.pelicula__puntuacion {
+    font-size: var(--font-xsmall);
+    font-weight: 700;
+}
+
+.pelicula__puntuacion--vacia {
+    font-weight: 400;
+    color: var(--tinta-suave);
+}
+
+.pelicula__estrella {
+    color: var(--mostaza);
+}
+
+.pelicula__cantidad {
+    font-weight: 400;
+    color: var(--tinta-suave);
+}

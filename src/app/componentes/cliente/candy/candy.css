@@ -1,0 +1,122 @@
+.candy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+}
+
+.candy__titulo {
+    font-size: var(--font-large);
+}
+
+.candy__ayuda {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.candy__titulo--secundario {
+    margin-top: var(--spacing-20);
+    font-size: var(--font-medium);
+}
+
+.candy__categoria {
+    margin-top: var(--spacing-12);
+    font-size: var(--font-medium);
+}
+
+.candy__lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--spacing-16);
+}
+
+.producto {
+    display: flex;
+    flex-direction: column;
+}
+
+.producto::before,
+.producto::after {
+    display: none;
+}
+
+.producto--elegido {
+    border-color: var(--rojo);
+}
+
+.producto__imagen {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: var(--radio) var(--radio) 0 0;
+}
+
+.producto__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--spacing-12) var(--spacing-16);
+    flex: 1;
+}
+
+.producto__nombre {
+    font-size: var(--font-small);
+}
+
+.producto__descripcion {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.producto__precio {
+    color: var(--rojo);
+}
+
+.producto__ahorro {
+    font-size: var(--font-xsmall);
+    font-weight: 700;
+    color: var(--verde, #3F7A38);
+}
+
+.producto__chip {
+    align-self: flex-start;
+}
+
+.producto__control {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    padding: var(--spacing-12) var(--spacing-16);
+    border-top: 2px dashed var(--crema-borde);
+}
+
+.cantidad,
+.canje {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-8);
+}
+
+.canje {
+    flex-wrap: wrap;
+}
+
+.canje__texto,
+.canje__aviso {
+    flex: 1 0 100%;
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.cantidad__boton {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    font-size: var(--font-medium);
+    line-height: 1;
+}
+
+.cantidad__valor {
+    min-width: 32px;
+    text-align: center;
+    font-weight: 700;
+}

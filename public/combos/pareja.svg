@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img"><rect width="200" height="200" fill="#F3D98B"/><rect x="0" y="168" width="200" height="32" fill="#56232A"/><title>Combo Pareja</title>
+<g fill="#FFF8E8" stroke="#2A1B15" stroke-width="3"><circle cx="70" cy="46" r="16"/><circle cx="100" cy="36" r="18"/><circle cx="130" cy="46" r="16"/><circle cx="84" cy="64" r="14"/><circle cx="116" cy="64" r="14"/></g>
+<path d="M54 70 L146 70 L134 168 L66 168 Z" fill="#C8362B" stroke="#2A1B15" stroke-width="3"/>
+<path d="M78 70 L84 168 M100 70 L100 168 M122 70 L116 168" stroke="#FFF8E8" stroke-width="10" fill="none"/>
+<rect x="8" y="96" width="42" height="9" rx="3" fill="#3A1519" stroke="#2A1B15" stroke-width="3"/>
+<path d="M11 105 L47 105 L42 168 L16 168 Z" fill="#E0A526" stroke="#2A1B15" stroke-width="3"/>
+<rect x="150" y="96" width="42" height="9" rx="3" fill="#3A1519" stroke="#2A1B15" stroke-width="3"/>
+<path d="M153 105 L189 105 L184 168 L158 168 Z" fill="#E0A526" stroke="#2A1B15" stroke-width="3"/>
+</svg>

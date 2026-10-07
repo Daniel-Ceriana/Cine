@@ -80,7 +80,21 @@ export const routes: Routes = [
         { path: 'crear', canDeactivate: [confirmarSalidaGuard], loadComponent: () => import('./componentes/admin/peliculas/crear-modificar/crear-modificar').then(m => m.CrearModificar) },
       ],
     },
-    { path: 'productos', loadComponent: () => import('./componentes/admin/productos/productos').then(m => m.Productos) },
+    {
+      path: 'productos',
+      children: [
+        { path: '', loadComponent: () => import('./componentes/admin/productos/productos').then(m => m.Productos) },
+        { path: 'crear', canDeactivate: [confirmarSalidaGuard], loadComponent: () => import('./componentes/admin/productos/crear-modificar/crear-modificar').then(m => m.CrearModificarProducto) },
+        { path: 'categorias', canDeactivate: [confirmarSalidaGuard], loadComponent: () => import('./componentes/admin/productos/categorias/categorias').then(m => m.Categorias) },
+      ],
+    },
+    {
+      path: 'combos',
+      children: [
+        { path: '', loadComponent: () => import('./componentes/admin/combos/combos').then(m => m.Combos) },
+        { path: 'crear', canDeactivate: [confirmarSalidaGuard], loadComponent: () => import('./componentes/admin/combos/crear-modificar/crear-modificar').then(m => m.CrearModificarCombo) },
+      ],
+    },
     { path: 'puntos', loadComponent: () => import('./componentes/admin/puntos/puntos').then(m => m.Puntos) },
     { path: 'configuracion', loadComponent: () => import('./componentes/admin/configuracion/configuracion').then(m => m.Configuracion) },
     { path: 'cupones', canDeactivate: [confirmarSalidaGuard], loadComponent: () => import('./componentes/admin/cupones/cupones').then(m => m.Cupones) },

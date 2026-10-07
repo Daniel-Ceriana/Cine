@@ -31,6 +31,19 @@ export class TarjetaCompra {
   butacas = computed(() => this.compra().compra_butacas.map((b) => b.butaca_codigo).sort());
   restriccion = computed(() => this.compra().funciones.peliculas.restriccion_edad);
 
+  // Candy de la compra: primero los combos y después los productos sueltos, sumando lo pagado en dinero y lo
+  // canjeado con puntos. Los productos que vinieron dentro de un combo no se repiten: ya están en el combo.
+  productos = computed(() => {
+    const porNombre = new Map<string, number>();
+    for (const c of this.compra().compra_combos ?? []) {
+      porNombre.set(c.nombre, (porNombre.get(c.nombre) ?? 0) + c.cantidad);
+    }
+    for (const i of (this.compra().compra_items ?? []).filter((x) => !x.combo_nombre)) {
+      porNombre.set(i.nombre, (porNombre.get(i.nombre) ?? 0) + i.cantidad);
+    }
+    return [...porNombre].map(([nombre, cantidad]) => ({ nombre, cantidad }));
+  });
+
   // Cuándo deja de poder cancelarse (se ve en pantalla)
   limiteCancelacion = computed(
     () => new Date(new Date(this.compra().funciones.inicio).getTime() - this.horasCancelacion() * 3_600_000),
@@ -40,7 +53,7 @@ export class TarjetaCompra {
   motivoNoCancelable = computed<string | null>(() => {
     const c = this.compra();
     if (c.estado !== 'pagada') return null; // si ya está cancelada no hace falta explicar nada
-    if (c.entrada_validada_at || c.candy_entregado_at) return 'La entrada ya fue utilizada.';
+    if (c.entrada_validada_at || c.candy_entregado_at) return 'La entrada o el candy ya fueron utilizados.';
     if (this.limiteCancelacion().getTime() <= Date.now()) {
       return `Ya no se puede cancelar: solo hasta ${this.horasCancelacion()} horas antes de la función.`;
     }
@@ -70,6 +83,7 @@ export class TarjetaCompra {
           codigo,
           tipo: BUTACAS.find((b) => b.codigo === codigo)?.tipo ?? 'normal',
         })),
+        productos: this.productos(),
         comprador: c.nombre,
         total: c.total,
         restriccionEdad: this.restriccion(),

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img"><rect width="200" height="200" fill="#F3D98B"/><title>Agua mineral</title>
+<rect x="90" y="24" width="20" height="14" rx="3" fill="#56232A" stroke="#2A1B15" stroke-width="3"/>
+<path d="M92 38 L108 38 L108 52 Q140 66 140 96 L140 168 Q140 178 130 178 L70 178 Q60 178 60 168 L60 96 Q60 66 92 52 Z" fill="#FFF8E8" stroke="#2A1B15" stroke-width="3"/>
+<path d="M62 110 L138 110 L138 168 Q138 176 130 176 L70 176 Q62 176 62 168 Z" fill="#8EC5D6"/>
+<rect x="60" y="118" width="80" height="30" fill="#C8362B"/>
+</svg>

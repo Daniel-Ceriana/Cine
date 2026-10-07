@@ -12,6 +12,7 @@ import { DiaArPipe, HoraArPipe } from '../../../pipes/comunes/fechas-ar.pipes';
 import { FormatoSalaPipe } from '../../../pipes/sala/sala.pipes';
 import { IdiomaFuncionPipe } from '../../../pipes/funcion/idioma-funcion.pipe';
 import { RestriccionEdadPipe } from '../../../pipes/pelicula/restriccion-edad.pipe';
+import { ReseniasPelicula } from '../resenias-pelicula/resenias-pelicula';
 
 interface FuncionConPrecio {
   funcion: FuncionConRelaciones;
@@ -24,9 +25,9 @@ interface DiaConFunciones {
   funciones: FuncionConPrecio[];
 }
 
-// Detalle de una película: datos, sinopsis y sus próximas funciones agrupadas por día
+// Detalle de una película: datos, sinopsis, sus próximas funciones agrupadas por día y las reseñas
 @Component({
-  imports: [RouterLink, PesosPipe, DuracionPipe, DiaArPipe, HoraArPipe, FormatoSalaPipe, IdiomaFuncionPipe, RestriccionEdadPipe],
+  imports: [RouterLink, ReseniasPelicula, PesosPipe, DuracionPipe, DiaArPipe, HoraArPipe, FormatoSalaPipe, IdiomaFuncionPipe, RestriccionEdadPipe],
   selector: 'app-detalle-pelicula',
   styleUrl: './detalle-pelicula.css',
   templateUrl: './detalle-pelicula.html',

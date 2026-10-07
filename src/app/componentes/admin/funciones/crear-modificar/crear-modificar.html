@@ -100,6 +100,12 @@
         <mat-timepicker #pickerHora interval="5m" />
       </mat-form-field>
 
+      @if (peliculaElegida(); as pelicula) {
+        <p class="resumen">
+          Estreno: {{ pelicula.fecha_estreno | fechaCortaAr }}. Las funciones se pueden crear desde esa fecha.
+        </p>
+      }
+
       @if (modoVarias() && fechasGeneradas().length > 0) {
         <div class="resumen">
           <p>
@@ -128,15 +134,19 @@
       </mat-form-field>
 
       @if (peliculaElegida(); as pelicula) {
-        <p class="resumen">
-          Estreno: {{ pelicula.fecha_estreno }}.
-          @if (pelicula.dias_preventa > 0) {
-            Preventa: {{ pelicula.precio_preventa | pesos }} durante {{ pelicula.dias_preventa }} días antes del estreno
-            (se configura en la película).
-          } @else {
-            Sin preventa (se configura en la película).
-          }
-        </p>
+        @if (peliculaTienePreventa()) {
+          <label class="check">
+            <input type="checkbox" [formField]="funcionForm.con_preventa" />
+            Con preventa
+          </label>
+          <p class="resumen">
+            Una función con preventa se vende desde {{ pelicula.dias_preventa }} días antes del estreno, a
+            {{ pelicula.precio_preventa | pesos }}; desde el estreno vale el precio base. Las funciones sin preventa se
+            venden recién desde el estreno.
+          </p>
+        } @else {
+          <p class="resumen">Esta película no tiene preventa (se configura en la película).</p>
+        }
       }
     </fieldset>
 

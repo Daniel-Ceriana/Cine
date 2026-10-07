@@ -1,0 +1,18 @@
+.faltantes {
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: #FBE3DF;
+    border: 2px solid var(--error);
+    border-radius: var(--radio);
+}
+
+.faltantes__titulo {
+    font-size: var(--font-xsmall);
+    font-weight: 700;
+    color: var(--error);
+}
+
+.faltantes__lista {
+    margin: var(--spacing-8) 0 0 var(--spacing-20);
+    list-style: disc;
+    font-size: var(--font-xsmall);
+}

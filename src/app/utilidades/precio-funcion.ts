@@ -9,8 +9,9 @@ export interface VigenciaPrecio {
 
 // Precio de hoy de una función. Es la misma regla que aplica reservar_butacas en la base:
 //  - desde el estreno: precio base
-//  - antes del estreno: precio de preventa, pero solo dentro de los "días de preventa" previos
-//  - antes de eso (o sin preventa configurada): no se vende
+//  - antes del estreno: solo se venden las funciones "con preventa", al precio de preventa de la película,
+//    dentro de los "días de preventa" previos al estreno
+//  - antes de eso (o en una función sin preventa): no se vende
 // La base vuelve a calcularlo al reservar; esto sirve para mostrarlo en pantalla.
 export function precioVigente(f: FuncionConRelaciones): VigenciaPrecio {
   const hoy = hoyAr();
@@ -20,8 +21,8 @@ export function precioVigente(f: FuncionConRelaciones): VigenciaPrecio {
     return { estado: 'normal', precio: Number(f.precio_base), abreEl: null };
   }
 
-  // la preventa se configura por película
-  if (f.peliculas.dias_preventa > 0) {
+  // el precio y los días de preventa son de la película; qué funciones la tienen lo marca el admin en cada una
+  if (f.con_preventa && f.peliculas.dias_preventa > 0) {
     const abreEl = sumarDias(estreno, -f.peliculas.dias_preventa);
     return hoy >= abreEl
       ? { estado: 'preventa', precio: Number(f.peliculas.precio_preventa), abreEl }

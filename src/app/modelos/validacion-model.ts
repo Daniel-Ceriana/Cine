@@ -25,6 +25,8 @@ export interface ResultadoCodigo {
   idioma?: IdiomaFuncion;
   butacas?: { codigo: string; tipo: TipoButaca }[];
   tiene_candy?: boolean;
+  productos?: { nombre: string; cantidad: number }[]; // lo que hay que entregar en el candy (incluye los de los combos)
+  combos?: { nombre: string; cantidad: number }[];
   usado_at?: string | null;
   usado_por?: string | null;
 }

@@ -71,8 +71,8 @@
                   }
                 </div>
                 <p class="funcion__meta texto-ticket">Sala {{ f.salas.numero }} · {{ f.precio_base | pesos }}</p>
-                @if (f.peliculas.dias_preventa > 0) {
-                  <p class="funcion__meta texto-ticket">Preventa {{ f.peliculas.precio_preventa | pesos }} ({{ f.peliculas.dias_preventa }} días)</p>
+                @if (f.con_preventa) {
+                  <p class="funcion__meta texto-ticket">Con preventa: {{ f.peliculas.precio_preventa | pesos }} ({{ f.peliculas.dias_preventa }} días antes del estreno)</p>
                 }
               </div>
 

@@ -26,8 +26,20 @@ export interface CompraModel {
   pagada_at: string | null;
   entrada_validada_at: string | null; // la entrada se usa una sola vez
   tiene_candy: boolean;
+  candy_subtotal: number; // parte del subtotal que es candy (antes del cupón)
+  candy_descuento: number; // parte del descuento que le tocó al candy
   candy_entregado_at: string | null; // el candy también, por separado
   created_at: string;
+}
+
+// Un producto del candy dentro de una compra (con el nombre y el precio del momento de comprar).
+// Una parte puede pagarse en dinero (puntos_unitarios = 0) y otra con puntos (precio_unitario = 0).
+export interface CompraItemModel {
+  nombre: string;
+  cantidad: number;
+  precio_unitario: number;
+  puntos_unitarios: number;
+  combo_nombre: string | null; // si vino dentro de un combo (ya está en el precio del combo)
 }
 
 export interface CompraButacaModel {
@@ -43,7 +55,7 @@ export interface CompraButacaModel {
 
 // Butaca ocupada de una función, con los datos de la compra (para el admin)
 export interface OcupacionButaca extends CompraButacaModel {
-  compras: Pick<CompraModel, 'nombre' | 'email' | 'estado' | 'total' | 'usuario_id' | 'pagada_at' | 'created_at'>;
+  compras: Pick<CompraModel, 'nombre' | 'email' | 'estado' | 'total' | 'candy_subtotal' | 'candy_descuento' | 'usuario_id' | 'pagada_at' | 'created_at'>;
 }
 
 // Lo que se manda a reservar_butacas
@@ -57,6 +69,13 @@ export interface ReservarButacasParams {
   usar_credito?: boolean; // paga con el crédito de la cuenta todo lo que alcance
 }
 
+// Un producto del pedido: cuántas unidades en total y cuántas de ellas se pagan con puntos
+export interface ProductoPedido {
+  producto_id: string;
+  cantidad: number;
+  cantidad_con_puntos: number;
+}
+
 // Compra con los datos de la función y las butacas (para "Mis compras" y "Mi entrada")
 export interface CompraDetalle extends CompraModel {
   funciones: {
@@ -66,6 +85,8 @@ export interface CompraDetalle extends CompraModel {
     salas: { numero: number; formato: FormatoSala };
   };
   compra_butacas: { butaca_codigo: string }[];
+  compra_items: CompraItemModel[];
+  compra_combos: { nombre: string; cantidad: number }[];
 }
 
 export type ButacaEstadoVista = 'libre' | 'seleccionada' | 'reservada' | 'vendida';

@@ -12,6 +12,13 @@
   <div class="pelicula__info">
     <h3 class="pelicula__nombre">{{ pelicula().nombre }}</h3>
     <p class="pelicula__meta texto-ticket">{{ pelicula().duracion_minutos | duracion }}</p>
+    @if (puntuacion(); as p) {
+      <p class="pelicula__puntuacion" [attr.aria-label]="'Puntuación ' + (p.promedio | puntuacion) + ' de 5, ' + p.cantidad + ' reseñas'">
+        <span class="pelicula__estrella" aria-hidden="true">★</span> {{ p.promedio | puntuacion }} <span class="pelicula__cantidad">({{ p.cantidad }})</span>
+      </p>
+    } @else {
+      <p class="pelicula__puntuacion pelicula__puntuacion--vacia">Sin reseñas</p>
+    }
   </div>
 
   <div class="pelicula__acciones">

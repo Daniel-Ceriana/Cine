@@ -2,6 +2,8 @@ import { Service } from '@angular/core';
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase-service'; 
 import { PeliculaModel,PeliculaConGeneros, Genero } from '../modelos/pelicula-model';
+import { ResumenCancelacion } from '../modelos/funcion-model';
+import { subirImagen } from '../utilidades/subir-imagen';
 
 export type PeliculaModelPayload = Omit<PeliculaModel, 'id' | 'created_at'>;
 
@@ -24,6 +26,17 @@ export class PeliculaService {
     return data as PeliculaModel;
   }
 
+  // Qué funciones se cancelarían (y cómo se compensa) si el estreno se posterga a esta fecha
+  async resumenPostergarEstreno(id: string, nuevaFecha: string): Promise<ResumenCancelacion> {
+    const { data, error } = await this.supabase.client.rpc('resumen_postergar_estreno', {
+      p_pelicula_id: id,
+      p_nueva_fecha: nuevaFecha,
+    });
+
+    if (error) throw error;
+    return data as ResumenCancelacion;
+  }
+
   async getByIdConGeneros(id: string): Promise<PeliculaConGeneros> {
     const { data, error } = await this.supabase.client
       .from(this.tabla)
@@ -33,6 +46,14 @@ export class PeliculaService {
 
     if (error) throw error;
     return data as unknown as PeliculaConGeneros;
+  }
+
+  // Nombre y póster de varias películas a la vez (para "Mis películas")
+  async getResumenPorIds(ids: string[]): Promise<{ id: string; nombre: string; imagen_url: string }[]> {
+    const { data, error } = await this.supabase.client.from(this.tabla).select('id, nombre, imagen_url').in('id', ids);
+
+    if (error) throw error;
+    return data as { id: string; nombre: string; imagen_url: string }[];
   }
 
   // Las más vendidas de los últimos `dias` días (función SQL peliculas_mas_vendidas), de mayor a menor.
@@ -140,18 +161,7 @@ async getGeneroIdsDePelicula(peliculaId: string): Promise<number[]> {
   }
 
   async subirImagen(file: File): Promise<string> {
-    const extension = file.name.split('.').pop();
-    const nombreArchivo = `${crypto.randomUUID()}.${extension}`;
-    const ruta = `peliculas/${nombreArchivo}`;
-
-    const { error } = await this.supabase.client.storage
-      .from('imagenes')
-      .upload(ruta, file, { upsert: false });
-
-    if (error) throw error;
-
-    const { data } = this.supabase.client.storage.from('imagenes').getPublicUrl(ruta);
-    return data.publicUrl;
+    return subirImagen(this.supabase, 'peliculas', file);
   }
 }
 

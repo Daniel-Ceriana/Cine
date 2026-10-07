@@ -14,6 +14,7 @@ const PARAMETROS: Record<string, Parametro> = {
   recargo_vip: { nombre: 'Recargo de las butacas VIP', unidad: 'pesos', minimo: 0, entero: false },
   max_butacas_por_compra: { nombre: 'Máximo de butacas por compra', unidad: 'butacas', minimo: 1, entero: true },
   minutos_reserva: { nombre: 'Tiempo de reserva mientras se paga', unidad: 'minutos', minimo: 1, entero: true },
+  max_unidades_candy: { nombre: 'Máximo de unidades de cada producto del candy', unidad: 'unidades por compra', minimo: 1, entero: true },
   horas_cancelacion: { nombre: 'Cancelación de compras hasta', unidad: 'horas antes de la función', minimo: 0, entero: true },
 };
 

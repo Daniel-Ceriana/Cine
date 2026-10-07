@@ -39,10 +39,16 @@ export class ButacasFuncion implements OnInit, OnDestroy {
   vendidas = computed(() => this.ocupacion().filter((o) => o.estado === 'vendida'));
   enProceso = computed(() => this.ocupacion().filter((o) => o.estado === 'reservada').length);
   libres = computed(() => TOTAL_BUTACAS - this.ocupacion().length);
-  // Lo que se cobró en dinero: el total de cada compra pagada, contada una sola vez
-  // (una compra tiene varias butacas, y su total ya incluye el cupón y los puntos canjeados)
+  // Lo que se cobró por las entradas de esta función (sin el candy): el total de cada compra pagada, contada
+  // una sola vez (una compra tiene varias butacas, y su total ya incluye el cupón y los puntos canjeados).
+  // Al total se le resta la parte del candy ya con su descuento.
   recaudacion = computed(() => {
-    const totales = new Map(this.vendidas().map((o) => [o.compra_id, Number(o.compras.total)]));
+    const totales = new Map(
+      this.vendidas().map((o) => {
+        const candy = Number(o.compras.candy_subtotal) - Number(o.compras.candy_descuento);
+        return [o.compra_id, Number(o.compras.total) - candy];
+      }),
+    );
     return [...totales.values()].reduce((suma, total) => suma + total, 0);
   });
 

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img"><rect width="200" height="200" fill="#F3D98B"/><title>Caramelos</title>
+<g stroke="#2A1B15" stroke-width="3">
+<path d="M34 70 L52 80 L52 60 Z" fill="#C8362B"/><circle cx="76" cy="70" r="22" fill="#C8362B"/><path d="M118 70 L100 60 L100 80 Z" fill="#C8362B"/>
+<path d="M62 150 L80 160 L80 140 Z" fill="#3A1519"/><circle cx="104" cy="150" r="22" fill="#E0A526"/><path d="M146 150 L128 140 L128 160 Z" fill="#E0A526"/>
+<path d="M120 100 L132 108 L132 92 Z" fill="#FFF8E8"/><circle cx="152" cy="100" r="16" fill="#FFF8E8"/>
+</g>
+</svg>

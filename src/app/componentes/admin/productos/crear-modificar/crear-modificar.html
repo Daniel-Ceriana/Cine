@@ -1,0 +1,105 @@
+<h1 class="titulo-pagina">{{ esEdicion() ? 'Modificar producto' : 'Crear producto' }}</h1>
+
+<div class="contenedor-form">
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  <form (submit)="onSubmit($event)" novalidate>
+
+    <div class="item">
+      <section>
+        <label for="nombre">Nombre</label>
+        <input id="nombre" type="text" [formField]="productoForm.nombre" placeholder="Ej.: Pochoclos medianos" />
+      </section>
+    </div>
+
+    <div class="item">
+      <section>
+        <label for="descripcion">Descripción <small>(opcional)</small></label>
+        <textarea id="descripcion" rows="3" [formField]="productoForm.descripcion"></textarea>
+      </section>
+    </div>
+
+    <div class="item">
+      <section>
+        <label for="categoria">Categoría</label>
+        <select id="categoria" [formField]="productoForm.categoria_id">
+          <option value="">Elegí una categoría</option>
+          @for (c of categorias(); track c.id) {
+            <option [value]="c.id">{{ c.nombre }}{{ c.activa ? '' : ' (inactiva)' }}</option>
+          }
+        </select>
+      </section>
+      @if (!cargando() && categorias().length === 0) {
+        <small class="ayuda">
+          Todavía no hay categorías. <a routerLink="/admin/productos/categorias">Creá la primera</a>.
+        </small>
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label for="precio">Precio ($)</label>
+        <input id="precio" type="text" inputmode="decimal" [formField]="productoForm.precio" placeholder="4500" />
+      </section>
+    </div>
+
+    <div class="item">
+      <section>
+        <label for="puntos">Costo en puntos <small>(opcional)</small></label>
+        <input id="puntos" type="text" inputmode="numeric" [formField]="productoForm.costo_puntos" placeholder="Ej.: 600" />
+      </section>
+      <small class="ayuda">Cuántos puntos cuesta canjear una unidad. Vacío: el producto solo se paga con dinero.</small>
+    </div>
+
+    <div class="item">
+      <section>
+        <label for="orden">Orden</label>
+        <input id="orden" type="text" inputmode="numeric" [formField]="productoForm.orden" />
+      </section>
+      <small class="ayuda">Dentro de su categoría se muestra primero el número más bajo.</small>
+    </div>
+
+    <div class="item">
+      <section>
+        <label for="imagen">Imagen <small>(obligatoria)</small></label>
+        <input id="imagen" type="file" accept="image/*" (change)="onFileSelected($event)" />
+      </section>
+      @if (previewUrl()) {
+        <img class="preview-imagen" [src]="previewUrl()" alt="Vista previa de la imagen del producto" />
+      }
+    </div>
+
+    <div class="item">
+      <section>
+        <label>
+          <input type="checkbox" [formField]="productoForm.activo" />
+          Activo
+        </label>
+      </section>
+      <small class="ayuda">Un producto inactivo (o de una categoría inactiva) no se muestra al cliente.</small>
+    </div>
+
+    @if (intentoEnvio() && faltantes().length > 0) {
+      <div class="faltantes" role="alert">
+        <p class="faltantes__titulo">Falta completar:</p>
+        <ul class="faltantes__lista">
+          @for (m of faltantes(); track m) {
+            <li>{{ m }}</li>
+          }
+        </ul>
+      </div>
+    }
+
+    @if (errorMsg()) {
+      <p class="error" role="alert">{{ errorMsg() }}</p>
+    }
+
+    <div class="item">
+      <button type="submit" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando...' : (esEdicion() ? 'Modificar' : 'Crear') }}
+      </button>
+    </div>
+  </form>
+</div>

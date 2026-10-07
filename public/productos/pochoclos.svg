@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img"><rect width="200" height="200" fill="#F3D98B"/><title>Pochoclos</title>
+<g fill="#FFF8E8" stroke="#2A1B15" stroke-width="3"><circle cx="70" cy="68" r="18"/><circle cx="100" cy="55" r="20"/><circle cx="132" cy="68" r="18"/><circle cx="85" cy="88" r="16"/><circle cx="116" cy="88" r="16"/></g>
+<path d="M50 90 L150 90 L136 178 L64 178 Z" fill="#C8362B" stroke="#2A1B15" stroke-width="3"/>
+<path d="M76 90 L82 178 M100 90 L100 178 M124 90 L118 178" stroke="#FFF8E8" stroke-width="10" fill="none"/>
+</svg>

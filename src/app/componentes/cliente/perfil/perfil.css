@@ -232,3 +232,75 @@
     font-size: var(--font-xsmall);
     font-weight: 600;
 }
+
+/* ---- Mis películas ---- */
+.peliculas {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+}
+
+.peliculas__intro {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+}
+
+.filtro {
+    min-height: 44px;
+    cursor: pointer;
+}
+
+.filtro--activo {
+    background-color: var(--bordo);
+    color: var(--crema-superficie);
+}
+
+.vista {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: var(--spacing-16);
+    padding: var(--spacing-16);
+}
+
+.vista::before,
+.vista::after {
+    display: none;
+}
+
+.vista__poster {
+    width: 100%;
+    border-radius: var(--radio);
+    border: 2px solid var(--crema-borde);
+}
+
+.vista__info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-8);
+}
+
+.vista__titulo {
+    font-size: var(--font-medium);
+}
+
+.vista__meta {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.vista__comentario {
+    overflow-wrap: anywhere;
+}
+
+.vista__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+}

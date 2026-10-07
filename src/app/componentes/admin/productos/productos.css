@@ -1,0 +1,113 @@
+.barra {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-12);
+    margin-bottom: var(--spacing-20);
+}
+
+.barra__buscar {
+    flex: 1;
+    min-width: 220px;
+}
+
+.categoria {
+    margin-bottom: var(--spacing-24);
+}
+
+.categoria__titulo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
+    margin-bottom: var(--spacing-12);
+    font-size: var(--font-medium);
+}
+
+.categoria__vacia {
+    color: var(--tinta-suave);
+    font-size: var(--font-xsmall);
+}
+
+.categoria__lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--spacing-20);
+}
+
+.producto {
+    display: flex;
+    flex-direction: column;
+}
+
+/* las muescas van sobre la línea de corte (ver .producto__acciones), no al medio */
+.producto::before,
+.producto::after {
+    display: none;
+}
+
+.producto--inactivo {
+    opacity: .65;
+}
+
+.producto__imagen {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: var(--radio) var(--radio) 0 0;
+}
+
+.producto__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--spacing-16) var(--spacing-20);
+}
+
+.producto__nombre {
+    font-size: var(--font-medium);
+}
+
+.producto__descripcion {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.producto__precio {
+    color: var(--rojo);
+}
+
+.producto__chips {
+    display: flex;
+    gap: var(--spacing-8);
+    margin-top: var(--spacing-8);
+}
+
+/* línea de corte del ticket entre los datos y las acciones */
+.producto__acciones {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-8);
+    padding: var(--spacing-16) var(--spacing-20);
+    border-top: 2px dashed var(--crema-borde);
+}
+
+.producto__acciones::before,
+.producto__acciones::after {
+    content: '';
+    position: absolute;
+    top: -11px;
+    width: 18px;
+    height: 18px;
+    background-color: var(--crema-fondo);
+    border: 2px solid var(--crema-borde);
+    border-radius: 50%;
+}
+
+.producto__acciones::before {
+    left: -11px;
+}
+
+.producto__acciones::after {
+    right: -11px;
+}

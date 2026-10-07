@@ -1,10 +1,11 @@
 import { Service, inject } from '@angular/core';
 import { SupabaseService } from './supabase-service';
-import { CompraDetalle, CompraModel, ReservarButacasParams } from '../modelos/compra-model';
+import { CompraDetalle, CompraModel, ProductoPedido, ReservarButacasParams } from '../modelos/compra-model';
+import { ComboPedido } from '../modelos/combo-model';
 
 // Datos de la función y las butacas que se piden junto con la compra
 const SELECT_DETALLE =
-  '*, funciones(inicio, idioma, peliculas(nombre, imagen_url, restriccion_edad), salas(numero, formato)), compra_butacas(butaca_codigo)';
+  '*, funciones(inicio, idioma, peliculas(nombre, imagen_url, restriccion_edad), salas(numero, formato)), compra_butacas(butaca_codigo), compra_items(nombre, cantidad, precio_unitario, puntos_unitarios, combo_nombre), compra_combos(nombre, cantidad)';
 
 @Service()
 export class CompraService {
@@ -21,6 +22,25 @@ export class CompraService {
       p_mayor_declarado: params.mayor_declarado ?? false,
       p_butacas_con_puntos: params.butacas_con_puntos ?? [],
       p_usar_credito: params.usar_credito ?? false,
+    });
+
+    if (error) throw error;
+    return data as CompraModel;
+  }
+
+  // Deja en la reserva los productos y combos pedidos (listas vacías = sin candy) y recalcula los totales.
+  // La reserva sigue con el mismo vencimiento: se puede cambiar el candy cuantas veces haga falta (función SQL definir_candy_compra).
+  async definirCandy(
+    compraId: string,
+    productos: ProductoPedido[],
+    combos: ComboPedido[],
+    usarCredito: boolean,
+  ): Promise<CompraModel> {
+    const { data, error } = await this.supabase.client.rpc('definir_candy_compra', {
+      p_compra_id: compraId,
+      p_productos: productos,
+      p_combos: combos,
+      p_usar_credito: usarCredito,
     });
 
     if (error) throw error;

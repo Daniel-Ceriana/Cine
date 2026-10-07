@@ -12,6 +12,7 @@ export interface DatosEntrada {
   formato: FormatoSala;
   idioma: IdiomaFuncion;
   butacas: { codigo: string; tipo: TipoButaca }[];
+  productos?: { nombre: string; cantidad: number }[]; // candy de la compra (se retira con el mismo código)
   comprador: string;
   total: number;
   restriccionEdad: number;
@@ -43,7 +44,10 @@ export async function descargarEntradaPdf(datos: DatosEntrada): Promise<void> {
   const x = 15;
   const y = 20;
   const ancho = 180;
-  const alto = 125;
+  // '2 × Gaseosa, 1 × Alfajor': si hay candy, el ticket crece para que entre
+  const textoProductos = (datos.productos ?? []).map((p) => `${p.cantidad} × ${p.nombre}`).join(', ');
+  const lineasProductos = textoProductos ? Math.ceil(textoProductos.length / 40) : 0;
+  const alto = 125 + (lineasProductos > 0 ? 9.5 + lineasProductos * 5 : 0);
   const cortex = x + 128; // línea de corte entre los datos y el talón del QR
 
   doc.setFillColor(...CREMA);
@@ -100,6 +104,7 @@ export async function descargarEntradaPdf(datos: DatosEntrada): Promise<void> {
       .map((b) => (b.tipo === 'normal' ? b.codigo : `${b.codigo} (${ETIQUETA_TIPO_BUTACA[b.tipo]})`))
       .join(', '),
   );
+  if (textoProductos) linea('Candy', textoProductos);
   linea('A nombre de', datos.comprador);
   linea('Total pagado', `$ ${Number(datos.total).toLocaleString('es-AR', { maximumFractionDigits: 2 })}`);
 

@@ -1,1 +1,92 @@
-<p>candy works!</p>
+<section class="candy">
+  <h2 class="candy__titulo">¿Querés sumar algo del candy?</h2>
+  <p class="candy__ayuda">
+    Es opcional. Lo retirás en el candy con el mismo código de tu entrada (hasta {{ maxUnidades() }} unidades de cada producto).
+  </p>
+
+  @if (combos().length > 0) {
+    <h3 class="candy__categoria">Combos</h3>
+
+    <div class="candy__lista">
+      @for (c of combos(); track c.id) {
+        <article class="producto ticket" [class.producto--elegido]="cantidadCombo(c) > 0">
+          <img class="producto__imagen" [src]="c.imagen_url" [alt]="c.nombre" />
+
+          <div class="producto__info">
+            @if (c.destacado) {
+              <span class="chip chip--preventa producto__chip">Destacado</span>
+            }
+            <h4 class="producto__nombre">{{ c.nombre }}</h4>
+            @if (c.descripcion) {
+              <p class="producto__descripcion">{{ c.descripcion }}</p>
+            }
+            <p class="producto__descripcion">
+              Incluye {{ c.cantidad_entradas }} {{ c.cantidad_entradas === 1 ? 'entrada' : 'entradas' }}
+              @for (i of c.combo_items; track i.producto_id) {
+                + {{ i.cantidad }} × {{ i.productos.nombre }}
+              }
+            </p>
+            <p class="producto__precio texto-ticket">{{ c.precio | pesos }}</p>
+            @if (ahorro(c) > 0) {
+              <p class="producto__ahorro">Ahorrás {{ ahorro(c) | pesos }}</p>
+            }
+          </div>
+
+          <div class="producto__control">
+            <div class="cantidad" role="group" [attr.aria-label]="'Cantidad de ' + c.nombre">
+              <button type="button" class="cantidad__boton" (click)="restarCombo(c)" [disabled]="cantidadCombo(c) === 0" [attr.aria-label]="'Quitar un ' + c.nombre">−</button>
+              <span class="cantidad__valor texto-ticket" aria-live="polite">{{ cantidadCombo(c) }}</span>
+              <button type="button" class="cantidad__boton" (click)="sumarCombo(c)" [disabled]="!puedeSumarCombo(c)" [attr.aria-label]="'Sumar un ' + c.nombre">+</button>
+            </div>
+            @if (!puedeSumarCombo(c) && butacasLibres() < c.cantidad_entradas) {
+              <p class="canje__aviso">Necesitás {{ c.cantidad_entradas }} {{ c.cantidad_entradas === 1 ? 'butaca libre' : 'butacas libres' }} para sumarlo.</p>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  @if (catalogo().length > 0 && combos().length > 0) {
+    <h2 class="candy__titulo candy__titulo--secundario">Productos sueltos</h2>
+  }
+
+  @for (cat of catalogo(); track cat.id) {
+    <h3 class="candy__categoria">{{ cat.nombre }}</h3>
+
+    <div class="candy__lista">
+      @for (p of cat.productos; track p.id) {
+        <article class="producto ticket" [class.producto--elegido]="cantidadDe(p) > 0">
+          <img class="producto__imagen" [src]="p.imagen_url" [alt]="p.nombre" />
+
+          <div class="producto__info">
+            <h4 class="producto__nombre">{{ p.nombre }}</h4>
+            @if (p.descripcion) {
+              <p class="producto__descripcion">{{ p.descripcion }}</p>
+            }
+            <p class="producto__precio texto-ticket">{{ p.precio | pesos }}</p>
+          </div>
+
+          <div class="producto__control">
+            <div class="cantidad" role="group" [attr.aria-label]="'Cantidad de ' + p.nombre">
+              <button type="button" class="cantidad__boton" (click)="restar(p)" [disabled]="cantidadDe(p) === 0" [attr.aria-label]="'Quitar una unidad de ' + p.nombre">−</button>
+              <span class="cantidad__valor texto-ticket" aria-live="polite">{{ cantidadDe(p) }}</span>
+              <button type="button" class="cantidad__boton" (click)="sumar(p)" [disabled]="cantidadDe(p) >= maxUnidades()" [attr.aria-label]="'Sumar una unidad de ' + p.nombre">+</button>
+            </div>
+
+            @if (sePuedeCanjear(p) && cantidadDe(p) > 0) {
+              <div class="canje" role="group" [attr.aria-label]="'Unidades de ' + p.nombre + ' que se pagan con puntos'">
+                <span class="canje__texto">Pagar con {{ p.costo_puntos }} pts c/u</span>
+                <button type="button" class="cantidad__boton" (click)="restarPuntos(p)" [disabled]="conPuntosDe(p) === 0" [attr.aria-label]="'Pagar una unidad menos con puntos'">−</button>
+                <span class="cantidad__valor texto-ticket" aria-live="polite">{{ conPuntosDe(p) }}</span>
+                <button type="button" class="cantidad__boton" (click)="sumarPuntos(p)" [disabled]="!puedeSumarPuntos(p)" [attr.aria-label]="'Pagar una unidad más con puntos'">+</button>
+              </div>
+            } @else if (sePuedeCanjear(p)) {
+              <p class="canje__aviso">Se puede canjear por {{ p.costo_puntos }} pts</p>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

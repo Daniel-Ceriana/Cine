@@ -13,6 +13,7 @@ import {
 import { SupabaseService } from '../../../../services/supabase-service';
 import { PeliculaModel, PeliculaModelForm, Genero } from '../../../../modelos/pelicula-model';
 import{PeliculaService} from '../../../../services/peliculas-service'
+import { textoResumenCancelacion } from '../../../../utilidades/resumen-cancelacion';
 import { ConfirmarSalida, confirmarDescartar } from '../../../../guards/salida-guard';
 import { SelectorFecha } from '../../../compartido/selector-fecha/selector-fecha';
 
@@ -32,6 +33,7 @@ export class CrearModificar implements OnInit, ConfirmarSalida {
   cargando = signal(false);
 
   peliculaId = signal<string | null>(null);
+  private estrenoOriginal = '';
   esEdicion = computed(() => this.peliculaId() !== null);
 
   archivoSeleccionado = signal<File | null>(null);
@@ -134,6 +136,7 @@ export class CrearModificar implements OnInit, ConfirmarSalida {
       activa: pelicula.activa,
       destacada: pelicula.destacada,
     });
+    this.estrenoOriginal = pelicula.fecha_estreno;
     this.generosSeleccionados.set(generoIds);
     this.previewUrl.set(pelicula.imagen_url ?? null);
   } catch (e: any) {
@@ -157,6 +160,22 @@ export class CrearModificar implements OnInit, ConfirmarSalida {
     this.previewUrl.set(URL.createObjectURL(file));
   }
 
+  // Si el estreno se pasa a una fecha posterior, la base cancela (con compensación) las funciones que queden
+  // antes de esa fecha. Antes de guardar se le muestra al admin cuántas son y a quién afecta.
+  private async confirmarPostergacion(): Promise<boolean> {
+    const id = this.peliculaId();
+    const nueva = this.model().fecha_estreno;
+    if (!id || !this.estrenoOriginal || nueva <= this.estrenoOriginal) return true;
+
+    const resumen = await this.peliculasService.resumenPostergarEstreno(id, nueva);
+    if (!resumen.funciones) return true;
+
+    return confirm(
+      `Al postergar el estreno se cancelan ${resumen.funciones} función(es) anteriores a la nueva fecha.\n\n` +
+        `${textoResumenCancelacion(resumen)}\n\n¿Querés continuar?`,
+    );
+  }
+
   async onSubmit(event: Event) {
     event.preventDefault();
     this.errorMsg.set('');
@@ -164,6 +183,9 @@ export class CrearModificar implements OnInit, ConfirmarSalida {
     await submit(this.peliculaForm, async () => {
       try {
         this.cargando.set(true);
+
+        // Postergar el estreno cancela las funciones que queden antes de la nueva fecha: se confirma con los números
+        if (!(await this.confirmarPostergacion())) return;
 
         let imagenUrl = this.model().imagen_url;
         const archivo = this.archivoSeleccionado();

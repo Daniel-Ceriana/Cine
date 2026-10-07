@@ -90,6 +90,7 @@ export class FuncionService {
       p_formato: params.formato,
       p_idioma: params.idioma,
       p_precio_base: params.precio_base,
+      p_con_preventa: params.con_preventa,
     });
 
     if (error) throw error;
@@ -107,6 +108,7 @@ export class FuncionService {
       p_formato: params.formato,
       p_idioma: params.idioma,
       p_precio_base: params.precio_base,
+      p_con_preventa: params.con_preventa,
     });
 
     if (error) throw error;

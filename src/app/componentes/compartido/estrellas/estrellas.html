@@ -1,0 +1,21 @@
+@if (editable()) {
+  <div class="estrellas estrellas--editable" role="radiogroup" aria-label="Tu puntuación">
+    @for (n of numeros; track n) {
+      <button
+        type="button"
+        role="radio"
+        class="estrellas__boton"
+        [class.estrellas__boton--llena]="n <= valor()"
+        [attr.aria-checked]="n === valor()"
+        [attr.aria-label]="n + (n === 1 ? ' estrella' : ' estrellas')"
+        (click)="elegir(n)">
+        ★
+      </button>
+    }
+  </div>
+} @else {
+  <span class="estrellas" role="img" [attr.aria-label]="'Puntuación ' + (valor() | puntuacion) + ' de 5'">
+    <span class="estrellas__fondo" aria-hidden="true">★★★★★</span>
+    <span class="estrellas__llenas" aria-hidden="true" [style.width]="relleno()">★★★★★</span>
+  </span>
+}

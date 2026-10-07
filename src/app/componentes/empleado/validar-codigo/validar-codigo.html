@@ -59,6 +59,22 @@
               {{ b.codigo }}@if (b.tipo !== 'normal') { ({{ b.tipo | tipoButaca }}) }@if (!ultima) {, }
             }
           </dd>
+          @if (seccion === 'candy' && r.combos?.length) {
+            <dt>Combos</dt>
+            <dd class="texto-ticket">
+              @for (c of r.combos; track c.nombre; let ultimo = $last) {
+                {{ c.cantidad }} × {{ c.nombre }}@if (!ultimo) {, }
+              }
+            </dd>
+          }
+          @if (seccion === 'candy' && r.productos?.length) {
+            <dt>Entregar</dt>
+            <dd class="texto-ticket">
+              @for (p of r.productos; track p.nombre; let ultimo = $last) {
+                {{ p.cantidad }} × {{ p.nombre }}@if (!ultimo) {, }
+              }
+            </dd>
+          }
           <dt>A nombre de</dt>
           <dd>{{ r.comprador }}</dd>
         </dl>

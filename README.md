@@ -55,9 +55,9 @@ tablas usa ese número.
 | RF-06 | Las películas pueden tener restricción de edad: sin restricción, +13 o +18. | 6 | Hecho |
 | RF-07 | Sección "Próximamente" con las películas que se estrenan en las próximas semanas. | 9 | Pendiente |
 | RF-08 | El usuario puede activar una alerta para que le avisen cuando abra la venta de una película próxima. | 9 | Pendiente |
-| RF-09 | Reseñas: calificación con estrellas y comentario corto, visibles **antes** de comprar. | 2 | Pendiente |
-| RF-10 | Se muestra la puntuación promedio de cada película. | 2 | Pendiente |
-| RF-11 | Sección "Mis películas": historial visual de lo que vio el usuario (póster, fecha, su calificación). | 9 | Pendiente |
+| RF-09 | Reseñas: calificación con estrellas y comentario corto, visibles **antes** de comprar. | 2 | Hecho |
+| RF-10 | Se muestra la puntuación promedio de cada película. | 2 | Hecho |
+| RF-11 | Sección "Mis películas": historial visual de lo que vio el usuario (póster, fecha, su calificación). | 9 | Hecho |
 | RF-12 | Detalle de película con sus próximas funciones, agrupadas por día, con precio y acceso a la compra. | 1 | Hecho |
 
 ### 3.2 Salas y funciones
@@ -71,9 +71,11 @@ tablas usa ese número.
 | RF-24 | La asignación de sala es **automática** y bajo ningún término dos funciones coinciden en la misma sala al mismo tiempo. | 5 | Hecho |
 | RF-25 | El admin puede programar una película para varios días de la semana a la misma hora (ej.: lunes, martes y viernes a las 18 h). | 5 | Hecho |
 | RF-26 | Preventa: abrir la venta antes del estreno con un **precio especial**, que vuelve al normal al pasar la fecha. Configurable película por película. | 9 | Hecho |
+| RF-27 | Una función no puede empezar antes de la **fecha de estreno** de su película. | acordado | Hecho |
 
-> RF-26: el precio y los días de preventa se configuran **una sola vez por película** (formulario de película) y valen
-> para todas sus funciones. La regla se aplica al vender (`reservar_butacas`).
+> RF-26: el precio y los días de preventa se configuran **una sola vez por película** (formulario de película). Después,
+> el admin marca **qué funciones tienen preventa** (casilla "Con preventa"): solo esas se venden antes del estreno. La
+> regla se aplica al vender (`reservar_butacas`).
 
 ### 3.3 Butacas y compra de entradas
 
@@ -102,10 +104,11 @@ tablas usa ese número.
 | RF-43 | El admin puede cambiar el porcentaje del cupón de primera compra cuando quiera. | 4 | Hecho |
 | RF-44 | El admin puede crear cupones que solo apliquen a usuarios de **más de 50 años**. | 4 | Hecho |
 | RF-45 | Puntos de fidelización: 1 punto por cada peso gastado (solo usuarios registrados). | 8 | Hecho |
-| RF-46 | Canje de puntos por entradas gratis o productos del candy. El admin configura cuántos puntos cuesta cada recompensa. | 8 | Parcial |
+| RF-46 | Canje de puntos por entradas gratis o productos del candy. El admin configura cuántos puntos cuesta cada recompensa. | 8 | Hecho |
 | RF-47 | El perfil muestra los puntos acumulados, el historial de canjes y el crédito. Los puntos no se transfieren. | 8, 10 | Hecho |
 
-> RF-46: se pueden canjear **entradas**; los productos del candy se suman cuando exista el candy (RF-50 a 52).
+> RF-46: se canjean **entradas** (costo único, en Puntos) y **productos** (cada producto tiene su propio costo en
+> puntos, que el admin edita en el formulario del producto).
 > RF-47: puntos, historial de canjes, **crédito con su historial** y notificaciones. El crédito se acredita al
 > cancelar una compra (RF-39).
 
@@ -120,9 +123,9 @@ tablas usa ese número.
 
 | ID | Requerimiento | Origen | Estado |
 |----|---------------|--------|--------|
-| RF-50 | El admin crea productos (pochoclos, bebidas, etc.) y los ordena en categorías. | 4 | Pendiente |
-| RF-51 | Los productos se compran **junto con la entrada** y se retiran con el mismo QR. | 4 | Pendiente |
-| RF-52 | Combos (entrada + pochoclos + bebida) a precio fijo, configurables por el admin y destacados en la compra. | 8 | Pendiente |
+| RF-50 | El admin crea productos (pochoclos, bebidas, etc.) y los ordena en categorías. | 4 | Hecho |
+| RF-51 | Los productos se compran **junto con la entrada** y se retiran con el mismo QR. | 4 | Hecho |
+| RF-52 | Combos (entrada + pochoclos + bebida) a precio fijo, configurables por el admin y destacados en la compra. | 8 | Hecho |
 
 ### 3.6 Validación en el cine
 
@@ -130,17 +133,16 @@ tablas usa ese número.
 |----|---------------|--------|--------|
 | RF-60 | Los empleados validan entradas y candy con el código de la compra (cine y candy). | 5 | Hecho |
 | RF-61 | Se puede ingresar el código a mano (no hay lector de QR real: solo se genera el QR). | 5 | Hecho |
-| RF-62 | Una vez validada la entrada o entregada la comida, el QR **deja de funcionar** (la entrada y el candy se validan por separado). | 5 | Parcial |
+| RF-62 | Una vez validada la entrada o entregada la comida, el QR **deja de funcionar** (la entrada y el candy se validan por separado). | 5 | Hecho |
 
-> RF-62: la entrada ya funciona con un solo uso. El candy también, pero recién se podrá probar de punta a punta
-> cuando la compra incluya productos (RF-51).
+> RF-62: la entrada y el candy se usan una sola vez cada uno. Con productos en la compra ya se prueba de punta a punta.
 
 ### 3.7 Administración, reportes y auditoría
 
 | ID | Requerimiento | Origen | Estado |
 |----|---------------|--------|--------|
 | RF-70 | Usuario admin que controla salas, funciones, distribución de butacas, productos, etc. | 5 | Parcial |
-| RF-77 | Pantalla de configuración del admin: recargo VIP, máximo de butacas por compra, minutos de reserva y horas de cancelación. | acordado | Hecho |
+| RF-77 | Pantalla de configuración del admin: recargo VIP, máximo de butacas por compra, minutos de reserva, horas de cancelación y máximo de unidades de cada producto del candy. | acordado | Hecho |
 | RF-78 | "Mi entrada": quien compró sin cuenta recupera su entrada (QR y PDF) con código + email. Con cuenta, "Mi perfil → Mis compras". | acordado | Hecho |
 | RF-71 | Gestión de empleados (usuarios que validan QR). | 5 | Hecho |
 | RF-72 | Reporte de facturación por día y de cantidad de entradas vendidas. | 7 | Pendiente |
@@ -150,7 +152,7 @@ tablas usa ese número.
 | RF-76 | Mapa del cine que indique la sala de la entrada comprada. | 4 | Fuera de alcance (el cliente aún no dio "luz verde") |
 
 > RF-70: el admin ya gestiona películas, salas y funciones. La distribución de butacas es la misma en todas las
-> salas y se modifica desde el código (decisión acordada). Ya están cupones y empleados; falta productos.
+> salas y se modifica desde el código (decisión acordada). Ya están cupones, empleados y productos con sus categorías.
 
 ---
 
@@ -199,12 +201,17 @@ Filas R–T   1  2  3  4  |  6 … 25                        | 27 28 29 30   VIP
 5. La sala se asigna sola: se elige una sala libre del formato pedido. Si en algún día no hay ninguna, no se crea
    ninguna función y se avisa qué días fallaron.
 6. Al modificar, se elige entre cambiar **solo esa función** o **esa y las siguientes de su serie** (las creadas juntas).
+7. Una función **no puede ser anterior al estreno** de su película (lo valida la base al crear, mover o modificar; el
+   calendario de Angular solo muestra días válidos). Si se posterga el estreno, las funciones que queden antes de la
+   nueva fecha se cancelan con compensación a los compradores, previa confirmación del admin con el resumen.
 
 **Precios**
-7. La preventa se configura **por película** (`precio_preventa` y `dias_preventa`) y rige desde
-   `fecha de estreno − días de preventa` hasta el estreno. Antes de eso no se vende; desde el estreno, precio normal.
-8. Las butacas VIP suman un **recargo global** configurable por el admin. Las accesibles cuestan lo mismo que las comunes.
-9. El precio se guarda tal como se cobró en cada entrada: cambios posteriores no alteran compras anteriores.
+8. La preventa: la película define `dias_preventa` y `precio_preventa` (precio especial que **reemplaza** al base) y el
+   admin marca las funciones con preventa (`funciones.con_preventa`). Una función con preventa se vende desde
+   `estreno − días de preventa`, al precio de preventa, hasta el estreno; desde el estreno, precio base. **Antes del
+   estreno solo se venden las funciones con preventa**; las demás, desde el estreno.
+9. Las butacas VIP suman un **recargo global** configurable por el admin. Las accesibles cuestan lo mismo que las comunes.
+10. El precio se guarda tal como se cobró en cada entrada: cambios posteriores no alteran compras anteriores.
 
 **Compra**
 10. Máximo **8 butacas** por compra.
@@ -345,7 +352,7 @@ src/app/
 | `/entradas`, `/candy` | Empleados (y admin) | Validar entradas y entregar candy ingresando el código |
 | `/login`, `/register` | Sin sesión | Acceso y registro |
 | `/no-autorizado` | Cualquiera | Aviso de "sin permiso" (sesión iniciada con un rol que no alcanza) |
-| `/admin/...` | Solo admin | Películas, salas, funciones (con butacas por función), empleados, cupones, puntos y configuración |
+| `/admin/...` | Solo admin | Películas, salas, funciones (con butacas por función), empleados, cupones, puntos, configuración y productos con sus categorías |
 
 ### 3.4 Fechas y horas
 
@@ -516,7 +523,13 @@ Los scripts están en `supabase/` y se ejecutan **en orden** desde el editor SQL
 | `005_codigos_validacion.sql` | Código corto de la compra, validación de entrada y candy (un uso por sección) |
 | `006_cupones_puntos_notificaciones.sql` | Cupones, puntos, canje, notificaciones; reemplaza `reservar_butacas` y `confirmar_pago` |
 | `007_mis_compras_credito.sql` | Crédito (historial y uso al pagar), `cancelar_compra`, `buscar_entrada`, `peliculas_mas_vendidas`; reemplaza `reservar_butacas` y `confirmar_pago` |
+| `009_funciones_desde_estreno.sql` | `funciones.con_preventa`, funciones solo desde el estreno, cancelación de funciones al postergar el estreno; reemplaza `colocar_funcion`, `crear_funciones`, `modificar_funciones` y `reservar_butacas` |
 | `008_funcion_cancelada_preventa.sql` | Preventa por película, `compensar_compra`, `cancelar_funcion`, `resumen_cancelacion`, regla de funciones vendidas; reemplaza `colocar_funcion`, `crear_funciones`, `modificar_funciones`, `reservar_butacas` y `cancelar_compra` |
+| `010_productos_categorias.sql` | Catálogo del candy: `categorias_producto` y `productos` (imagen obligatoria), con 3 categorías y 8 productos de ejemplo |
+| `011_candy_en_la_compra.sql` | `compra_items`, `productos.costo_puntos`, `compras.candy_subtotal/candy_descuento`, configuración `max_unidades_candy`; reemplaza `confirmar_pago` y `evaluar_codigo` (y le sumó productos a `reservar_butacas`, que la 012 deja sin ellos) |
+| `012_candy_sobre_la_reserva.sql` | La reserva empieza al elegir las butacas y el candy se agrega después: `definir_candy_compra`, `validar_candy`, `guardar_candy`; `reservar_butacas` vuelve a recibir solo butacas |
+| `013_combos.sql` | `combos`, `combo_items`, `compra_combos`, `guardar_combo`, `validar_combos` (reemplaza las tablas de combos viejas, si había); reemplaza `reservar_butacas` (guarda `compras.precio_entrada`), `guardar_candy`, `definir_candy_compra` y `evaluar_codigo`; 3 combos de ejemplo |
+| `014_resenias.sql` | `resenias` (reemplaza una tabla vieja, si había), vista `peliculas_puntuacion`, `puede_resenar`, `guardar_resenia`, `eliminar_resenia`, `mis_peliculas` |
 
 ---
 
@@ -541,25 +554,31 @@ configuracion (recargo VIP, máximo de butacas, minutos de reserva)
 | `peliculas` | Nombre, sinopsis, imagen, duración, estreno, restricción de edad y **preventa** (`precio_preventa`, `dias_preventa`) |
 | `generos`, `pelicula_generos` | Relación muchos a muchos entre películas y géneros |
 | `salas` | Número, nombre, **formato** (2D–5D) y si está activa |
-| `funciones` | Película + sala + inicio + idioma + precio base + serie. Guarda también `fin_bloqueo` |
+| `funciones` | Película + sala + inicio + idioma + precio base + `con_preventa` + serie. Guarda también `fin_bloqueo` |
 | `butacas` | 518 filas fijas con código, fila, bloque, número y tipo (normal/accesible/vip) |
 | `compras` | Una por función: comprador, estado, vencimiento de la reserva, subtotal, descuento, total, `codigo`, puntos y crédito usados, y si se canceló (`cancelada_at`, `cancelada_motivo`) |
 | `compra_butacas` | Una por butaca comprada: precio cobrado y estado (reservada/vendida/liberada) |
+| `compra_items` | Productos del candy de cada compra: nombre y precio del momento, cantidad y, si se canjearon, puntos por unidad; los que vienen en un combo llevan su nombre (`combo_nombre`) y precio 0 |
+| `combos`, `combo_items` | Combos del candy (precio fijo, cantidad de entradas, imagen obligatoria, orden, activo, destacado) y los productos que incluye cada uno |
+| `compra_combos` | Combos de cada compra: nombre, cantidad, entradas y precio del momento |
+| `resenias` | Una por persona y por película: estrellas (1 a 5), comentario opcional (hasta 300 caracteres) y fechas |
 | `cupones`, `recompensas` | Descuentos (primera compra, rango de edad) y cuántos puntos cuesta canjear cada cosa |
 | `puntos_movimientos` | Historial de puntos: ganados, canjes, devoluciones y ajustes |
 | `credito_movimientos` | Historial del crédito: se acredita al cancelar y se usa al pagar (el saldo está en `profiles.credito`) |
 | `notificaciones` | Avisos que se ven en Mi perfil (compra, canje, cancelación) |
-| `configuracion` | Valores que el admin modifica: recargo VIP, máximo de butacas, minutos de reserva y horas de cancelación |
+| `categorias_producto` | Categorías del candy: nombre único, orden y si está activa |
+| `productos` | Productos del candy: categoría, nombre, descripción, precio, **costo en puntos** (opcional), **imagen obligatoria**, orden y si está activo |
+| `configuracion` | Valores que el admin modifica: recargo VIP, máximo de butacas, minutos de reserva, horas de cancelación y máximo de unidades de candy |
 
 ---
 
 ## 6. Decisiones de negocio y cómo se implementaron
 
-### 6.1 El precio base va en la función; la preventa, en la película
-El precio normal depende de *cuándo y dónde* se proyecta, por eso `precio_base` vive en `funciones`. La preventa, en
-cambio, es una decisión sobre la película (el cliente la pidió "película por película"): `precio_preventa` y
-`dias_preventa` están en `peliculas` y valen para todas sus funciones. Una migración copió a cada película los valores
-de su función más reciente.
+### 6.1 El precio base va en la función; la preventa, repartida entre película y función
+El precio normal depende de *cuándo y dónde* se proyecta, por eso `precio_base` vive en `funciones`. La preventa se
+reparte: la **película** define cuánto dura (`dias_preventa`) y a qué precio (`precio_preventa`), una sola vez, como
+pidió el cliente ("película por película"); la **función** dice si participa (`con_preventa`), porque no todas las
+funciones se abren antes del estreno. Una función no puede ser anterior al estreno (ver 6.20).
 
 ### 6.2 El formato (2D/3D/4D/5D) pertenece a la sala
 Una sala física es 3D o no lo es; una misma sala no puede proyectar 2D y 3D. Guardarlo en la función permitía
@@ -686,9 +705,9 @@ tiene funciones para **leerlos**.
 **Empleados**, busca la cuenta por email y le asigna el rol (`empleado_entradas`, `empleado_candy` o `admin`) o se
 lo quita. No puede quitarse a sí mismo el rol de administrador (evita quedarse sin acceso por error).
 
-**Candy.** La compra todavía no incluye productos, así que la columna `tiene_candy` queda en `false` y la pantalla
-de candy responde "la compra no incluye productos". Cuando se implemente el candy, la compra marcará `tiene_candy` y
-la entrega funcionará sin cambios. Para probar la pantalla antes, se puede marcar una compra a mano en la base.
+**Candy.** Cuando la compra incluye productos, `tiene_candy` queda en `true` y la pantalla de candy muestra **qué
+productos entregar** (`evaluar_codigo` los devuelve). Se entrega una sola vez (`candy_entregado_at`), por separado de
+la entrada.
 
 ---
 
@@ -722,8 +741,8 @@ abandonada no sume puntos.
 **Cómo se canjean:** durante la compra, cada butaca puede marcarse como "pagar con puntos".
 - El costo de una entrada lo define el admin (tabla `recompensas`, editable desde su pantalla de Puntos).
 - Los puntos cubren el precio de la entrada; el **recargo VIP se sigue pagando en dinero**.
-- Como la tabla de recompensas admite tipo `entrada` y `producto`, los productos del candy se suman después sin
-  cambiar el modelo.
+- Los productos del candy **no usan la tabla de recompensas**: cada producto tiene su propio `costo_puntos` (vacío = no
+  se canjea), que el admin edita en el formulario del producto. El costo de la entrada sigue en `recompensas`.
 - **Los puntos se descuentan al confirmar el pago**, con el perfil bloqueado (`FOR UPDATE`) y verificando de nuevo el
   saldo. Así, aunque alguien abra dos compras a la vez, no puede gastar dos veces los mismos puntos.
 - `compra_butacas.precio` pasa a guardar lo cobrado **en dinero** por esa butaca (0 si se pagó con puntos, salvo el
@@ -777,8 +796,122 @@ saldo se vuelve a leer al entrar, para que refleje la última compra.
 - **Una función con entradas vendidas no se puede mover ni cambiar** (día, hora, película, formato o idioma): hay que
   cancelarla y crear otra. Solo se puede cambiar el precio base. Lo hace cumplir `validar_cambio_con_ventas`.
 - **Quién canceló:** `compras.cancelada_motivo` es `cliente` o `cine`, y "Mis compras" lo muestra distinto.
-- **Preventa por película:** ver 6.1. El cálculo del precio vigente sigue duplicado (Angular y SQL), ahora leyendo de la
-  película en los dos lados.
+- **Preventa:** ver 6.1 y 6.20. El cálculo del precio vigente sigue duplicado (Angular y SQL).
+
+### 6.20 Funciones desde el estreno y preventa por función
+
+| Función | Antes de `estreno − días` | Entre `estreno − días` y el estreno | Desde el estreno |
+|---------|---------------------------|-------------------------------------|------------------|
+| Con preventa | no se vende | **precio de preventa** | precio base |
+| Sin preventa | no se vende | no se vende | precio base |
+
+- **Funciones solo desde el estreno:** `validar_funcion_pelicula` (llamada por `colocar_funcion`) rechaza una función
+  anterior al estreno y también marcar `con_preventa` en una película sin preventa configurada. Como `crear_funciones` y
+  `modificar_funciones` pasan por `colocar_funcion`, la regla no se puede saltear.
+- **Postergar el estreno:** un trigger en `peliculas` cancela (con `desactivar_funcion`, o sea con compensación) las
+  funciones activas que queden antes de la nueva fecha. Antes de guardar, `resumen_postergar_estreno` le muestra al
+  admin cuántas son y a quién afecta, para que no se cancelen entradas vendidas sin que lo decida.
+- **Datos viejos:** la migración marcó `con_preventa` en las funciones existentes de películas con preventa y canceló,
+  con compensación, las funciones que estaban antes del estreno.
+- **Qué muestra el cliente:** el detalle de la película indica "Preventa" y el precio en las funciones marcadas, y
+  "Venta desde el …" en las que todavía no abrieron (`precio-funcion.ts`, la misma regla que `reservar_butacas`).
+
+### 6.21 Catálogo del candy: productos y categorías
+
+- **Sin stock.** Un producto solo está activo o inactivo; el candy no se agota en el modelo.
+- **Imagen obligatoria, garantizada por la base:** `productos.imagen_url` es `not null` y no puede ser vacía. El
+  formulario también lo avisa en "Falta completar". Al modificar alcanza con la imagen que ya tenía. Las imágenes
+  nuevas van al bucket `imagenes`, carpeta `productos/` (`utilidades/subir-imagen.ts`, que también usan las películas).
+- **Categorías activas/inactivas:** desactivar una categoría oculta al cliente todos sus productos sin tocarlos (ej.:
+  "Helados" en invierno). Un producto se muestra solo si él **y** su categoría están activos; eso lo resuelve
+  `ProductoService.getCatalogoActivo()`, que usará la compra del candy.
+- **Borrado protegido:** `productos.categoria_id` es `on delete restrict`. La base no deja eliminar una categoría con
+  productos y la pantalla lo traduce a "Desactivala en lugar de eliminarla".
+- **Orden editable:** categorías y productos llevan una columna `orden` (entero, 0 o mayor) y se listan por orden y
+  después por nombre. El nombre de la categoría es único (sin mayúsculas) y el del producto, único dentro de su categoría.
+- **Datos de ejemplo:** el script carga Pochoclos, Bebidas y Golosinas y 8 productos con ilustraciones propias
+  (`public/productos/*.svg`, con la paleta del cine). Cumplen la regla de imagen obligatoria sin pasar por Storage y
+  el admin las puede reemplazar al modificar cada producto.
+- **Pantallas** (`/admin/productos`): listado agrupado por categoría con buscador (pipe `filtrar`), alta y modificación
+  (`/crear`) y administración de categorías (`/categorias`). El esqueleto `cliente/candy` es el paso de candy de la
+  compra (ver 6.22).
+
+### 6.22 Candy en la compra
+
+- **Siempre con entrada.** El candy es un paso opcional dentro de la compra de entradas: una sola compra, un solo
+  código y un solo QR. La entrada y el candy se validan por separado y una vez cada uno.
+- **Flujo:** butacas → candy (opcional; si no hay productos activos se salta) → resumen y pago → confirmación.
+  **La reserva de 5 minutos empieza al pasar de las butacas al candy**: las butacas quedan tomadas en tiempo real y el
+  contador corre a la vista en el paso del candy.
+- **Volver atrás sin perder lo elegido.** Desde el resumen se puede "Cambiar candy" (vuelve al paso del candy sobre la
+  misma reserva, sin perder tiempo) o "Cambiar butacas" (libera la reserva y vuelve al mapa). Si el cliente ya eligió
+  candy y solo cambia las butacas, **no se le vuelve a pedir**: el candy se carga solo a la reserva nueva (a menos que
+  después toque "Cambiar candy"). Durante el paso del candy no se pueden cambiar los canjes de las entradas, porque se
+  fijaron al reservar.
+- **Funciones SQL.** `reservar_butacas` reserva solo butacas. `definir_candy_compra(compra, productos, usar_credito)`
+  reemplaza los productos de una reserva vigente (`[{producto_id, cantidad, cantidad_con_puntos}]`) y recalcula
+  subtotal, cupón, puntos, crédito y total, sin tocar el vencimiento. Usa `validar_candy` (producto y categoría
+  activos, cantidad entre 1 y `max_unidades_candy`, canje solo con cuenta y costo en puntos) y `guardar_candy`. Todo en
+  una transacción: si algo falla, no queda nada a medias.
+- **Cupón y crédito sobre toda la compra.** El subtotal es entradas + candy; el cupón se aplica sobre el total y el
+  crédito cubre hasta el total.
+- **Canje por producto.** Cada producto tiene su `costo_puntos`. Al comprar, algunas unidades se pagan con puntos y el
+  resto en dinero (en `compra_items` van en filas aparte: `precio_unitario = 0` y `puntos_unitarios > 0`). Los
+  puntos de entradas y productos se suman en `compras.puntos_usados` y se descuentan al confirmar el pago, igual que antes.
+- **Puntos ganados:** 1 por peso pagado en dinero; ahora el candy también cuenta.
+- **Cancelación.** `compensar_compra` no cambió: devuelve el total (candy incluido) como crédito y devuelve los puntos
+  canjeados. Si el candy ya se entregó, `cancelar_compra` no deja cancelar.
+- **Recaudado por función sin candy.** `compras.candy_subtotal` y `candy_descuento` guardan la parte del candy, así que
+  la pantalla de ventas por función muestra "Recaudado en entradas" restando esa parte. El reporte general (S9)
+  decidirá cómo mostrar el candy.
+- **Dónde se ve:** el resumen y el pago, "Mis compras" y "Mi entrada", el PDF (el ticket crece si hay productos) y la
+  pantalla del empleado de candy, que lista qué entregar.
+
+### 6.23 Combos
+
+- **Qué es.** Un precio fijo por N entradas (configurable: 1, 2...) más unos productos. El admin los crea en
+  `/admin/combos` con **imagen obligatoria**, orden, activo y **destacado**. Sin fechas de vigencia: se activan y
+  desactivan a mano. `guardar_combo` crea o modifica el combo **y** sus productos en una sola transacción y exige al
+  menos un producto, sin repetir.
+- **Precio.** El precio del combo **reemplaza** el valor de las entradas que incluye (al precio vigente de la función,
+  preventa incluida; se guarda en `compras.precio_entrada`) y el de sus productos. Subtotal = butacas − valor de las
+  entradas cubiertas + precio de los combos + productos sueltos. El **recargo VIP** de cada butaca se paga aparte.
+- **Con qué se combina.** El cupón vale sobre toda la compra, combos incluidos. El combo **no** se paga con puntos. Un
+  combo cubre butacas que no estén pagadas con puntos: `definir_candy_compra` rechaza combos que cubran más entradas
+  que las butacas libres, y la pantalla desactiva el "+" y el canje de una entrada cuando no queda ninguna libre.
+- **Dónde se elige.** En el paso del candy, sobre la reserva ya hecha. Los combos van arriba (destacados primero), con
+  lo que incluyen y el cartel **"Ahorrás $X"**: se calcula contra el precio de la entrada de esa función y **no
+  aparece si el precio del combo es mayor al valor suelto**. Si el cliente cambia las butacas y quedan menos que las
+  que cubrían sus combos, se sacan combos hasta que entren y se le avisa.
+- **Aviso al admin.** Si el precio del combo supera el valor de lo que incluye (usando la función futura más barata
+  como referencia para las entradas), el formulario muestra una advertencia pero **deja guardar**.
+- **Disponibilidad.** El cliente solo ve combos activos con **todos** sus productos (y categorías) activos. La base lo
+  vuelve a controlar al reservar (`validar_combos`). Un producto que está en un combo no se puede eliminar (clave
+  foránea `restrict`): se lo desactiva.
+- **Para el reporte.** De lo que se paga por un combo, el valor de las entradas cuenta como entradas y lo que sobra
+  como candy (`compras.candy_subtotal`), así "Recaudado en entradas" por función sigue siendo solo de la película.
+- **Entrega.** Los productos del combo se guardan en `compra_items` con precio 0 y el nombre del combo, así el empleado
+  de candy ve **todo lo que tiene que entregar**; los combos vendidos van en `compra_combos` y se muestran en Mis
+  compras, Mi entrada, el PDF y la pantalla del empleado.
+- **Cancelación.** Sin cambios: `compensar_compra` devuelve el total (combos incluidos) como crédito.
+
+### 6.24 Reseñas y "Mis películas"
+
+- **Quién reseña.** Solo quien **vio** la película: una compra pagada (no cancelada) de una función que **ya empezó**
+  (`puede_resenar`). No se exige haber validado el QR en la puerta. La regla la hace cumplir la base:
+  `guardar_resenia` rechaza a quien no la vio, y cada persona escribe solo la suya (usa `auth.uid()`).
+- **Una por persona.** `unique (pelicula_id, usuario_id)`: si vuelve a calificar, `guardar_resenia` hace un
+  *upsert* y modifica la suya. También la puede borrar (`eliminar_resenia`). **Sin moderación.**
+- **Datos.** De 1 a 5 estrellas (`check`) y comentario opcional de hasta 300 caracteres (`check`, y contador en pantalla).
+- **Promedio.** La vista `peliculas_puntuacion` calcula promedio (un decimal) y cantidad. Se muestra en el detalle y en
+  cada tarjeta de la cartelera ("★ 4,3 (12)" o "Sin reseñas"), con el pipe `puntuacion` (coma decimal).
+- **Estrellas hechas a mano.** El componente `app-estrellas` tiene dos modos: mostrar (relleno parcial con CSS, sin
+  librerías) y elegir (cinco botones con `role="radio"`, usables con teclado y con `aria-label`).
+- **En el detalle de la película** (`app-resenias-pelicula`): promedio, tu reseña (formulario con "Falta completar"),
+  y las de los demás, 5 a la vez con "Ver más". Cada reseña muestra el autor como nombre + inicial del apellido.
+- **"Mis películas"** (pestaña del perfil): `mis_peliculas()` devuelve una fila por película vista, con la última
+  función que vio y su reseña si la hizo. Se puede filtrar por Todas / Con reseña / Sin reseñar, ir al detalle para
+  dejar o editar la reseña y eliminarla desde ahí mismo.
 
 ---
 
@@ -835,8 +968,7 @@ que se está viendo.
 
 ## 10. Limitaciones y decisiones abiertas
 
-**Pendiente de implementar** (detalle en las tablas de la sección 3): candy bar y combos, crédito y cancelación,
-reseñas, "Próximamente", "Mis películas", top 3 más vendidas, reportes y exportaciones, gráficos y log de actividad.
+**Pendiente de implementar** (detalle en las tablas de la sección 3): "Próximamente" y alertas, reportes y exportaciones, gráficos y log de actividad.
 La PWA y el despliegue están armados y falta verificarlos.
 
 **PWA y despliegue (armados, falta verificar)**
