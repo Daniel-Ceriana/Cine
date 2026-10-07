@@ -3,6 +3,7 @@ import { SupabaseService } from './supabase-service';
 import { precioVigente } from '../utilidades/precio-funcion';
 import {
   FuncionConRelaciones,
+  IdiomaFuncion,
   ResumenCancelacion,
   CrearFuncionesParams,
   ModificarFuncionesParams,
@@ -64,6 +65,26 @@ export class FuncionService {
     if (error) throw error;
     const funciones = data as unknown as FuncionConRelaciones[];
     return new Set(funciones.filter((f) => precioVigente(f).estado === 'preventa').map((f) => f.pelicula_id));
+  }
+
+  // Idiomas y formatos de las funciones futuras activas, por película: de ahí salen las opciones de los filtros del buscador
+  async getOfertaPorPelicula(): Promise<Map<string, { idiomas: IdiomaFuncion[]; formatos: string[] }>> {
+    const { data, error } = await this.supabase.client
+      .from(this.tabla)
+      .select('pelicula_id, idioma, salas(formato)')
+      .eq('activa', true)
+      .gte('inicio', new Date().toISOString());
+
+    if (error) throw error;
+
+    const oferta = new Map<string, { idiomas: IdiomaFuncion[]; formatos: string[] }>();
+    for (const f of data as unknown as { pelicula_id: string; idioma: IdiomaFuncion; salas: { formato: string } }[]) {
+      const actual = oferta.get(f.pelicula_id) ?? { idiomas: [], formatos: [] };
+      if (!actual.idiomas.includes(f.idioma)) actual.idiomas.push(f.idioma);
+      if (!actual.formatos.includes(f.salas.formato)) actual.formatos.push(f.salas.formato);
+      oferta.set(f.pelicula_id, actual);
+    }
+    return oferta;
   }
 
   // Funciones activas de una serie desde un momento en adelante (para precargar el modificar)

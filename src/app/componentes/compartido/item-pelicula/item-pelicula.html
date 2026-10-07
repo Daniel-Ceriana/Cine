@@ -12,7 +12,9 @@
   <div class="pelicula__info">
     <h3 class="pelicula__nombre">{{ pelicula().nombre }}</h3>
     <p class="pelicula__meta texto-ticket">{{ pelicula().duracion_minutos | duracion }}</p>
-    @if (puntuacion(); as p) {
+    @if (proxima()) {
+      <p class="pelicula__puntuacion">Estreno: {{ pelicula().fecha_estreno | fechaCortaAr }}</p>
+    } @else if (puntuacion(); as p) {
       <p class="pelicula__puntuacion" [attr.aria-label]="'Puntuación ' + (p.promedio | puntuacion) + ' de 5, ' + p.cantidad + ' reseñas'">
         <span class="pelicula__estrella" aria-hidden="true">★</span> {{ p.promedio | puntuacion }} <span class="pelicula__cantidad">({{ p.cantidad }})</span>
       </p>
@@ -25,7 +27,7 @@
     @if (esAdmin()) {
       <button type="button" (click)="onClickModificar()">Modificar</button>
     } @else {
-      <a class="btn btn--secundario" [routerLink]="['/peliculas', pelicula().id]">Ver funciones</a>
+      <a class="btn btn--secundario" [routerLink]="['/peliculas', pelicula().id]">{{ proxima() ? 'Ver detalle' : 'Ver funciones' }}</a>
     }
   </div>
 </article>

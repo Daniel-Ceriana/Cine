@@ -304,3 +304,9 @@
     flex-wrap: wrap;
     gap: var(--spacing-8);
 }
+
+.lista__enlace {
+    display: inline-block;
+    margin-top: var(--spacing-8);
+    font-weight: 700;
+}

@@ -53,8 +53,8 @@ tablas usa ese número.
 | RF-04 | El listado de películas tiene un buscador por nombre y por género. | 2, 3 | Hecho |
 | RF-05 | En la página principal se muestran primero las **3 películas más vendidas** (entradas vendidas en los últimos 30 días). | 2 | Hecho |
 | RF-06 | Las películas pueden tener restricción de edad: sin restricción, +13 o +18. | 6 | Hecho |
-| RF-07 | Sección "Próximamente" con las películas que se estrenan en las próximas semanas. | 9 | Pendiente |
-| RF-08 | El usuario puede activar una alerta para que le avisen cuando abra la venta de una película próxima. | 9 | Pendiente |
+| RF-07 | Sección "Próximamente" con las películas que se estrenan más adelante y todavía no están a la venta. | 9 | Hecho |
+| RF-08 | El usuario puede activar una alerta para que le avisen cuando abra la venta de una película próxima. | 9 | Hecho |
 | RF-09 | Reseñas: calificación con estrellas y comentario corto, visibles **antes** de comprar. | 2 | Hecho |
 | RF-10 | Se muestra la puntuación promedio de cada película. | 2 | Hecho |
 | RF-11 | Sección "Mis películas": historial visual de lo que vio el usuario (póster, fecha, su calificación). | 9 | Hecho |
@@ -117,7 +117,7 @@ tablas usa ese número.
 | RF-48 | Los avisos al usuario (por ejemplo "estrenos" o compras) se ven en **Mi perfil → Notificaciones**. El sistema **no envía mails**. | 9 (aclaración) | Parcial |
 
 > RF-48: hoy se avisa cuando se confirma una compra, al hacer un canje, al cancelar una compra y cuando el cine cancela
-> una función. Las alertas de estreno (RF-08) usarán el mismo mecanismo cuando se implementen.
+> una función. Las alertas de estreno (RF-08) usan el mismo mecanismo.
 
 ### 3.5 Candy bar
 
@@ -530,6 +530,7 @@ Los scripts están en `supabase/` y se ejecutan **en orden** desde el editor SQL
 | `012_candy_sobre_la_reserva.sql` | La reserva empieza al elegir las butacas y el candy se agrega después: `definir_candy_compra`, `validar_candy`, `guardar_candy`; `reservar_butacas` vuelve a recibir solo butacas |
 | `013_combos.sql` | `combos`, `combo_items`, `compra_combos`, `guardar_combo`, `validar_combos` (reemplaza las tablas de combos viejas, si había); reemplaza `reservar_butacas` (guarda `compras.precio_entrada`), `guardar_candy`, `definir_candy_compra` y `evaluar_codigo`; 3 combos de ejemplo |
 | `014_resenias.sql` | `resenias` (reemplaza una tabla vieja, si había), vista `peliculas_puntuacion`, `puede_resenar`, `guardar_resenia`, `eliminar_resenia`, `mis_peliculas` |
+| `015_proximamente.sql` | `alertas_estreno` (reemplaza una tabla vieja, si había), `notificaciones.pelicula_id` y tipo `estreno`, `pelicula_con_venta_abierta`, `activar_alerta`, `quitar_alerta`, `revisar_alertas` |
 
 ---
 
@@ -561,6 +562,7 @@ configuracion (recargo VIP, máximo de butacas, minutos de reserva)
 | `compra_items` | Productos del candy de cada compra: nombre y precio del momento, cantidad y, si se canjearon, puntos por unidad; los que vienen en un combo llevan su nombre (`combo_nombre`) y precio 0 |
 | `combos`, `combo_items` | Combos del candy (precio fijo, cantidad de entradas, imagen obligatoria, orden, activo, destacado) y los productos que incluye cada uno |
 | `compra_combos` | Combos de cada compra: nombre, cantidad, entradas y precio del momento |
+| `alertas_estreno` | Una por persona y por película próxima: si ya se avisó (`avisada`) y cuándo |
 | `resenias` | Una por persona y por película: estrellas (1 a 5), comentario opcional (hasta 300 caracteres) y fechas |
 | `cupones`, `recompensas` | Descuentos (primera compra, rango de edad) y cuántos puntos cuesta canjear cada cosa |
 | `puntos_movimientos` | Historial de puntos: ganados, canjes, devoluciones y ajustes |
@@ -918,6 +920,26 @@ saldo se vuelve a leer al entrar, para que refleje la última compra.
   (una fila que se desliza si son muchos) y debajo se ven solo las funciones del día elegido. Es un solo día a la vez;
   por defecto el primero. Los chips son botones propios con `aria-pressed` (Angular Material queda limitado al
   formulario de funciones).
+
+### 6.25 Próximamente, alertas de estreno y filtros del buscador
+
+- **Qué es "próxima".** Una película activa con **estreno futuro** cuya venta **todavía no abrió** (ninguna función está
+  en preventa). Es la misma regla de precio de `reservar_butacas`: desde el estreno se vende todo y, antes, solo las
+  funciones marcadas "con preventa" cuando ya rige la preventa (`utilidades/proximamente.ts`, que reutiliza
+  `getPeliculasEnPreventa`). Cuando abre la venta, la película **pasa sola a la cartelera**; el admin las ve siempre todas.
+- **Dónde se ve.** Sección "Próximamente" debajo de la cartelera: tarjetas con el día de estreno y el botón
+  "Avisarme". El detalle de una película próxima es el normal (con sus funciones como "Venta desde...") más el aviso
+  de estreno y el mismo botón.
+- **La alerta.** `alertas_estreno` guarda una por persona y película. `activar_alerta` solo la acepta si la película
+  sigue sin venta; `quitar_alerta` la borra. Hace falta cuenta, porque el aviso llega a **Mi perfil > Notificaciones**.
+- **Quién dispara el aviso.** El sistema no tiene tareas programadas (decisión del equipo), así que el aviso se genera
+  **cuando la persona entra a la app**: la cartelera y el perfil llaman a `revisar_alertas()`, que busca las alertas
+  pendientes de esa cuenta cuya venta ya abrió (`pelicula_con_venta_abierta`), crea la notificación de tipo `estreno`
+  (con un enlace a la película) y marca la alerta como avisada. Cada alerta avisa **una sola vez**, aunque se revise
+  desde dos pantallas a la vez (`update ... where not avisada`).
+- **Filtros de idioma y formato.** Vuelven al buscador: las opciones salen de las funciones futuras activas
+  (`getOfertaPorPelicula`), no están fijas, y cada película se filtra por los idiomas y formatos de sus funciones con
+  el pipe `filtrar`.
 
 ---
 

@@ -7,6 +7,7 @@ import { CompraService } from '../../../services/compra-service';
 import { CreditoService } from '../../../services/credito-service';
 import { ConfiguracionService } from '../../../services/configuracion-service';
 import { ReseniaService } from '../../../services/resenia-service';
+import { AlertaService } from '../../../services/alerta-service';
 import { PeliculaService } from '../../../services/peliculas-service';
 import { TarjetaCompra } from '../../compartido/tarjeta-compra/tarjeta-compra';
 import { Estrellas } from '../../compartido/estrellas/estrellas';
@@ -39,6 +40,7 @@ export class Perfil implements OnInit {
   private creditoService = inject(CreditoService);
   private configuracionService = inject(ConfiguracionService);
   private reseniaService = inject(ReseniaService);
+  private alertaService = inject(AlertaService);
   private peliculaService = inject(PeliculaService);
 
   perfil = this.auth.perfil;
@@ -75,6 +77,9 @@ export class Perfil implements OnInit {
 
     this.cargando.set(true);
     try {
+      // primero se generan los avisos de estrenos cuya venta ya abrió, así aparecen en las notificaciones
+      await this.alertaService.revisar().catch(() => 0);
+
       // el saldo se relee por si cambió desde que se abrió la aplicación (ej.: después de una compra)
       const [movimientos, notificaciones, compras, movimientosCredito, horas, misPeliculas] = await Promise.all([
         this.puntosService.getMovimientos(id),

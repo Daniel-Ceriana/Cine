@@ -1,0 +1,19 @@
+@if (tieneSesion()) {
+  <button
+    type="button"
+    [class.btn--secundario]="activa()"
+    [attr.aria-pressed]="activa()"
+    [disabled]="procesando()"
+    (click)="alternar()">
+    {{ procesando() ? 'Un momento...' : activa() ? 'Quitar aviso' : 'Avisarme' }}
+  </button>
+  @if (activa()) {
+    <p class="alerta__ayuda">Te vamos a avisar en Mi perfil cuando se abra la venta.</p>
+  }
+} @else {
+  <p class="alerta__ayuda"><a routerLink="/login">Iniciá sesión</a> para que te avisemos cuando abra la venta.</p>
+}
+
+@if (errorMsg()) {
+  <p class="error" role="alert">{{ errorMsg() }}</p>
+}

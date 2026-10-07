@@ -236,6 +236,9 @@
                   @if (!n.leida) { <span class="chip chip--rojo">Nueva</span> }
                 </p>
                 <p>{{ n.mensaje }}</p>
+                @if (n.pelicula_id) {
+                  <a class="lista__enlace" [routerLink]="['/peliculas', n.pelicula_id]">Ver película</a>
+                }
                 <p class="lista__meta">{{ n.created_at | diaAr }} · {{ n.created_at | horaAr }}</p>
               </div>
               @if (!n.leida) {

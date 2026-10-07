@@ -1,0 +1,29 @@
+.proximamente {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+    margin-top: var(--spacing-24);
+    padding-top: var(--spacing-20);
+    border-top: 2px dashed var(--crema-borde);
+}
+
+.proximamente__titulo {
+    font-size: var(--font-large);
+}
+
+.proximamente__ayuda {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
+.proximamente__grilla {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-20);
+}
+
+.proxima {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+}

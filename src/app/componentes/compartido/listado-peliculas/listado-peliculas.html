@@ -1,9 +1,11 @@
 <main class="pagina listado">
 
     <!-- Se filtra encadenando el pipe: por nombre (contiene), por género (exacto) y solo destacadas -->
-    @let filtradas = peliculas()
+    @let filtradas = peliculasConOferta()
         | filtrar: filtrosForm.nombre().value() : ['nombre']
         | filtrar: filtrosForm.genero().value() : ['generos.nombre'] : true
+        | filtrar: filtrosForm.idioma().value() : ['idiomas'] : true
+        | filtrar: filtrosForm.formato().value() : ['formatos'] : true
         | filtrar: filtrosForm.destacada().value() : ['destacada'];
 
     <form class="filtros" (submit)="$event.preventDefault()">
@@ -18,6 +20,26 @@
                 <option value="">Todos</option>
                 @for (g of generos(); track g.id) {
                 <option [value]="g.nombre">{{ g.nombre }}</option>
+                }
+            </select>
+        </div>
+
+        <div class="filtros__campo">
+            <label for="idioma">Idioma</label>
+            <select id="idioma" [formField]="filtrosForm.idioma">
+                <option value="">Todos</option>
+                @for (i of idiomasDisponibles(); track i) {
+                <option [value]="i">{{ i | idiomaFuncion }}</option>
+                }
+            </select>
+        </div>
+
+        <div class="filtros__campo">
+            <label for="formato">Formato</label>
+            <select id="formato" [formField]="filtrosForm.formato">
+                <option value="">Todos</option>
+                @for (f of formatosDisponibles(); track f) {
+                <option [value]="f">{{ f }}</option>
                 }
             </select>
         </div>

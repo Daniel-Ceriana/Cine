@@ -29,6 +29,14 @@
 
         <p class="ficha__sinopsis">{{ p.sinopsis }}</p>
 
+        @if (esProxima()) {
+          <div class="ficha__proxima">
+            <p class="texto-ticket">Estreno: {{ p.fecha_estreno | diaAr }}</p>
+            <p class="ficha__ayuda">Todavía no se venden entradas para esta película.</p>
+            <app-boton-alerta [peliculaId]="p.id" />
+          </div>
+        }
+
         @if (p.restriccion_edad > 0) {
           <p class="aviso">
             Película +{{ p.restriccion_edad }}: los menores de {{ p.restriccion_edad }} años no pueden comprar

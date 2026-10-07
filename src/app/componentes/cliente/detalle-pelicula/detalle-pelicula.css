@@ -48,6 +48,21 @@
     max-width: 65ch;
 }
 
+.ficha__proxima {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    padding: var(--spacing-12) var(--spacing-16);
+    background-color: var(--mostaza-suave);
+    border: 2px solid var(--mostaza);
+    border-radius: var(--radio);
+}
+
+.ficha__ayuda {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}
+
 .aviso {
     padding: var(--spacing-12) var(--spacing-16);
     background-color: #FBE3DF;
