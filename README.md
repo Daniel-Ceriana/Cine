@@ -58,7 +58,7 @@ tablas usa ese número.
 | RF-09 | Reseñas: calificación con estrellas y comentario corto, visibles **antes** de comprar. | 2 | Hecho |
 | RF-10 | Se muestra la puntuación promedio de cada película. | 2 | Hecho |
 | RF-11 | Sección "Mis películas": historial visual de lo que vio el usuario (póster, fecha, su calificación). | 9 | Hecho |
-| RF-12 | Detalle de película con sus próximas funciones, agrupadas por día, con precio y acceso a la compra. | 1 | Hecho |
+| RF-12 | Detalle de película con sus próximas funciones, con precio y acceso a la compra. Se eligen por día: chips con los días que tienen funciones y, abajo, las del día elegido. | 1 | Hecho |
 
 ### 3.2 Salas y funciones
 
@@ -912,6 +912,12 @@ saldo se vuelve a leer al entrar, para que refleje la última compra.
 - **"Mis películas"** (pestaña del perfil): `mis_peliculas()` devuelve una fila por película vista, con la última
   función que vio y su reseña si la hizo. Se puede filtrar por Todas / Con reseña / Sin reseñar, ir al detalle para
   dejar o editar la reseña y eliminarla desde ahí mismo.
+- **Aviso al salir.** La ruta del detalle usa `canDeactivate`: el detalle le pregunta a la sección de reseñas
+  (`puedeSalir`) si hay una reseña sin guardar (estrellas tocadas o comentario escrito) y pide confirmación.
+- **Funciones por día.** El detalle ya no muestra todos los días a la vez: hay un chip por cada día que tiene funciones
+  (una fila que se desliza si son muchos) y debajo se ven solo las funciones del día elegido. Es un solo día a la vez;
+  por defecto el primero. Los chips son botones propios con `aria-pressed` (Angular Material queda limitado al
+  formulario de funciones).
 
 ---
 

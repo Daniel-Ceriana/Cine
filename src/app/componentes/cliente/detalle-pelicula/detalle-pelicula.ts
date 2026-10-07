@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, viewChild, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PeliculaService } from '../../../services/peliculas-service';
 import { FuncionService } from '../../../services/funcion-service';
@@ -8,11 +8,12 @@ import { partesAr, formatearDia } from '../../../utilidades/fechas-ar';
 import { precioVigente, VigenciaPrecio } from '../../../utilidades/precio-funcion';
 import { PesosPipe } from '../../../pipes/comunes/pesos.pipe';
 import { DuracionPipe } from '../../../pipes/comunes/duracion.pipe';
-import { DiaArPipe, HoraArPipe } from '../../../pipes/comunes/fechas-ar.pipes';
+import { DiaArPipe, FechaCortaArPipe, HoraArPipe } from '../../../pipes/comunes/fechas-ar.pipes';
 import { FormatoSalaPipe } from '../../../pipes/sala/sala.pipes';
 import { IdiomaFuncionPipe } from '../../../pipes/funcion/idioma-funcion.pipe';
 import { RestriccionEdadPipe } from '../../../pipes/pelicula/restriccion-edad.pipe';
 import { ReseniasPelicula } from '../resenias-pelicula/resenias-pelicula';
+import { ConfirmarSalida } from '../../../guards/salida-guard';
 
 interface FuncionConPrecio {
   funcion: FuncionConRelaciones;
@@ -25,14 +26,15 @@ interface DiaConFunciones {
   funciones: FuncionConPrecio[];
 }
 
-// Detalle de una película: datos, sinopsis, sus próximas funciones agrupadas por día y las reseñas
+// Detalle de una película: datos, sinopsis, las reseñas y sus próximas funciones. Las funciones se eligen por día:
+// chips con los días que tienen funciones y, abajo, las funciones del día elegido.
 @Component({
-  imports: [RouterLink, ReseniasPelicula, PesosPipe, DuracionPipe, DiaArPipe, HoraArPipe, FormatoSalaPipe, IdiomaFuncionPipe, RestriccionEdadPipe],
+  imports: [RouterLink, ReseniasPelicula, PesosPipe, DuracionPipe, DiaArPipe, FechaCortaArPipe, HoraArPipe, FormatoSalaPipe, IdiomaFuncionPipe, RestriccionEdadPipe],
   selector: 'app-detalle-pelicula',
   styleUrl: './detalle-pelicula.css',
   templateUrl: './detalle-pelicula.html',
 })
-export class DetallePelicula implements OnInit {
+export class DetallePelicula implements OnInit, ConfirmarSalida {
   private route = inject(ActivatedRoute);
   private peliculasService = inject(PeliculaService);
   private funcionService = inject(FuncionService);
@@ -41,6 +43,12 @@ export class DetallePelicula implements OnInit {
   funciones = signal<FuncionConRelaciones[]>([]);
   cargando = signal(false);
   errorMsg = signal('');
+
+  // La reseña sin guardar se consulta en la sección de reseñas (canDeactivate)
+  private resenias = viewChild(ReseniasPelicula);
+
+  // Día elegido en los chips (null = todavía no eligió: se muestra el primero)
+  private diaElegido = signal<string | null>(null);
 
   dias = computed<DiaConFunciones[]>(() => {
     const dias: DiaConFunciones[] = [];
@@ -57,6 +65,20 @@ export class DetallePelicula implements OnInit {
     }
     return dias;
   });
+
+  // Solo hay chips para los días que tienen alguna función; si el elegido ya no está, vale el primero
+  diaActual = computed<DiaConFunciones | null>(() => {
+    const dias = this.dias();
+    return dias.find((d) => d.fecha === this.diaElegido()) ?? dias[0] ?? null;
+  });
+
+  elegirDia(fecha: string) {
+    this.diaElegido.set(fecha);
+  }
+
+  puedeSalir(): boolean {
+    return this.resenias()?.puedeSalir() ?? true;
+  }
 
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id') ?? '';

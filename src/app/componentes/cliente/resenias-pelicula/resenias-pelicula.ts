@@ -2,6 +2,7 @@ import { Component, computed, inject, input, OnInit, signal } from '@angular/cor
 import { RouterLink } from '@angular/router';
 import { form, FormField } from '@angular/forms/signals';
 import { Auth } from '../../../services/auth';
+import { confirmarDescartar } from '../../../guards/salida-guard';
 import { ReseniaService } from '../../../services/resenia-service';
 import { MAX_COMENTARIO_RESENIA, PuntuacionPelicula, ReseniaConAutor } from '../../../modelos/resenia-model';
 import { Estrellas } from '../../compartido/estrellas/estrellas';
@@ -38,6 +39,7 @@ export class ReseniasPelicula implements OnInit {
 
   // Formulario: las estrellas son un componente aparte y el comentario va en el formulario
   estrellas = signal(0);
+  private estrellasGuardadas = signal(0); // las de la reseña que ya está publicada (0 = todavía no hay)
   private model = signal({ comentario: '' });
   reseniaForm = form(this.model);
 
@@ -84,8 +86,14 @@ export class ReseniasPelicula implements OnInit {
   private cargarFormulario() {
     const mia = this.miResenia();
     this.estrellas.set(mia?.estrellas ?? 0);
+    this.estrellasGuardadas.set(mia?.estrellas ?? 0);
     this.model.set({ comentario: mia?.comentario ?? '' });
     this.reseniaForm().reset();
+  }
+
+  // Lo consulta la pantalla del detalle (canDeactivate): hay cambios si se escribió algo o se tocaron las estrellas
+  puedeSalir(): boolean {
+    return confirmarDescartar(this.reseniaForm().dirty() || this.estrellas() !== this.estrellasGuardadas());
   }
 
   autor(r: ReseniaConAutor): string {

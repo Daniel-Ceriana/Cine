@@ -16,6 +16,7 @@ export const routes: Routes = [
 {
   path: 'peliculas/:id',
   canMatch: [clienteMatch],
+  canDeactivate: [confirmarSalidaGuard],
   loadComponent: () => import('./componentes/cliente/detalle-pelicula/detalle-pelicula').then(m => m.DetallePelicula),
 },
 {

@@ -45,41 +45,53 @@
         <p class="funciones__vacio">Por ahora no hay funciones programadas para esta película.</p>
       }
 
-      @for (dia of dias(); track dia.fecha) {
-        <div class="dia">
-          <h3 class="dia__titulo">{{ dia.etiqueta }}</h3>
+      @if (diaActual(); as dia) {
+        <!-- Un chip por día con funciones: se ve un solo día a la vez -->
+        <div class="dias" role="group" aria-label="Elegí un día">
+          @for (d of dias(); track d.fecha) {
+            <button
+              type="button"
+              class="dias__chip"
+              [class.dias__chip--activo]="d.fecha === dia.fecha"
+              [attr.aria-pressed]="d.fecha === dia.fecha"
+              (click)="elegirDia(d.fecha)">
+              {{ d.fecha | fechaCortaAr }}
+            </button>
+          }
+        </div>
 
-          <div class="dia__funciones">
-            @for (item of dia.funciones; track item.funcion.id) {
-              <article class="funcion ticket">
-                <div class="funcion__info">
-                  <p class="funcion__horario texto-ticket">{{ item.funcion.inicio | horaAr }}</p>
-                  <div class="funcion__chips">
-                    <span class="chip">{{ item.funcion.salas.formato | formatoSala }}</span>
-                    <span class="chip">{{ item.funcion.idioma | idiomaFuncion }}</span>
-                    @if (item.vigencia.estado === 'preventa') {
-                      <span class="chip chip--rojo">Preventa</span>
-                    }
-                  </div>
-                  @if (item.vigencia.precio !== null) {
-                    <p class="funcion__precio texto-ticket">{{ item.vigencia.precio | pesos }}</p>
-                  } @else {
-                    <p class="funcion__precio funcion__precio--cerrada texto-ticket">
-                      Venta desde el {{ item.vigencia.abreEl | diaAr }}
-                    </p>
+        <h3 class="dia__titulo">{{ dia.etiqueta }}</h3>
+
+        <div class="dia__funciones">
+          @for (item of dia.funciones; track item.funcion.id) {
+            <article class="funcion ticket">
+              <div class="funcion__info">
+                <p class="funcion__horario texto-ticket">{{ item.funcion.inicio | horaAr }}</p>
+                <div class="funcion__chips">
+                  <span class="chip">{{ item.funcion.salas.formato | formatoSala }}</span>
+                  <span class="chip">{{ item.funcion.idioma | idiomaFuncion }}</span>
+                  @if (item.vigencia.estado === 'preventa') {
+                    <span class="chip chip--rojo">Preventa</span>
                   }
                 </div>
+                @if (item.vigencia.precio !== null) {
+                  <p class="funcion__precio texto-ticket">{{ item.vigencia.precio | pesos }}</p>
+                } @else {
+                  <p class="funcion__precio funcion__precio--cerrada texto-ticket">
+                    Venta desde el {{ item.vigencia.abreEl | diaAr }}
+                  </p>
+                }
+              </div>
 
-                <div class="funcion__accion">
-                  @if (item.vigencia.precio !== null) {
-                    <a class="btn" [routerLink]="['/funcion', item.funcion.id, 'butacas']">Elegir butacas</a>
-                  } @else {
-                    <span class="funcion__cerrada">Próximamente</span>
-                  }
-                </div>
-              </article>
-            }
-          </div>
+              <div class="funcion__accion">
+                @if (item.vigencia.precio !== null) {
+                  <a class="btn" [routerLink]="['/funcion', item.funcion.id, 'butacas']">Elegir butacas</a>
+                } @else {
+                  <span class="funcion__cerrada">Próximamente</span>
+                }
+              </div>
+            </article>
+          }
         </div>
       }
     </section>
