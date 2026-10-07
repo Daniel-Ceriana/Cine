@@ -147,7 +147,7 @@ tablas usa ese número.
 | RF-71 | Gestión de empleados (usuarios que validan QR). | 5 | Hecho |
 | RF-72 | Reporte de facturación por día y de cantidad de entradas vendidas. | 7 | Hecho |
 | RF-73 | Exportar el reporte de facturación a PDF y a Excel. | 10 | Hecho |
-| RF-74 | Gráfico de películas más vistas por semana y por mes, y producto del candy más vendido. | 10 | Pendiente |
+| RF-74 | Gráfico de películas más vistas por semana y por mes, y producto del candy más vendido. | 10 | Hecho |
 | RF-75 | Log de actividad: quién creó una función, quién modificó un precio, quién validó un QR, con fecha y hora. | 10 | Pendiente |
 | RF-76 | Mapa del cine que indique la sala de la entrada comprada. | 4 | Fuera de alcance (el cliente aún no dio "luz verde") |
 
@@ -294,6 +294,7 @@ pedir datos y avisar al usuario. Así, aunque alguien saltee la interfaz, las re
 | Google Fonts | Bungee, Special Elite, Inter | Tipografías de la identidad visual |
 | `qrcode` | Generar el código QR de cada compra | Genera la imagen del QR en el navegador; es pequeña y no depende de Angular |
 | `jsPDF` | Generar el PDF de la entrada y el del reporte de facturación | Arma el PDF en el navegador, sin servidor |
+| `chart.js` | Gráficos de barras de la pantalla de gráficos del admin | MIT. Se registran solo las piezas que se usan (barras, ejes y tooltip) y se carga con importación dinámica al abrir esa pantalla (unos 61 kB comprimidos). Se descartaron los gráficos con SVG propio (se eligió la librería por sus tooltips y su ajuste automático), `ng2-charts` (una dependencia más) y `ngx-charts` (usa d3, más pesada) |
 | `write-excel-file` | Exportar el reporte de facturación a Excel (`.xlsx`) | Pequeña (unos 20 kB comprimida), licencia MIT, reutiliza `fflate` (que ya trae jsPDF) y se carga solo al exportar. Se descartaron SheetJS (más pesada y con la versión de npm sin actualizar) y ExcelJS (unas 45 veces más pesada) |
 
 Decisión: **no** se usó una librería de componentes para toda la interfaz. Se eligió CSS propio para lograr un
@@ -533,6 +534,7 @@ Los scripts están en `supabase/` y se ejecutan **en orden** desde el editor SQL
 | `014_resenias.sql` | `resenias` (reemplaza una tabla vieja, si había), vista `peliculas_puntuacion`, `puede_resenar`, `guardar_resenia`, `eliminar_resenia`, `mis_peliculas` |
 | `015_proximamente.sql` | `alertas_estreno` (reemplaza una tabla vieja, si había), `notificaciones.pelicula_id` y tipo `estreno`, `pelicula_con_venta_abierta`, `activar_alerta`, `quitar_alerta`, `revisar_alertas` |
 | `016_reporte_facturacion.sql` | `reporte_facturacion(desde, hasta)`: una fila por día con movimiento, solo para el admin (no agrega tablas) |
+| `017_graficos.sql` | `ranking_peliculas`, `ranking_productos` y `ranking_combos`: los más vendidos de un período, solo para el admin (no agrega tablas) |
 
 ---
 
@@ -965,6 +967,27 @@ saldo se vuelve a leer al entrar, para que refleje la última compra.
   números con formato (Excel los muestra según el idioma de la computadora) y fila de totales. Se usa la versión
   `universal`, que devuelve un `Blob`, en lugar de la de navegador (que usa Web Workers), y el archivo se baja con la
   misma función que el PDF. Las dos librerías se cargan con importación dinámica al tocar el botón.
+
+### 6.27 Gráficos
+
+- **Pantalla** `/admin/graficos`: tres gráficos de barras horizontales (películas más vistas, productos más vendidos y
+  combos más vendidos), cada uno con el **Top 5**. Se mira por **Semana** (de lunes a domingo) o por **Mes**, con
+  flechas anterior/siguiente y un botón "Hoy". Arranca en la semana actual.
+- **Qué se cuenta.** Solo compras **pagadas y no canceladas**. El período se mide por **el día de la función** (hora
+  argentina): las entradas vendidas de las funciones que caen en la semana o el mes elegido. Los productos y los combos
+  se miden igual, para que los tres gráficos hablen del mismo período.
+- **Productos y combos por separado.** El gráfico de productos cuenta los sueltos (lo pagado en dinero y lo canjeado con
+  puntos) **sin** los que vienen dentro de un combo (`compra_items.combo_nombre is null`); los combos tienen su propio
+  ranking (`compra_combos`). Se agrupan por el nombre que tenían al comprar, así el histórico no cambia si se los renombra.
+- **Tres funciones SQL** (`ranking_peliculas`, `ranking_productos`, `ranking_combos`), solo para el admin, que reciben el
+  rango de fechas. Si dos tienen la misma cantidad, se ordenan por nombre.
+- **Chart.js.** El componente `grafico-barras` carga la librería con importación dinámica solo cuando hay algo para
+  dibujar y registra únicamente lo necesario. Los colores salen de las variables del tema (`--bordo`, `--rojo`,
+  `--mostaza`).
+- **Accesibilidad.** El canvas no lo leen los lectores de pantalla, así que lleva una descripción en texto
+  (`aria-label`) y, debajo de cada gráfico, **la misma información en una tabla**. Los botones de período se usan con
+  teclado y las flechas tienen etiqueta. Si un período no tiene ventas, se dice "Sin ventas en este período".
+- **Consultas que se pisan.** Si se cambia de período mientras se está cargando, solo vale la última consulta.
 
 ---
 

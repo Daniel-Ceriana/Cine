@@ -1,0 +1,50 @@
+<main class="pagina graficos">
+  <h1 class="titulo-pagina">Gráficos</h1>
+
+  <p class="graficos__intro">
+    Los 5 más vendidos de la semana o del mes. El período se mide por el día de la función y las compras canceladas no
+    cuentan. Los productos que vienen dentro de un combo no se suman a los productos sueltos: los combos tienen su propio
+    gráfico.
+  </p>
+
+  <!-- Período -->
+  <div class="periodo ticket">
+    <div class="vista" role="group" aria-label="Ver por">
+      <button type="button" class="chip vista__boton" [class.vista__boton--activo]="vista() === 'semana'" [attr.aria-pressed]="vista() === 'semana'" (click)="elegirVista('semana')">Semana</button>
+      <button type="button" class="chip vista__boton" [class.vista__boton--activo]="vista() === 'mes'" [attr.aria-pressed]="vista() === 'mes'" (click)="elegirVista('mes')">Mes</button>
+    </div>
+
+    <div class="navegar">
+      <button type="button" class="btn--secundario" (click)="mover(-1)" [attr.aria-label]="vista() === 'semana' ? 'Semana anterior' : 'Mes anterior'">&larr;</button>
+      <p class="navegar__etiqueta texto-ticket" aria-live="polite">{{ periodo().etiqueta }}</p>
+      <button type="button" class="btn--secundario" (click)="mover(1)" [attr.aria-label]="vista() === 'semana' ? 'Semana siguiente' : 'Mes siguiente'">&rarr;</button>
+      <button type="button" class="btn--secundario" (click)="hoy()" [disabled]="esActual()">Hoy</button>
+    </div>
+  </div>
+
+  @if (errorMsg()) {
+    <p class="error aviso-error" role="alert">{{ errorMsg() }}</p>
+  }
+
+  <section class="graficos__grilla">
+    <app-grafico-barras
+      class="graficos__ancho"
+      titulo="Películas más vistas"
+      unidad="entradas"
+      color="bordo"
+      [filas]="peliculas()"
+      [cargando]="cargando()" />
+    <app-grafico-barras
+      titulo="Productos más vendidos"
+      unidad="unidades"
+      color="rojo"
+      [filas]="productos()"
+      [cargando]="cargando()" />
+    <app-grafico-barras
+      titulo="Combos más vendidos"
+      unidad="unidades"
+      color="mostaza"
+      [filas]="combos()"
+      [cargando]="cargando()" />
+  </section>
+</main>

@@ -1,0 +1,66 @@
+:host {
+    display: block;
+}
+
+.grafico {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-12);
+    height: 100%;
+    padding: var(--spacing-20);
+}
+
+.grafico::before,
+.grafico::after {
+    display: none;
+}
+
+.grafico__titulo {
+    font-size: var(--font-medium);
+}
+
+.grafico__vacio {
+    color: var(--tinta-suave);
+    font-size: var(--font-xsmall);
+}
+
+/* Chart.js necesita un contenedor con altura propia para ajustar el canvas */
+.grafico__lienzo {
+    position: relative;
+    width: 100%;
+}
+
+.grafico__tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-xsmall);
+}
+
+.grafico__tabla-titulo {
+    margin-bottom: var(--spacing-8);
+    text-align: left;
+    font-weight: 700;
+    color: var(--tinta-suave);
+}
+
+.grafico__tabla th,
+.grafico__tabla td {
+    padding: var(--spacing-8) var(--spacing-12);
+    border-bottom: 1px dashed var(--crema-borde);
+    text-align: left;
+    font-weight: 400;
+}
+
+.grafico__tabla thead th {
+    font-weight: 700;
+}
+
+.grafico__tabla .num {
+    text-align: right;
+    text-transform: capitalize;
+}
+
+.grafico__tabla td.num {
+    font-weight: 700;
+    text-transform: none;
+}

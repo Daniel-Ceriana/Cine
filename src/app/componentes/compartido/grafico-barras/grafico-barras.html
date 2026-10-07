@@ -1,0 +1,32 @@
+<section class="grafico ticket">
+  <h2 class="grafico__titulo">{{ titulo() }}</h2>
+
+  @if (cargando()) {
+    <p class="grafico__vacio">Cargando...</p>
+  } @else if (filas().length === 0) {
+    <p class="grafico__vacio">Sin ventas en este período.</p>
+  } @else {
+    <div class="grafico__lienzo" [style.height]="alto()">
+      <canvas #lienzo role="img" [attr.aria-label]="descripcion()"></canvas>
+    </div>
+
+    <!-- La misma información en una tabla: para lectores de pantalla y para ver los números exactos -->
+    <table class="grafico__tabla">
+      <caption class="grafico__tabla-titulo">Datos del gráfico</caption>
+      <thead>
+        <tr>
+          <th scope="col">{{ titulo() }}</th>
+          <th scope="col" class="num">{{ unidad() }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (f of filas(); track f.nombre) {
+          <tr>
+            <th scope="row">{{ f.nombre }}</th>
+            <td class="num texto-ticket">{{ f.cantidad }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

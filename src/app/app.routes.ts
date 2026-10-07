@@ -96,6 +96,7 @@ export const routes: Routes = [
         { path: 'crear', canDeactivate: [confirmarSalidaGuard], loadComponent: () => import('./componentes/admin/combos/crear-modificar/crear-modificar').then(m => m.CrearModificarCombo) },
       ],
     },
+    { path: 'graficos', loadComponent: () => import('./componentes/admin/graficos/graficos').then(m => m.Graficos) },
     { path: 'reportes', loadComponent: () => import('./componentes/admin/reportes/reportes').then(m => m.Reportes) },
     { path: 'puntos', loadComponent: () => import('./componentes/admin/puntos/puntos').then(m => m.Puntos) },
     { path: 'configuracion', loadComponent: () => import('./componentes/admin/configuracion/configuracion').then(m => m.Configuracion) },
