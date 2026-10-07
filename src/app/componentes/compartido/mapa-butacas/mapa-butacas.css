@@ -60,6 +60,7 @@
 /* ---- Butaca ---- */
 .butaca {
     height: var(--tam);
+    min-height: 0; /* las butacas tienen su propio tamaño: no les corresponde el mínimo de los botones */
     padding: 0;
     font-family: var(--font-ticket);
     font-size: 1rem;
@@ -119,6 +120,21 @@
     background-color: var(--bordo-claro);
     border-color: var(--bordo);
     cursor: not-allowed;
+}
+
+/* la que tiene el foco del teclado: bien marcada y por encima de las vecinas */
+.butaca:focus-visible {
+    position: relative;
+    z-index: 1;
+    outline: 3px solid var(--bordo);
+    outline-offset: 1px;
+    transform: scale(1.15);
+}
+
+.mapa__ayuda {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+    text-align: center;
 }
 
 /* la que el admin está mirando */

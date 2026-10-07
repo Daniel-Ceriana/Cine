@@ -1,0 +1,24 @@
+.logout__tarjeta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-12);
+    max-width: 520px;
+    margin: var(--spacing-36) auto 0;
+    padding: var(--spacing-28) var(--spacing-20);
+    text-align: center;
+}
+
+.logout__tarjeta::before,
+.logout__tarjeta::after {
+    display: none;
+}
+
+.logout__titulo {
+    font-size: var(--font-medium);
+}
+
+.logout__ayuda {
+    font-size: var(--font-xsmall);
+    color: var(--tinta-suave);
+}

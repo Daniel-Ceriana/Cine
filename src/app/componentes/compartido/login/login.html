@@ -13,11 +13,11 @@
         <label>
           Email
         </label>
-        <input type="email" [formField]="loginForm.email" autocomplete="email" [class.campo-error]="errorMsg()" />
+        <input type="email" [formField]="loginForm.email" [attr.aria-describedby]="loginForm.email().touched() && loginForm.email().invalid() ? 'error-email' : null" autocomplete="email" [class.campo-error]="errorMsg()" />
       </section>
 
       @if (loginForm.email().touched() && loginForm.email().invalid()) {
-      <small class="error">{{ loginForm.email().errors()[0].message }}</small>
+      <small class="error" role="alert" id="error-email">{{ loginForm.email().errors()[0].message }}</small>
       }
     </div>
 
@@ -30,11 +30,11 @@
         <label>
           Contraseña
         </label>
-        <input type="password" [formField]="loginForm.password" autocomplete="current-password" [class.campo-error]="errorMsg()" />
+        <input type="password" [formField]="loginForm.password" [attr.aria-describedby]="loginForm.password().touched() && loginForm.password().invalid() ? 'error-password' : null" autocomplete="current-password" [class.campo-error]="errorMsg()" />
       </section>
         
       @if (loginForm.password().touched() && loginForm.password().invalid()) {
-      <small class="error">{{ loginForm.password().errors()[0].message }}</small>
+      <small class="error" role="alert" id="error-password">{{ loginForm.password().errors()[0].message }}</small>
       }
     </div>
 

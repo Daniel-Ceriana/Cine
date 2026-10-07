@@ -131,7 +131,7 @@
 
 .funcion__horario {
     font-size: var(--font-large);
-    color: var(--rojo);
+    color: var(--rojo-oscuro);
     line-height: 1;
 }
 

@@ -68,7 +68,7 @@
 }
 
 .producto__precio {
-    color: var(--rojo);
+    color: var(--rojo-oscuro);
 }
 
 .producto__ahorro {

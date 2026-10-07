@@ -184,9 +184,15 @@ small {
     font-size: var(--font-xsmall);
 }
 
+/* Foco del teclado: rojo oscuro, que se ve sobre el fondo crema (la mostaza casi no se distinguía).
+   Sobre la barra bordó se usa mostaza clara. */
 :focus-visible {
-    outline: 3px solid var(--mostaza);
+    outline: 3px solid var(--rojo-oscuro);
     outline-offset: 2px;
+}
+
+.cabecera :focus-visible {
+    outline-color: var(--mostaza-suave);
 }
 
 /* =====================================================================
@@ -282,6 +288,7 @@ input.campo-error:not([type='checkbox']):not([type='radio']):not(.mat-mdc-input-
     text-transform: uppercase;
     color: var(--crema-superficie);
     background-color: var(--rojo);
+    min-height: 44px; /* tamaño cómodo para tocar con el dedo */
     padding: var(--spacing-8) var(--spacing-16);
     border: 2px solid var(--rojo-oscuro);
     border-radius: var(--radio);
@@ -437,4 +444,18 @@ button:not([class*='mat-']):disabled {
 .mat-button-toggle-checked {
     outline: 2px solid var(--mostaza);
     outline-offset: -2px;
+}
+
+/* =====================================================================
+   MOVIMIENTO REDUCIDO: quien lo pide en su sistema no ve transiciones ni animaciones
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

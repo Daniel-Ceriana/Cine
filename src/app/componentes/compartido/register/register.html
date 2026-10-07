@@ -10,10 +10,10 @@
         <label>
           Nombre
         </label>
-        <input type="text" [formField]="registerForm.nombre" />
+        <input type="text" [formField]="registerForm.nombre" [attr.aria-describedby]="registerForm.nombre().touched() && registerForm.nombre().invalid() ? 'error-nombre' : null" />
       </section>
       @if (registerForm.nombre().touched() && registerForm.nombre().invalid()) {
-      <small class="error">{{ registerForm.nombre().errors()[0].message }}</small>
+      <small class="error" role="alert" id="error-nombre">{{ registerForm.nombre().errors()[0].message }}</small>
       }
     </div>
 
@@ -22,10 +22,10 @@
         <label>
           Apellido
         </label>
-        <input type="text" [formField]="registerForm.apellido" />
+        <input type="text" [formField]="registerForm.apellido" [attr.aria-describedby]="registerForm.apellido().touched() && registerForm.apellido().invalid() ? 'error-apellido' : null" />
       </section>
       @if (registerForm.apellido().touched() && registerForm.apellido().invalid()) {
-      <small class="error">{{ registerForm.apellido().errors()[0].message }}</small>
+      <small class="error" role="alert" id="error-apellido">{{ registerForm.apellido().errors()[0].message }}</small>
       }
     </div>
     <div class="item">
@@ -35,10 +35,10 @@
   <label>
     Fecha de nacimiento
   </label>
-  <app-selector-fecha [formField]="registerForm.fecha_nacimiento" [aniosAtras]="100" [aniosAdelante]="0" />
+  <app-selector-fecha [formField]="registerForm.fecha_nacimiento" [attr.aria-describedby]="registerForm.fecha_nacimiento().touched() && registerForm.fecha_nacimiento().invalid() ? 'error-fecha_nacimiento' : null" [aniosAtras]="100" [aniosAdelante]="0" />
 </section>
       @if (registerForm.fecha_nacimiento().touched() && registerForm.fecha_nacimiento().invalid()) {
-      <small class="error">{{ registerForm.fecha_nacimiento().errors()[0].message }}</small>
+      <small class="error" role="alert" id="error-fecha_nacimiento">{{ registerForm.fecha_nacimiento().errors()[0].message }}</small>
       }
 
     </div>
@@ -49,7 +49,7 @@
         <label>
           Tipo de sangre
         </label>
-        <select [formField]="registerForm.tipo_sangre">
+        <select [formField]="registerForm.tipo_sangre" [attr.aria-describedby]="registerForm.tipo_sangre().touched() && registerForm.tipo_sangre().invalid() ? 'error-tipo_sangre' : null">
           <option value="">Seleccioná...</option>
           @for (t of tiposSangre; track t) {
             <option [value]="t">{{ t }}</option>
@@ -57,7 +57,7 @@
         </select>
       </section>
       @if (registerForm.tipo_sangre().touched() && registerForm.tipo_sangre().invalid()) {
-      <small class="error">{{ registerForm.tipo_sangre().errors()[0].message }}</small>
+      <small class="error" role="alert" id="error-tipo_sangre">{{ registerForm.tipo_sangre().errors()[0].message }}</small>
       }
 
     </div>
@@ -68,7 +68,7 @@
         <label>
           Color de ojos
         </label>
-        <select [formField]="registerForm.color_ojos">
+        <select [formField]="registerForm.color_ojos" [attr.aria-describedby]="registerForm.color_ojos().touched() && registerForm.color_ojos().invalid() ? 'error-color_ojos' : null">
           <option value="">Seleccioná...</option>
           @for (c of coloresOjos; track c) {
             <option [value]="c">{{ c }}</option>
@@ -76,7 +76,7 @@
         </select>
       </section>
       @if (registerForm.color_ojos().touched() && registerForm.color_ojos().invalid()) {
-      <small class="error">{{ registerForm.color_ojos().errors()[0].message }}</small>
+      <small class="error" role="alert" id="error-color_ojos">{{ registerForm.color_ojos().errors()[0].message }}</small>
       }
 
     </div>
@@ -88,11 +88,11 @@
         <label>
           Dias de vacaciones
         </label>
-        <input type="number" [formField]="registerForm.dias_vacaciones" />
+        <input type="number" [formField]="registerForm.dias_vacaciones" [attr.aria-describedby]="registerForm.dias_vacaciones().touched() && registerForm.dias_vacaciones().invalid() ? 'error-dias_vacaciones' : null" />
         
       </section>
       @if (registerForm.dias_vacaciones().touched() && registerForm.dias_vacaciones().invalid()) {
-      <small class="error">{{ registerForm.dias_vacaciones().errors()[0].message }}</small>
+      <small class="error" role="alert" id="error-dias_vacaciones">{{ registerForm.dias_vacaciones().errors()[0].message }}</small>
       }
     </div>
     <div class="item">
@@ -103,11 +103,11 @@
         <label>
           Email
         </label>
-        <input type="email" [formField]="registerForm.email" autocomplete="email" />
+        <input type="email" [formField]="registerForm.email" [attr.aria-describedby]="registerForm.email().touched() && registerForm.email().invalid() ? 'error-email' : null" autocomplete="email" />
       </section>
 
       @if (registerForm.email().touched() && registerForm.email().invalid()) {
-      <small class="error">{{ registerForm.email().errors()[0].message }}</small>
+      <small class="error" role="alert" id="error-email">{{ registerForm.email().errors()[0].message }}</small>
       }
     </div>
 
@@ -120,11 +120,11 @@
         <label>
           Contraseña
         </label>
-        <input type="password" [formField]="registerForm.password" autocomplete="new-password" />
+        <input type="password" [formField]="registerForm.password" [attr.aria-describedby]="registerForm.password().touched() && registerForm.password().invalid() ? 'error-password' : null" autocomplete="new-password" />
       </section>
         
       @if (registerForm.password().touched() && registerForm.password().invalid()) {
-      <small class="error">{{ registerForm.password().errors()[0].message }}</small>
+      <small class="error" role="alert" id="error-password">{{ registerForm.password().errors()[0].message }}</small>
       }
     </div>
 
@@ -136,15 +136,15 @@
         <label>
           Repetir contraseña
         </label>
-        <input type="password" [formField]="registerForm.confirmPassword" autocomplete="new-password" />
+        <input type="password" [formField]="registerForm.confirmPassword" [attr.aria-describedby]="registerForm.confirmPassword().touched() && registerForm.confirmPassword().invalid() ? 'error-confirmPassword' : null" autocomplete="new-password" />
       </section>
         
       @if (registerForm.confirmPassword().touched() && registerForm.confirmPassword().invalid()) {
-      <small class="error">{{ registerForm.confirmPassword().errors()[0].message }}</small>
+      <small class="error" role="alert" id="error-confirmPassword">{{ registerForm.confirmPassword().errors()[0].message }}</small>
       }
 
       @if (errorMsg()) {
-      <p class="error">{{ errorMsg() }}</p>
+      <p class="error" role="alert">{{ errorMsg() }}</p>
       }
     </div>
 

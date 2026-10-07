@@ -1,0 +1,24 @@
+
+/* Enlace "Saltar al contenido": queda fuera de la pantalla y aparece cuando recibe el foco con el teclado */
+.saltar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    padding: var(--spacing-12) var(--spacing-20);
+    background-color: var(--crema-superficie);
+    color: var(--bordo);
+    font-weight: 700;
+    border: 2px solid var(--bordo);
+    border-radius: 0 0 var(--radio) 0;
+    transform: translateY(-120%);
+}
+
+.saltar:focus {
+    transform: translateY(0);
+}
+
+/* el contenido principal recibe el foco por programa (al saltar): no hace falta marcarlo */
+#contenido:focus {
+    outline: none;
+}

@@ -128,13 +128,14 @@
 
 .dia__funciones {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
     gap: var(--spacing-16);
 }
 
-/* Entrada: datos a la izquierda, talón con el botón a la derecha */
+/* Entrada: datos a la izquierda y talón con el botón a la derecha, las dos mitades del mismo tamaño */
 .funcion {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: stretch;
 }
 
@@ -153,7 +154,7 @@
 
 .funcion__horario {
     font-size: var(--font-large);
-    color: var(--rojo);
+    color: var(--rojo-oscuro);
     line-height: 1;
 }
 
@@ -217,4 +218,10 @@
         width: min(60%, 240px);
         margin: 0 auto;
     }
+}
+
+/* el botón ocupa todo el talón; si el texto no entra en una línea, baja a la siguiente */
+.funcion__accion .btn {
+    width: 100%;
+    text-align: center;
 }

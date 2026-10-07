@@ -5,12 +5,12 @@
     etiquetaCrear="Crear sala"
     etiquetaVer="Ver salas"></app-menu-crear-ver>
 
-<main class="pagina">
+<div class="pagina">
   @if (cargando()) {
     <p>Cargando salas...</p>
   }
   @if (errorMsg()) {
-    <p class="error">{{ errorMsg() }}</p>
+    <p class="error" role="alert">{{ errorMsg() }}</p>
   }
   @if (!cargando() && salas().length === 0) {
     <p>Todavía no hay salas creadas.</p>
@@ -39,4 +39,4 @@
       </article>
     }
   </section>
-</main>
+</div>

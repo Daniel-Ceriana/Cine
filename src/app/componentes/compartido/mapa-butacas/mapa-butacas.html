@@ -1,7 +1,11 @@
 <div class="mapa">
   <div class="mapa__pantalla texto-ticket">PANTALLA</div>
 
-  <div class="mapa__scroll">
+  <p class="mapa__ayuda" id="mapa-ayuda">
+    Con el teclado: Tab para entrar al mapa, flechas para moverte entre butacas, Enter o espacio para elegir.
+  </p>
+
+  <div class="mapa__scroll" role="group" aria-label="Mapa de butacas" aria-describedby="mapa-ayuda">
     <div class="mapa__salon">
       @for (f of filas; track $index) {
         @if (f.fila === '') {
@@ -24,7 +28,11 @@
                   [style.grid-column]="b.numero"
                   [attr.aria-label]="titulo(b)"
                   [attr.aria-pressed]="estadoDe(b.codigo) === 'seleccionada'"
+                  [attr.data-codigo]="b.codigo"
+                  [attr.tabindex]="activa() === b.codigo ? 0 : -1"
                   [title]="titulo(b)"
+                  (focus)="alEnfocar(b.codigo)"
+                  (keydown)="alTeclear($event, f, b)"
                   (click)="butacaClick.emit(b.codigo)">
                   {{ b.numero }}
                 </button>

@@ -1,4 +1,4 @@
-<main class="pagina listado">
+<div class="pagina listado">
 
     <!-- Se filtra encadenando el pipe: por nombre (contiene), por género (exacto) y solo destacadas -->
     @let filtradas = peliculasConOferta()
@@ -58,7 +58,7 @@
     <p class="listado__mensaje">Cargando películas...</p>
     }
     @if (errorMsg()) {
-    <p class="error">{{ errorMsg() }}</p>
+    <p class="error" role="alert">{{ errorMsg() }}</p>
     }
     @if (!cargando() && peliculas().length === 0) {
     <p class="listado__mensaje">No hay películas disponibles.</p>
@@ -73,4 +73,4 @@
         }
     </section>
 
-</main>
+</div>

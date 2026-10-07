@@ -162,7 +162,7 @@
         </div>
       }
       @if (errorMsg()) {
-        <p class="error">{{ errorMsg() }}</p>
+        <p class="error" role="alert">{{ errorMsg() }}</p>
       }
       <button type="submit" [disabled]="funcionForm().submitting()">
         {{ funcionForm().submitting() ? 'Guardando...' : (esEdicion() ? 'Modificar' : 'Crear') }}

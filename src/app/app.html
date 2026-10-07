@@ -1,2 +1,5 @@
+<a class="saltar" href="#contenido" (click)="saltarAlContenido($event)">Saltar al contenido</a>
 <app-nav></app-nav>
-<router-outlet></router-outlet>
+<div id="contenido" tabindex="-1" #principal>
+  <router-outlet></router-outlet>
+</div>

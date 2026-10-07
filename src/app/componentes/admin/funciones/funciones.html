@@ -5,7 +5,7 @@
     etiquetaCrear="Crear funciones"
     etiquetaVer="Ver funciones"></app-menu-crear-ver>
 
-<main class="pagina funciones">
+<div class="pagina funciones">
   <form class="funciones__filtros" (submit)="$event.preventDefault()">
     <label class="funciones__check">
       <input type="checkbox" [formField]="filtrosForm.incluirPasadas" />
@@ -17,7 +17,7 @@
     <p>Cargando funciones...</p>
   }
   @if (errorMsg()) {
-    <p class="error">{{ errorMsg() }}</p>
+    <p class="error" role="alert">{{ errorMsg() }}</p>
   }
 
   @if (ultimaCancelacion(); as r) {
@@ -109,4 +109,4 @@
       }
     </section>
   }
-</main>
+</div>

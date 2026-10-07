@@ -1022,6 +1022,30 @@ saldo se vuelve a leer al entrar, para que refleje la última compra.
   los datos se podrían leer con la clave pública. Se corrige en la sesión S15 (activar RLS), donde además las
   funciones de los triggers tendrán que ejecutarse con permisos propios.
 
+### 6.29 Accesibilidad y pasada general de estilo
+
+- **Estructura.** Hay **un solo** `<main id="contenido">` para toda la aplicación (en `app.html`) y, antes del menú, un
+  enlace **"Saltar al contenido"** que aparece al recibir el foco con el teclado y lo manda al contenido principal.
+  Las pantallas dejaron de traer su propio `<main>` (dos anidados no son válidos): ahora usan `<div class="pagina">`.
+- **Mapa de butacas con el teclado.** Las 518 butacas no pueden ser 518 paradas del tabulador. Solo **una** (la
+  "activa") es parada de Tab (*roving tabindex*): con **Tab** se entra al mapa, con las **flechas** se mueve entre
+  butacas (arriba y abajo van a la más cercana de la misma columna, porque las filas no empiezan en el mismo número),
+  **Inicio/Fin** van al principio y al final de la fila y **Enter o espacio** la eligen, como un clic. Las ocupadas
+  siguen siendo enfocables para que un lector de pantalla pueda recorrer todo el mapa. El grupo tiene `aria-label` y
+  una descripción con estas instrucciones.
+- **Foco visible.** El anillo del teclado pasa a rojo oscuro (la mostaza casi no se distinguía sobre el crema) y a
+  mostaza clara sobre la barra bordó.
+- **Movimiento reducido.** Una regla global `prefers-reduced-motion` quita transiciones y animaciones a quien lo pide en
+  su sistema.
+- **Tamaños táctiles.** Botones y enlaces del menú con al menos 44 px de alto; las butacas del mapa quedan afuera
+  (tienen su propio tamaño).
+- **Errores.** Todos los avisos de error llevan `role="alert"`. En los formularios más viejos (ingreso, registro,
+  película y sala) cada mensaje está ligado a su campo con `aria-describedby`.
+- **Contraste.** Se midió el contraste de los colores del tema: casi todo supera 4,5:1. El rojo del tema sobre el fondo
+  crema daba 4,42, así que los textos chicos en rojo pasaron al rojo oscuro.
+- **Cerrar sesión.** Ya no es un texto suelto: es una tarjeta estilo ticket con `role="status"`.
+- **404.** Se decidió mantener la redirección a la cartelera para las direcciones que no existen.
+
 ---
 
 ## 7. Tiempo real
@@ -1079,7 +1103,7 @@ que se está viendo.
 
 ## 10. Limitaciones y decisiones abiertas
 
-**Pendiente de implementar** (detalle en las tablas de la sección 3): ajustes finales de estilo y accesibilidad, verificación de la PWA y cierre de la entrega.
+**Pendiente de implementar** (detalle en las tablas de la sección 3): verificación de la PWA y cierre de la entrega.
 La PWA y el despliegue están armados y falta verificarlos.
 
 **PWA y despliegue (armados, falta verificar)**

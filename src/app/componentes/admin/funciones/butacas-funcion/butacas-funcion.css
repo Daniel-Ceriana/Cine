@@ -24,7 +24,7 @@
 
 .contador__valor {
     font-size: var(--font-large);
-    color: var(--rojo);
+    color: var(--rojo-oscuro);
 }
 
 .contador__nombre {

@@ -4,7 +4,7 @@
 }
 
 .enlace-alterno a {
-    color: var(--rojo);
+    color: var(--rojo-oscuro);
     font-weight: 700;
     text-decoration: underline;
 }

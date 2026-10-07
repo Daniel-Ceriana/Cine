@@ -1,4 +1,4 @@
-<main class="pagina">
+<div class="pagina">
 
   @if (cargando()) {
     <p>Cargando función...</p>
@@ -35,7 +35,7 @@
         <p class="aviso aviso--info" role="status">{{ avisoMsg() }}</p>
       }
       @if (errorMsg()) {
-        <p class="error">{{ errorMsg() }}</p>
+        <p class="error" role="alert">{{ errorMsg() }}</p>
       }
       @if (paso() === 'candy') {
         <p class="cuenta texto-ticket" [class.cuenta--urgente]="segundosRestantes() < 60">
@@ -273,7 +273,7 @@
         <p class="datos__ayuda">A nombre de {{ compra()!.nombre }} · {{ compra()!.email }}</p>
 
         @if (errorMsg()) {
-          <p class="error">{{ errorMsg() }}</p>
+          <p class="error" role="alert">{{ errorMsg() }}</p>
         }
 
         <div class="paso-pago__acciones">
@@ -327,7 +327,7 @@
         </div>
 
         @if (errorMsg()) {
-          <p class="error">{{ errorMsg() }}</p>
+          <p class="error" role="alert">{{ errorMsg() }}</p>
         }
         <button type="button" (click)="descargarPdf()" [disabled]="descargando()">
           {{ descargando() ? 'Generando PDF...' : 'Descargar entrada en PDF' }}
@@ -342,8 +342,8 @@
 
   @if (!cargando() && !funcion()) {
     @if (errorMsg()) {
-      <p class="error">{{ errorMsg() }}</p>
+      <p class="error" role="alert">{{ errorMsg() }}</p>
     }
     <a class="btn btn--secundario" routerLink="/home">Volver a la cartelera</a>
   }
-</main>
+</div>

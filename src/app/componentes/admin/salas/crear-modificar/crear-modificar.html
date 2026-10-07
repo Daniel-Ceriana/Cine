@@ -10,20 +10,20 @@
     <div class="item">
       <section>
         <label>Número de sala</label>
-        <input type="number" [formField]="salaForm.numero" />
+        <input type="number" [formField]="salaForm.numero" [attr.aria-describedby]="salaForm.numero().touched() && salaForm.numero().invalid() ? 'error-numero' : null" />
       </section>
       @if (salaForm.numero().touched() && salaForm.numero().invalid()) {
-        <small class="error">{{ salaForm.numero().errors()[0].message }}</small>
+        <small class="error" role="alert" id="error-numero">{{ salaForm.numero().errors()[0].message }}</small>
       }
     </div>
 
     <div class="item">
       <section>
         <label>Nombre</label>
-        <input type="text" [formField]="salaForm.nombre" />
+        <input type="text" [formField]="salaForm.nombre" [attr.aria-describedby]="salaForm.nombre().touched() && salaForm.nombre().invalid() ? 'error-nombre' : null" />
       </section>
       @if (salaForm.nombre().touched() && salaForm.nombre().invalid()) {
-        <small class="error">{{ salaForm.nombre().errors()[0].message }}</small>
+        <small class="error" role="alert" id="error-nombre">{{ salaForm.nombre().errors()[0].message }}</small>
       }
     </div>
 
@@ -52,7 +52,7 @@
     }
 
     @if (errorMsg()) {
-      <p class="error">{{ errorMsg() }}</p>
+      <p class="error" role="alert">{{ errorMsg() }}</p>
     }
 
     <div class="item">

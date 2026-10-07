@@ -1,11 +1,11 @@
-<main class="pagina">
+<div class="pagina">
   <a class="btn btn--secundario volver" routerLink="/home">← Cartelera</a>
 
   @if (cargando()) {
     <p>Cargando película...</p>
   }
   @if (errorMsg()) {
-    <p class="error">{{ errorMsg() }}</p>
+    <p class="error" role="alert">{{ errorMsg() }}</p>
   }
 
   @if (pelicula(); as p) {
@@ -106,4 +106,4 @@
 
     <app-resenias-pelicula [peliculaId]="p.id" />
   }
-</main>
+</div>

@@ -28,7 +28,7 @@
 
 .sala__numero {
     font-size: var(--font-xsmall);
-    color: var(--rojo);
+    color: var(--rojo-oscuro);
     letter-spacing: 0.15em;
 }
 

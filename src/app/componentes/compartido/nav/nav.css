@@ -33,7 +33,9 @@
 }
 
 .navbar__link {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px; /* tamaño cómodo para tocar con el dedo */
     font-size: var(--font-xsmall);
     font-weight: 600;
     text-transform: uppercase;
