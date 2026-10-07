@@ -1,6 +1,6 @@
 // crear-modificar.ts
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   form,
   FormField,
@@ -19,7 +19,7 @@ import { SelectorFecha } from '../../../compartido/selector-fecha/selector-fecha
 
 
 @Component({
-  imports: [FormField, RouterLink, SelectorFecha],
+  imports: [FormField, SelectorFecha],
   selector: 'app-crear-modificar',
   styleUrls: ['../../../compartido/stylesCompartidos/forms.css', './crear-modificar.css'],
   templateUrl: './crear-modificar.html',
