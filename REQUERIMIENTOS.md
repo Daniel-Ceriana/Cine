@@ -171,8 +171,8 @@ tablas usa ese número.
 | RNF-03 | Estilo visual **único y producido**. | Hecho |
 | RNF-04 | Uso correcto de Angular, buenas prácticas y técnicas vistas en clase. | En curso |
 | RNF-05 | Integración con **Supabase**. | Hecho |
-| RNF-06 | Integración de **PWA**. | Hecho (íconos propios, aviso de versión nueva y de sin conexión; falta correr Lighthouse sobre la URL publicada) |
-| RNF-07 | Aplicación **desplegada** con URL funcional. | Parcial (Firebase Hosting configurado; falta confirmar URL y URLs permitidas en Supabase Auth) |
+| RNF-06 | Integración de **PWA**. | Hecho (íconos propios, aviso de versión nueva y de sin conexión; verificada con Lighthouse sobre la URL publicada) |
+| RNF-07 | Aplicación **desplegada** con URL funcional. | Hecho (publicada en Firebase Hosting y verificada) |
 | RNF-08 | Código en GitHub. | Hecho |
 | RNF-09 | README con arquitectura y decisiones técnicas. | Hecho (`README.md`: cómo correr el proyecto, base de datos, despliegue, arquitectura y decisiones) |
 | RNF-10 | Interfaz usable en celular (el cliente compra desde el teléfono). | Parcial (hecha mobile-first y con botones táctiles de 44 px; falta probarla en dispositivos reales) |
@@ -256,4 +256,4 @@ Filas R–T   1  2  3  4  |  6 … 25                        | 27 28 29 30   VIP
 - Una página 404: las direcciones que no existen redirigen a la cartelera (decisión acordada).
 - Pruebas automáticas propias (los `.spec.ts` son los de la plantilla de Angular).
 - Limpieza automática de reservas vencidas con `pg_cron`: se liberan al consultar (`liberar_reservas_vencidas`).
-- **RLS** (seguridad por filas): hecha en la sesión S15 con `supabase/019_rls.sql` (ver `README.md`, sección 9). Falta ejecutarla en Supabase y probar cada rol.
+- **RLS** (seguridad por filas): hecha en la sesión S15 con `supabase/019_rls.sql` (ver `README.md`, sección 9). Ejecutada en Supabase y probada con cada rol.

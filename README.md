@@ -13,7 +13,6 @@ almacenamiento y tiempo real), sin servidor propio.
 |-----------|--------------|
 | [`REQUERIMIENTOS.md`](REQUERIMIENTOS.md) | Todos los requerimientos pedidos por el cliente, las reglas de negocio acordadas y el estado de cada punto. |
 | `README.md` (este archivo) | Cómo correr y desplegar el proyecto, y la arquitectura con el porqué de cada decisión técnica. |
-| `docs/HOJA_DE_RUTA.md` | Plan de trabajo por sesiones y estado general (no está versionada por ahora). |
 
 ---
 
@@ -992,6 +991,10 @@ que se está viendo.
   | Bucket de imágenes | Ve | Ve | Ve | Ve y sube |
 
   Todo lo que modifica compras, puntos, crédito, notificaciones, reseñas o alertas pasa por funciones SQL.
+- **Vistas.** Una vista no lleva políticas: corre con los permisos de su dueño. `peliculas_puntuacion` (promedio y
+  cantidad de reseñas por película, sin datos personales) queda pública a propósito para la cartelera sin sesión.
+  `log_usuarios` usa `security_invoker`, así que respeta el RLS de quien consulta y solo el admin ve algo. Por eso al
+  revisar el panel de Supabase puede aparecer `peliculas_puntuacion` "sin políticas": no es un hueco.
 - **Funciones SQL.** Todas pasan a `SECURITY DEFINER` con `search_path` fijo (`public, pg_temp`), así pueden tocar
   tablas cerradas; a cambio, **cada una controla por dentro quién la llama** y el `EXECUTE` se revoca a todos y se
   otorga solo a quien corresponde: la compra sin cuenta y el catálogo (visitante), `cancelar_compra`, reseñas, alertas y
@@ -1023,7 +1026,7 @@ que se está viendo.
 
 ## 10. Limitaciones y decisiones abiertas
 
-**Pendiente de implementar** (detalle en las tablas de la sección 3): confirmar el despliegue y cerrar la entrega.
+**Pendiente de implementar:** nada. El despliegue está publicado y verificado.
 
 **PWA y despliegue**
 - Hosting en **Firebase Hosting**. `firebase.json` publica `dist/tp1/browser` (la salida de `ng build`, no la carpeta
@@ -1075,6 +1078,3 @@ que se está viendo.
   aviso de que no están disponibles.
 
 **Decisiones a revisar antes de la entrega**
-- Correr Lighthouse sobre la URL publicada y confirmar las URLs permitidas en Supabase Auth.
-- Decidir si las carpetas `supabase/` y `docs/` se suben al repositorio (hoy están en `.gitignore`).
-- Ejecutar `019_rls.sql` en Supabase y probar cada rol (lista de pruebas en la sesión S15 de `docs/HOJA_DE_RUTA.md`).
