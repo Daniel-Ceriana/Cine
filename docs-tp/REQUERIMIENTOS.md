@@ -8,7 +8,7 @@ Este documento resume **todos** los requerimientos pedidos por el cliente en el 
 reglas de negocio que se acordaron durante el desarrollo y el **estado actual** de cada punto.
 
 > Cómo está armada la aplicación, por qué se tomó cada decisión técnica, cómo correrla y cómo desplegarla está en el
-> [`README.md`](README.md).
+> [`README-TP.md`](README-TP.md).
 
 **Estado:** `Hecho` · `Parcial` (funciona, pero le falta una parte) · `Pendiente` · `Fuera de alcance`
 
@@ -174,7 +174,7 @@ tablas usa ese número.
 | RNF-06 | Integración de **PWA**. | Hecho (íconos propios, aviso de versión nueva y de sin conexión; verificada con Lighthouse sobre la URL publicada) |
 | RNF-07 | Aplicación **desplegada** con URL funcional. | Hecho (publicada en Firebase Hosting y verificada) |
 | RNF-08 | Código en GitHub. | Hecho |
-| RNF-09 | README con arquitectura y decisiones técnicas. | Hecho (`README.md`: cómo correr el proyecto, base de datos, despliegue, arquitectura y decisiones) |
+| RNF-09 | README con arquitectura y decisiones técnicas. | Hecho (`README-TP.md`: cómo correr el proyecto, base de datos, despliegue, arquitectura y decisiones) |
 | RNF-10 | Interfaz usable en celular (el cliente compra desde el teléfono). | Parcial (hecha mobile-first y con botones táctiles de 44 px; falta probarla en dispositivos reales) |
 | RNF-11 | **Accesibilidad**: teclado, foco visible, lectores de pantalla, contraste, movimiento reducido (ver 6.29). | Hecho |
 
@@ -256,4 +256,4 @@ Filas R–T   1  2  3  4  |  6 … 25                        | 27 28 29 30   VIP
 - Una página 404: las direcciones que no existen redirigen a la cartelera (decisión acordada).
 - Pruebas automáticas propias (los `.spec.ts` son los de la plantilla de Angular).
 - Limpieza automática de reservas vencidas con `pg_cron`: se liberan al consultar (`liberar_reservas_vencidas`).
-- **RLS** (seguridad por filas): hecha en la sesión S15 con `supabase/019_rls.sql` (ver `README.md`, sección 9). Ejecutada en Supabase y probada con cada rol.
+- **RLS** (seguridad por filas): hecha en la sesión S15 con `supabase/019_rls.sql` (ver `README-TP.md`, sección 9). Ejecutada en Supabase y probada con cada rol.
