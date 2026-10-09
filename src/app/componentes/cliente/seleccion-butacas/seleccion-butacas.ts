@@ -12,7 +12,7 @@ import { ProductoService } from '../../../services/producto-service';
 import { ComboService } from '../../../services/combo-service';
 import { Auth } from '../../../services/auth';
 import { FuncionConRelaciones } from '../../../modelos/funcion-model';
-import { CompraModel, OcupacionButaca } from '../../../modelos/compra-model';
+import { ButacaOcupada, CompraModel } from '../../../modelos/compra-model';
 import { CuponAplicable } from '../../../modelos/cupon-model';
 import { CategoriaConProductos } from '../../../modelos/producto-model';
 import { ComboConItems, ItemComboCarrito } from '../../../modelos/combo-model';
@@ -70,7 +70,7 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
   private cuentaRegresiva: ReturnType<typeof setInterval> | null = null;
 
   funcion = signal<FuncionConRelaciones | null>(null);
-  ocupacion = signal<OcupacionButaca[]>([]);
+  ocupacion = signal<ButacaOcupada[]>([]);
   seleccionadas = signal<string[]>([]);
   recargoVip = signal(0);
   cuponMio = signal<CuponAplicable | null>(null); // el cupón que le corresponde hoy (solo con cuenta)
@@ -295,7 +295,7 @@ export class SeleccionButacas implements OnInit, OnDestroy, ConfirmarSalida {
 
   private async cargarOcupacion() {
     try {
-      this.ocupacion.set(await this.butacaService.getOcupacion(this.funcionId));
+      this.ocupacion.set(await this.butacaService.getOcupadas(this.funcionId));
     } catch (e: any) {
       this.errorMsg.set(e?.message ?? 'No se pudieron cargar las butacas');
       return;

@@ -8,11 +8,8 @@ export class ReseniaService {
 
   // Reseñas de una película, de la más nueva a la más vieja, con el nombre de quien la escribió
   async getDePelicula(peliculaId: string): Promise<ReseniaConAutor[]> {
-    const { data, error } = await this.supabase.client
-      .from('resenias')
-      .select('*, profiles(nombre, apellido)')
-      .eq('pelicula_id', peliculaId)
-      .order('created_at', { ascending: false });
+    // Función SQL: devuelve el autor como nombre + inicial del apellido (la tabla profiles no se lee desde acá)
+    const { data, error } = await this.supabase.client.rpc('resenias_de_pelicula', { p_pelicula_id: peliculaId });
 
     if (error) throw error;
     return data as unknown as ReseniaConAutor[];

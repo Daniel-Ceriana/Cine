@@ -6,7 +6,7 @@ import {
   COLUMNAS_PASILLO,
   ButacaPlantilla,
 } from '../../../modelos/sala-plantilla';
-import { ButacaEstadoVista, OcupacionButaca } from '../../../modelos/compra-model';
+import { ButacaEstadoVista, ButacaOcupada } from '../../../modelos/compra-model';
 import { ETIQUETA_ESTADO_BUTACA, ETIQUETA_TIPO_BUTACA } from '../../../pipes/butaca/butaca.pipes';
 
 interface FilaMapa {
@@ -22,7 +22,7 @@ interface FilaMapa {
   styleUrl: './mapa-butacas.css',
 })
 export class MapaButacas {
-  ocupacion = input<OcupacionButaca[]>([]);
+  ocupacion = input<ButacaOcupada[]>([]);
   seleccionadas = input<string[]>([]); // las que eligió este usuario
   resaltada = input<string | null>(null); // la que el admin está mirando
   butacaClick = output<string>();

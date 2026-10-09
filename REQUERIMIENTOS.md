@@ -256,4 +256,4 @@ Filas R–T   1  2  3  4  |  6 … 25                        | 27 28 29 30   VIP
 - Una página 404: las direcciones que no existen redirigen a la cartelera (decisión acordada).
 - Pruebas automáticas propias (los `.spec.ts` son los de la plantilla de Angular).
 - Limpieza automática de reservas vencidas con `pg_cron`: se liberan al consultar (`liberar_reservas_vencidas`).
-- **RLS** (seguridad por filas): está programada como última etapa del proyecto (ver `README.md`, sección 9).
+- **RLS** (seguridad por filas): hecha en la sesión S15 con `supabase/019_rls.sql` (ver `README.md`, sección 9). Falta ejecutarla en Supabase y probar cada rol.

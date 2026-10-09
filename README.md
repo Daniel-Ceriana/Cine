@@ -39,12 +39,12 @@ npm install
      supabaseKey: 'TU-CLAVE-PUBLICA',
    };
    ```
-   La clave pública está pensada para ir en el navegador (ver la sección 9 sobre qué implica no tener RLS todavía).
+   La clave pública está pensada para ir en el navegador (ver la sección 9: con RLS activa, la base decide qué puede leer y escribir cada rol).
 
 ### 3. Armar la base de datos
 Ejecutar **en orden** los scripts de la carpeta `supabase/` en **SQL Editor** de Supabase, uno por uno y completos:
 
-`000_tablas_base.sql` → `001` → `002` → … → `018_log_actividad.sql`
+`000_tablas_base.sql` → `001` → `002` → … → `018_log_actividad.sql` → `019_rls.sql`
 
 - El `000` crea las tablas base (`profiles`, `peliculas`, `generos`, `pelicula_generos`), el bucket público de imágenes
   y sus políticas. Solo hace falta en un proyecto nuevo.
@@ -413,6 +413,7 @@ Los scripts están en `supabase/` y se ejecutan **en orden** desde el editor SQL
 | `016_reporte_facturacion.sql` | `reporte_facturacion(desde, hasta)`: una fila por día con movimiento, solo para el admin (no agrega tablas) |
 | `017_graficos.sql` | `ranking_peliculas`, `ranking_productos` y `ranking_combos`: los más vendidos de un período, solo para el admin (no agrega tablas) |
 | `018_log_actividad.sql` | `log_actividad` y la vista `log_usuarios`, los triggers que escriben el log (películas, salas, productos, categorías, combos, productos de combos, cupones, recompensas, configuración, funciones, roles y validaciones) y `guardar_combo` (ahora solo toca los productos que cambian) |
+| `019_rls.sql` | Seguridad (S15): helpers de rol, RLS en todas las tablas con sus políticas, todas las funciones en `SECURITY DEFINER`, broadcast de butacas, `buscar_entrada` y `resenias_de_pelicula` |
 
 ---
 
@@ -901,9 +902,8 @@ saldo se vuelve a leer al entrar, para que refleje la última compra.
   despliega y muestra el detalle (campo / antes / después, los datos, la lista de funciones o los cambios de productos),
   con nombres y valores legibles (pesos, Sí/No, fechas en hora argentina, roles).
 - **Retención.** Se conserva todo; no hay borrado automático (no hay tareas programadas).
-- **Limitación conocida.** Como el resto del sistema, la tabla no tiene RLS: la pantalla es solo para el admin, pero
-  los datos se podrían leer con la clave pública. Se corrige en la sesión S15 (activar RLS), donde además las
-  funciones de los triggers tendrán que ejecutarse con permisos propios.
+- **Seguridad.** La tabla solo la lee el admin (política RLS) y los triggers la escriben con funciones `SECURITY DEFINER`
+  (ver sección 9).
 
 ### 6.29 Accesibilidad y pasada general de estilo
 
@@ -974,16 +974,50 @@ que se está viendo.
 
 - **Autenticación** con Supabase Auth (email y contraseña).
 - **Roles** en `profiles.rol`; los guards (`canMatch`) leen el rol que `Auth` guarda en memoria y redirigen según el caso.
-- **Sin RLS (Row Level Security).** Por decisión del proyecto para este TP, las tablas no tienen políticas de acceso.
-  Esto significa que **quien tenga la clave pública (`anon`) podría leer y modificar tablas directamente**, salteando
-  la interfaz. Los guards de Angular protegen la navegación, no los datos.
-  Las reglas de negocio críticas sí se validan en la base (secciones 6.3 a 6.11).
-  En un sistema real se activaría RLS con políticas por rol, y las operaciones sensibles solo se permitirían
-  mediante las funciones SQL.
-  **Está programado activarla en todas las tablas al terminar el resto de la hoja de ruta** (sesión S15 de
-  `docs/HOJA_DE_RUTA.md`): hasta entonces hay que tomarla como una limitación conocida.
-- La clave pública de Supabase está en `src/environments/environment.ts`. Es una clave pensada para navegadores,
-  pero por lo anterior conviene no publicar el proyecto de Supabase con datos reales.
+- **RLS (Row Level Security) activa en todas las tablas** (`supabase/019_rls.sql`, sesión S15). Los guards de Angular
+  solo protegen la navegación; lo que protege los datos es la base. Con la clave pública y sin sesión no se puede leer
+  ni escribir nada que no corresponda.
+- **Quién puede qué** (RLS activa = sin política, sin acceso):
+
+  | Tabla | Visitante (sin sesión) | Cliente | Empleado | Admin |
+  |-------|------------------------|---------|----------|-------|
+  | Catálogo: películas, géneros, salas, butacas, funciones, productos, categorías, combos, configuración, reseñas | Lee | Lee | Lee | Lee y escribe |
+  | `recompensas` | No | Lee | Lee | Lee y escribe |
+  | `cupones` | No | No (usa `mi_cupon()`) | No | Lee y escribe |
+  | `profiles` | No | Solo la suya; puede crearla al registrarse (siempre como cliente, sin puntos ni crédito) | Solo la suya | Lee todas; cambia solo `rol` |
+  | `compras` y sus butacas, productos y combos | No | Solo las suyas | No | Compras y butacas: lee |
+  | `puntos_movimientos`, `credito_movimientos`, `alertas_estreno` | No | Solo los suyos | No | No |
+  | `notificaciones` | No | Solo las suyas; puede marcarlas como leídas (solo esa columna) | No | No |
+  | `log_actividad` y vista `log_usuarios` | No | No | No | Lee |
+  | Bucket de imágenes | Ve | Ve | Ve | Ve y sube |
+
+  Todo lo que modifica compras, puntos, crédito, notificaciones, reseñas o alertas pasa por funciones SQL.
+- **Funciones SQL.** Todas pasan a `SECURITY DEFINER` con `search_path` fijo (`public, pg_temp`), así pueden tocar
+  tablas cerradas; a cambio, **cada una controla por dentro quién la llama** y el `EXECUTE` se revoca a todos y se
+  otorga solo a quien corresponde: la compra sin cuenta y el catálogo (visitante), `cancelar_compra`, reseñas, alertas y
+  `mi_cupon` (con sesión), `evaluar_codigo` / `validar_codigo` (rol de empleado o admin, controlado adentro) y las
+  de administración (`crear_funciones`, `modificar_funciones`, `cancelar_funcion`, `guardar_combo`, reportes y
+  rankings: `exigir_admin()`). Las internas (`log_*`, `compensar_compra`, `colocar_funcion`…) no las puede llamar nadie
+  desde afuera. `confirmar_pago` y `liberar_compra` ahora verifican con `exigir_duenio_compra()` que la compra con cuenta
+  sea de quien la toca.
+- **Compra sin cuenta.** Un visitante nunca lee `compras`: crea y paga con funciones (la compra se maneja con su `id`,
+  un uuid imposible de adivinar) y recupera su entrada con `buscar_entrada(código, email)`, que ahora devuelve la entrada
+  completa y da siempre el mismo error si no coinciden los dos datos.
+- **Butacas en tiempo real por broadcast.** Antes el mapa leía `compra_butacas` (con nombre, email y total del
+  comprador). Ahora el cliente pide `butacas_ocupadas(funcion)`, que devuelve solo código, estado y vencimiento, y un
+  trigger emite un mensaje mínimo a un canal privado `butacas:<id>` con `realtime.send`. Una política sobre
+  `realtime.messages` deja *escuchar* esos canales y nadie puede enviar desde el cliente. El mensaje solo avisa: la
+  pantalla vuelve a pedir la lista. Solo el admin lee `compra_butacas` con los datos de la compra (pantalla de butacas
+  de la función).
+- **Reseñas.** El autor sale de `resenias_de_pelicula()`, que devuelve nombre + inicial del apellido (el apellido
+  completo nunca sale de la base).
+- **Alta de cuenta.** El cliente inserta su fila en `profiles` justo después de `signUp` (requiere "Confirm email"
+  desactivado, como ya estaba); la política obliga `rol = 'cliente'` y saldos en cero.
+- **Verificación.** El final de `019_rls.sql` corta con error si una función de administración quedó sin su control,
+  si alguna función no es `SECURITY DEFINER` o si alguna tabla quedó sin RLS.
+- **Marcha atrás.** Hay un bloque comentado al final del script que desactiva RLS en todas las tablas.
+- La clave pública de Supabase está en `src/environments/environment.ts`. Es una clave pensada para navegadores: con
+  RLS activa, por sí sola solo da acceso a lo que se describe arriba.
 
 ---
 
@@ -1028,7 +1062,7 @@ que se está viendo.
 - La regla de precio vigente está en Angular y en SQL (ver 6.14).
 - El cliente solo llega a la selección de butacas desde el detalle de la película.
 - No hay pruebas automáticas propias todavía.
-- **Sin RLS** hasta la sesión S15 (ver sección 9).
+- La compra sin cuenta se protege con un uuid como "llave" y el código de 8 caracteres + email; no hay límite de intentos de búsqueda (no hay servidor propio donde ponerlo).
 - **El build muestra dos avisos** que se decidió dejar por ahora: el paquete inicial pesa unos 590 kB (el aviso es a
   partir de 500 kB; casi todo es Angular y Supabase, y unos 63 kB son de Angular Material, que se descarga en todas
   las pantallas porque sus proveedores de fechas están en `app.config.ts` aunque solo los use el formulario de
@@ -1043,4 +1077,4 @@ que se está viendo.
 **Decisiones a revisar antes de la entrega**
 - Correr Lighthouse sobre la URL publicada y confirmar las URLs permitidas en Supabase Auth.
 - Decidir si las carpetas `supabase/` y `docs/` se suben al repositorio (hoy están en `.gitignore`).
-- Activar RLS en todas las tablas (sesión S15) y volver a probar cada rol.
+- Ejecutar `019_rls.sql` en Supabase y probar cada rol (lista de pruebas en la sesión S15 de `docs/HOJA_DE_RUTA.md`).

@@ -53,7 +53,10 @@ export interface CompraButacaModel {
   reservada_hasta: string | null;
 }
 
-// Butaca ocupada de una función, con los datos de la compra (para el admin)
+// Lo único que ve el público de una butaca ocupada (función SQL butacas_ocupadas): sin datos de la compra
+export type ButacaOcupada = Pick<CompraButacaModel, 'butaca_codigo' | 'estado' | 'reservada_hasta'>;
+
+// Butaca ocupada de una función, con los datos de la compra (solo para el admin)
 export interface OcupacionButaca extends CompraButacaModel {
   compras: Pick<CompraModel, 'nombre' | 'email' | 'estado' | 'total' | 'candy_subtotal' | 'candy_descuento' | 'usuario_id' | 'pagada_at' | 'created_at'>;
 }

@@ -89,23 +89,15 @@ export class CompraService {
     return data as unknown as CompraDetalle[];
   }
 
-  // Quien compró sin cuenta recupera su entrada con código + email (función SQL buscar_entrada).
+  // Quien compró sin cuenta recupera su entrada con código + email (función SQL buscar_entrada, que ya devuelve la entrada completa porque la tabla compras no se lee sin cuenta).
   // Si no coinciden, el error es siempre el mismo.
   async buscarEntrada(codigo: string, email: string): Promise<CompraDetalle> {
-    const { data: id, error } = await this.supabase.client.rpc('buscar_entrada', {
+    const { data, error } = await this.supabase.client.rpc('buscar_entrada', {
       p_codigo: codigo,
       p_email: email,
     });
     if (error) throw error;
-
-    const { data, error: errorLectura } = await this.supabase.client
-      .from('compras')
-      .select(SELECT_DETALLE)
-      .eq('id', id)
-      .single();
-
-    if (errorLectura) throw errorLectura;
-    return data as unknown as CompraDetalle;
+    return data as CompraDetalle;
   }
 
   // Cancela la compra (hasta N horas antes de la función): su total vuelve como crédito
